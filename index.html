@@ -339,7 +339,7 @@ input, textarea {
 }
 
 .detail-map {
-  height: 180px;
+  height: 200px;
   border-radius: var(--radius-md);
   overflow: hidden;
   border: 1px solid var(--gray-light);
@@ -503,6 +503,8 @@ input, textarea {
   justify-content: center;
   text-align: center;
   padding: 32px;
+  background: linear-gradient(180deg, #fff 0%, #F0F7FF 100%);
+  height: 100%;
 }
 
 .confirm-icon {
@@ -795,7 +797,10 @@ input, textarea {
       <div class="detail-section">
         <div class="detail-label">📍 Standort</div>
         <div class="detail-map" id="detail-map"></div>
-        <p class="detail-map-hint">Dein aktueller GPS-Standort wird verwendet</p>
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-top:8px;">
+          <p class="detail-map-hint" id="detail-gps-info">Dein aktueller GPS-Standort wird verwendet</p>
+          <button onclick="centerOnPosition()" style="background:none; border:1px solid #1A5FA8; color:#1A5FA8; border-radius:8px; padding:4px 10px; font-size:11px; font-weight:600; cursor:pointer;">📍 Zentrieren</button>
+        </div>
       </div>
 
       <!-- Foto -->
@@ -821,9 +826,11 @@ input, textarea {
       </div>
 
       <!-- Speichern -->
-      <button id="btn-save-report" class="btn-primary">
-        ✓ Meldung speichern
-      </button>
+      <div style="padding:8px 0 16px;">
+        <button id="btn-save-report" class="btn-primary">
+          ✓ Meldung speichern
+        </button>
+      </div>
     </div>
   </div>
 
@@ -833,16 +840,19 @@ input, textarea {
   <div data-screen="confirm">
     <div class="confirm-screen">
       <div class="confirm-icon">✓</div>
-      <h2 class="confirm-title">Meldung gespeichert!</h2>
+      <h2 class="confirm-title">Danke für deine Meldung!</h2>
       <p class="confirm-text">
         Deine Meldung wurde lokal auf deinem Gerät gespeichert.<br>
-        Du kannst sie als GeoJSON exportieren oder per QR-Code teilen.
+        Du kannst sie jederzeit als GeoJSON oder CSV exportieren.
       </p>
-      <button id="btn-new-report" class="btn-primary" style="margin-bottom:10px;">
-        + Neue Meldung
+      <button id="btn-new-report" class="btn-primary" style="margin-bottom:12px;">
+        + Weitere Meldung erstellen
       </button>
-      <button class="btn-secondary" onclick="window.location.hash='list'">
-        📋 Meine Meldungen
+      <button class="btn-secondary" onclick="window.location.hash='list'" style="margin-bottom:8px;">
+        📋 Meine Meldungen ansehen
+      </button>
+      <button class="btn-secondary" onclick="window.location.hash='home'" style="border-color:#8A9BA4; color:#8A9BA4;">
+        🗺️ Zurück zur Karte
       </button>
     </div>
   </div>
@@ -857,6 +867,7 @@ input, textarea {
       <div style="display:flex; gap:6px;">
         <button id="btn-export-geojson" class="export-btn">📥 GeoJSON</button>
         <button id="btn-export-csv" class="export-btn">📥 CSV</button>
+        <button id="btn-export-qgis" class="export-btn" style="background:#E0F2DE; color:#2D8C28;">🎨 QGIS</button>
       </div>
     </div>
     <div class="screen-body" id="report-list">
@@ -2012,6 +2023,10 @@ function renderDetailsForm() {
   // GPS-Anzeige aktualisieren
   if (state.gpsPosition) {
     updateGPSDisplay(state.gpsPosition);
+    const gpsInfo = document.getElementById('detail-gps-info');
+    if (gpsInfo) {
+      gpsInfo.textContent = `GPS: ±${state.gpsPosition.accuracy}m · ${state.gpsPosition.latitude.toFixed(5)}, ${state.gpsPosition.longitude.toFixed(5)}`;
+    }
   }
 
   // Fotos anzeigen
@@ -2054,7 +2069,10 @@ async function renderReportList() {
     container.innerHTML = `
       <div class="empty-state">
         <div class="empty-state__icon">🗺️</div>
-        <p>Noch keine Meldungen.<br>Erstelle deine erste Meldung!</p>
+        <p>Noch keine Meldungen vorhanden.</p>
+        <button onclick="window.location.hash='home'" style="margin-top:16px; background:linear-gradient(135deg,#1A5FA8,#2D8C28); color:#fff; border:none; border-radius:14px; padding:14px 28px; font-size:15px; font-weight:700; cursor:pointer; box-shadow:0 4px 16px rgba(26,95,168,0.3);">
+          + Erste Meldung erstellen
+        </button>
       </div>`;
     return;
   }
@@ -2070,7 +2088,7 @@ async function renderReportList() {
         <div class="report-item__icon" style="background: ${cat?.bgColor}">${sub?.icon || '📍'}</div>
         <div class="report-item__text">
           <div class="report-item__label">${sub?.label || r.subcategory}</div>
-          <div class="report-item__meta">${date} · ${r.photoCount || 0} Foto${r.photoCount !== 1 ? 's' : ''}</div>
+          <div class="report-item__meta">${date} · ${r.photoCount ? '📷 ' + r.photoCount : 'Kein Foto'}</div>
           ${r.comment ? `<div class="report-item__comment">„${r.comment.substring(0, 60)}${r.comment.length > 60 ? '...' : ''}"</div>` : ''}
         </div>
         <button class="report-item__delete" data-id="${r.localId}" title="Löschen">🗑️</button>
