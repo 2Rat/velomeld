@@ -2012,6 +2012,9 @@ function renderSubcategories() {
   });
 }
 
+let detailMap = null;
+let detailMarker = null;
+
 function renderDetailsForm() {
   const sub = getSubcategoryById(state.selectedCategory, state.selectedSubcategory);
   if (!sub) return;
@@ -2019,6 +2022,60 @@ function renderDetailsForm() {
   document.getElementById('detail-title').textContent = `${sub.icon} ${sub.label}`;
   document.getElementById('detail-description').textContent = sub.description;
   document.getElementById('comment-input').value = state.comment;
+
+  // Detail-Karte initialisieren
+  setTimeout(() => {
+    const container = document.getElementById('detail-map');
+    if (!container) return;
+    
+    // Alte Karte entfernen
+    if (detailMap) {
+      detailMap.remove();
+      detailMap = null;
+    }
+
+    const pos = getCurrentPosition();
+    const center = pos ? [pos.latitude, pos.longitude] : [49.41, 6.78];
+    const zoom = pos ? 17 : 14;
+
+    detailMap = L.map('detail-map', {
+      center: center,
+      zoom: zoom,
+      zoomControl: false,
+      dragging: true,
+      scrollWheelZoom: false,
+    });
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap',
+      maxZoom: 19,
+    }).addTo(detailMap);
+
+    // Marker für aktuelle Position
+    if (pos) {
+      detailMarker = L.marker(center, {
+        draggable: true,
+      }).addTo(detailMap);
+
+      // Wenn Marker verschoben wird, Position updaten
+      detailMarker.on('dragend', function(e) {
+        const latlng = e.target.getLatLng();
+        state.gpsPosition = {
+          ...state.gpsPosition,
+          latitude: latlng.lat,
+          longitude: latlng.lng,
+          accuracy: 0, // Manuell gesetzt
+        };
+        const gpsInfo = document.getElementById('detail-gps-info');
+        if (gpsInfo) {
+          gpsInfo.textContent = `📍 Manuell gesetzt · ${latlng.lat.toFixed(5)}, ${latlng.lng.toFixed(5)}`;
+        }
+      });
+    }
+
+    // Karte neu layouten (wichtig nach Screen-Wechsel)
+    setTimeout(() => detailMap.invalidateSize(), 100);
+  }, 150);
 
   // GPS-Anzeige aktualisieren
   if (state.gpsPosition) {
