@@ -10,8 +10,8 @@
   <meta name="apple-mobile-web-app-title" content="Radmelder">
   <title>2Rat Radmelder</title>
   <link rel="manifest" href="./manifest.json">
-  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
-  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -36,11 +36,11 @@
 
   /* Ampelfarben */
   --red: #E00000;
-  --red-light: #FFD4D4;
+  --red-light: #FFAAAA;
   --yellow: #E5A700;
-  --yellow-light: #FFECB3;
+  --yellow-light: #FFE082;
   --ampel-green: #00A836;
-  --ampel-green-light: #C8F0D0;
+  --ampel-green-light: #A5E6B5;
 
   --radius-sm: 10px;
   --radius-md: 14px;
@@ -281,7 +281,7 @@ input, textarea {
   gap: 14px;
   padding: 14px 16px;
   border: 1px solid #E8EBED;
-  border-left: 4px solid var(--accent, var(--blue));
+  border-left: 5px solid var(--accent, var(--blue));
   border-radius: var(--radius-md);
   background: var(--white);
   width: 100%;
@@ -692,11 +692,13 @@ input, textarea {
   <div data-screen="home" class="screen--active">
     
     <!-- Header mit Logo -->
-    <div style="display:flex; align-items:center; padding:10px 16px; background:var(--white); border-bottom:1px solid var(--gray-light); z-index:20; flex-shrink:0;">
-      <img src="./icons/icon-192.png" alt="2Rat" style="height:32px; width:32px; border-radius:8px; margin-right:10px;">
-      <div>
-        <span style="font-weight:700; font-size:16px; color:var(--blue);">2</span><span style="font-weight:700; font-size:16px; color:var(--green);">Rat</span>
-        <span style="font-size:12px; color:var(--gray-mid); margin-left:4px;">Radmelder</span>
+    <div style="display:flex; align-items:center; padding:10px 16px; background:#fff; border-bottom:1px solid #E8EBED; z-index:20; flex-shrink:0;">
+      <div style="width:36px; height:36px; border-radius:8px; background:linear-gradient(135deg,#1A5FA8,#2D8C28); display:flex; align-items:center; justify-content:center; margin-right:10px; flex-shrink:0;">
+        <span style="font-size:18px; line-height:1;">🚲</span>
+      </div>
+      <div style="font-weight:700; font-size:18px;">
+        <span style="color:#1A5FA8;">2</span><span style="color:#2D8C28;">Rat</span>
+        <span style="color:#3D4F58; font-weight:500; font-size:14px; margin-left:2px;">Radmelder</span>
       </div>
     </div>
 
@@ -882,7 +884,7 @@ const CATEGORIES = {
     label: 'Problem melden',
     emoji: '⚠️',
     color: '#E00000',
-    bgColor: '#FFD4D4',
+    bgColor: '#FF9999',
     items: [
       {
         id: 'surface',
@@ -970,7 +972,7 @@ const CATEGORIES = {
     label: 'Wunsch äußern',
     emoji: '💬',
     color: '#E5A700',
-    bgColor: '#FFECB3',
+    bgColor: '#FFD966',
     items: [
       {
         id: 'new_path',
@@ -1023,7 +1025,7 @@ const CATEGORIES = {
     label: 'Lob aussprechen',
     emoji: '👍',
     color: '#00A836',
-    bgColor: '#C8F0D0',
+    bgColor: '#8FD99F',
     items: [
       {
         id: 'good_infra',
