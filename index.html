@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1A5FA8">
+  <meta name="description" content="2Rat Radmelder – Radverkehrsinfrastruktur erfassen und Mängel melden">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Radmelder">
+
+  <title>2Rat Radmelder</title>
+
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Dexie.js (IndexedDB) -->
+  <script src="https://unpkg.com/dexie@3/dist/dexie.js"></script>
+
+  <!-- App CSS -->
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- SCREEN: Home (Karte + Kategorien)          -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div data-screen="home" class="screen--active">
+
+    <!-- Karte -->
+    <div class="map-container">
+      <div id="map-container"></div>
+
+      <!-- GPS-Status (Overlay auf Karte) -->
+      <div style="position:absolute; bottom:16px; right:16px; z-index:15;">
+        <div id="gps-status" class="gps-status">
+          <span class="gps-dot"></span> GPS wird gesucht…
+        </div>
+      </div>
+
+      <!-- Meine Meldungen Badge (Overlay) -->
+      <div class="report-badge">
+        <button id="btn-my-reports" class="report-badge__btn">
+          📋 <span id="report-badge" style="display:none;">0</span> Meldungen
+        </button>
+      </div>
+    </div>
+
+    <!-- Unterer Bereich: Kategorien -->
+    <div class="home-bottom">
+      <h2 class="home-bottom__title">Was möchtest du melden?</h2>
+      <p class="home-bottom__subtitle">Wähle eine Kategorie für deine Meldung.</p>
+
+      <!-- Problem -->
+      <button class="cat-btn cat-btn--problems" data-category="problems">
+        <div class="cat-btn__icon">⚠️</div>
+        <div>
+          <div class="cat-btn__label">Problem melden</div>
+          <div class="cat-btn__count">11 Unterkategorien</div>
+        </div>
+        <div class="cat-btn__arrow">›</div>
+      </button>
+
+      <!-- Wunsch -->
+      <button class="cat-btn cat-btn--wishes" data-category="wishes">
+        <div class="cat-btn__icon">💬</div>
+        <div>
+          <div class="cat-btn__label">Wunsch äußern</div>
+          <div class="cat-btn__count">6 Unterkategorien</div>
+        </div>
+        <div class="cat-btn__arrow">›</div>
+      </button>
+
+      <!-- Positiv -->
+      <button class="cat-btn cat-btn--positive" data-category="positive">
+        <div class="cat-btn__icon">👍</div>
+        <div>
+          <div class="cat-btn__label">Lob aussprechen</div>
+          <div class="cat-btn__count">3 Unterkategorien</div>
+        </div>
+        <div class="cat-btn__arrow">›</div>
+      </button>
+
+      <!-- Footer -->
+      <div style="text-align:center; margin-top:12px; font-size:11px; color:#8A9BA4;">
+        <a href="datenschutz.html" style="color:#8A9BA4; text-decoration:none;">🔒 Datenschutz</a>
+        &nbsp;·&nbsp;
+        <span>v1.0 · 2Rat Planungsbüro</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- SCREEN: Unterkategorie wählen              -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div data-screen="subcategory">
+    <div class="screen-header">
+      <button class="screen-header__back" data-back>←</button>
+      <div>
+        <h3 class="screen-header__title" id="subcategory-title"></h3>
+        <p class="screen-header__subtitle">Was genau möchtest du melden?</p>
+      </div>
+    </div>
+    <div class="screen-body" id="subcategory-list">
+      <!-- Wird dynamisch gefüllt -->
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- SCREEN: Details (Standort, Foto, Kommentar)-->
+  <!-- ═══════════════════════════════════════════ -->
+  <div data-screen="details">
+    <div class="screen-header">
+      <button class="screen-header__back" data-back>←</button>
+      <div>
+        <h3 class="screen-header__title" id="detail-title"></h3>
+        <p class="screen-header__subtitle" id="detail-description"></p>
+      </div>
+    </div>
+    <div class="screen-body">
+
+      <!-- Standort -->
+      <div class="detail-section">
+        <div class="detail-label">📍 Standort</div>
+        <div class="detail-map" id="detail-map"></div>
+        <p class="detail-map-hint">Dein aktueller GPS-Standort wird verwendet</p>
+      </div>
+
+      <!-- Foto -->
+      <div class="detail-section">
+        <div class="detail-label">📷 Foto (optional)</div>
+        <div class="photo-grid" id="photo-preview">
+          <button id="btn-add-photo" class="photo-add">
+            <span>+</span>
+            <small>Foto</small>
+          </button>
+        </div>
+      </div>
+
+      <!-- Kommentar -->
+      <div class="detail-section">
+        <div class="detail-label">💬 Kommentar (optional)</div>
+        <textarea
+          id="comment-input"
+          class="comment-input"
+          placeholder="Beschreibe das Problem genauer…"
+          rows="3"
+        ></textarea>
+      </div>
+
+      <!-- Speichern -->
+      <button id="btn-save-report" class="btn-primary">
+        ✓ Meldung speichern
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- SCREEN: Bestätigung                        -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div data-screen="confirm">
+    <div class="confirm-screen">
+      <div class="confirm-icon">✓</div>
+      <h2 class="confirm-title">Meldung gespeichert!</h2>
+      <p class="confirm-text">
+        Deine Meldung wurde lokal auf deinem Gerät gespeichert.<br>
+        Du kannst sie als GeoJSON exportieren oder per QR-Code teilen.
+      </p>
+      <button id="btn-new-report" class="btn-primary" style="margin-bottom:10px;">
+        + Neue Meldung
+      </button>
+      <button class="btn-secondary" onclick="window.location.hash='list'">
+        📋 Meine Meldungen
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- SCREEN: Meine Meldungen                    -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div data-screen="list">
+    <div class="screen-header">
+      <button class="screen-header__back" data-back>←</button>
+      <h3 class="screen-header__title" style="flex:1;">Meine Meldungen</h3>
+      <div style="display:flex; gap:6px;">
+        <button id="btn-export-geojson" class="export-btn">📥 GeoJSON</button>
+        <button id="btn-export-csv" class="export-btn">📥 CSV</button>
+      </div>
+    </div>
+    <div class="screen-body" id="report-list">
+      <!-- Wird dynamisch gefüllt -->
+    </div>
+  </div>
+
+</div>
+
+<!-- App JS (als Module) -->
+<script type="module" src="js/app.js"></script>
+
+</body>
+</html>
