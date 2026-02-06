@@ -8,30 +8,679 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Radmelder">
-
   <title>2Rat Radmelder</title>
-
   <link rel="manifest" href="./manifest.json">
-  <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
-
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-  <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-  <!-- Dexie.js (IndexedDB) -->
   <script src="https://unpkg.com/dexie@3/dist/dexie.js"></script>
+  <style>
+/* ─── 2Rat Radmelder – Stylesheet ─── */
 
-  <!-- App CSS -->
-  <link rel="stylesheet" href="./css/app.css">
+/* ─── CSS Variables ─── */
+:root {
+  --blue: #1A5FA8;
+  --blue-dark: #0E3F73;
+  --blue-light: #DDEAF8;
+  --green: #2D8C28;
+  --green-dark: #1B6B17;
+  --green-light: #E0F2DE;
+  --gray: #3D4F58;
+  --gray-light: #F0F2F4;
+  --gray-mid: #8A9BA4;
+  --white: #FFFFFF;
+
+  /* Ampelfarben */
+  --red: #E00000;
+  --red-light: #FFE5E5;
+  --yellow: #E5A700;
+  --yellow-light: #FFF6D4;
+  --ampel-green: #00A836;
+  --ampel-green-light: #E0F7E6;
+
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --shadow-sm: 0 1px 4px rgba(0,0,0,0.06);
+  --shadow-md: 0 2px 12px rgba(0,0,0,0.1);
+  --shadow-lg: 0 4px 24px rgba(0,0,0,0.12);
+
+  --font: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* ─── Reset ─── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  font-family: var(--font);
+  color: var(--gray);
+  background: var(--gray-light);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overflow: hidden;
+  user-select: none;
+}
+
+button {
+  font-family: var(--font);
+  border: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+input, textarea {
+  font-family: var(--font);
+}
+
+/* ─── App Container ─── */
+.app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  max-width: 480px;
+  margin: 0 auto;
+  background: var(--white);
+  position: relative;
+  overflow: hidden;
+}
+
+/* ─── Header ─── */
+.header {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--white);
+  border-bottom: 1px solid var(--gray-light);
+  z-index: 20;
+  flex-shrink: 0;
+}
+
+.header__logo {
+  display: flex;
+  align-items: baseline;
+  gap: 1px;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.header__logo-2 { color: var(--blue); }
+.header__logo-rat { color: var(--green); }
+.header__logo-sub {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--gray-mid);
+  margin-left: 6px;
+}
+
+/* ─── Screens ─── */
+[data-screen] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: none;
+  flex-direction: column;
+  z-index: 1;
+}
+
+[data-screen].screen--active {
+  display: flex;
+  z-index: 10;
+  animation: screenSlideIn 0.25s ease-out;
+}
+
+@keyframes screenSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ─── Home Screen ─── */
+.map-container {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+
+#map-container {
+  width: 100%;
+  height: 100%;
+}
+
+.home-bottom {
+  background: var(--white);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  padding: 24px 20px 28px;
+  box-shadow: 0 -4px 24px rgba(0,0,0,0.08);
+  position: relative;
+  z-index: 5;
+  flex-shrink: 0;
+}
+
+.home-bottom__title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.home-bottom__subtitle {
+  font-size: 13px;
+  color: var(--gray-mid);
+  margin-bottom: 18px;
+}
+
+/* ─── Kategorie-Buttons (Home) ─── */
+.cat-btn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: var(--radius-md);
+  width: 100%;
+  text-align: left;
+  transition: transform 0.15s ease;
+  margin-bottom: 10px;
+}
+
+.cat-btn:active { transform: scale(0.98); }
+
+.cat-btn--problems { background: var(--red-light); }
+.cat-btn--wishes { background: var(--yellow-light); }
+.cat-btn--positive { background: var(--ampel-green-light); }
+
+.cat-btn__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.cat-btn__label {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.cat-btn--problems .cat-btn__label { color: var(--red); }
+.cat-btn--wishes .cat-btn__label { color: var(--yellow); }
+.cat-btn--positive .cat-btn__label { color: var(--ampel-green); }
+
+.cat-btn__count {
+  font-size: 12px;
+  color: var(--gray-mid);
+  margin-top: 2px;
+}
+
+.cat-btn__arrow {
+  margin-left: auto;
+  font-size: 18px;
+}
+
+.cat-btn--problems .cat-btn__arrow { color: var(--red); }
+.cat-btn--wishes .cat-btn__arrow { color: var(--yellow); }
+.cat-btn--positive .cat-btn__arrow { color: var(--ampel-green); }
+
+/* ─── Category Cards (Subcategory Screen) ─── */
+.screen-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: var(--white);
+  border-bottom: 1px solid var(--gray-light);
+  flex-shrink: 0;
+}
+
+.screen-header__back {
+  background: none;
+  font-size: 22px;
+  color: var(--gray);
+  padding: 4px;
+}
+
+.screen-header__title {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.screen-header__subtitle {
+  font-size: 12px;
+  color: var(--gray-mid);
+}
+
+.screen-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 16px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.category-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 2px solid transparent;
+  border-radius: var(--radius-md);
+  background: var(--white);
+  width: 100%;
+  text-align: left;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 8px;
+  transition: all 0.2s ease;
+}
+
+.category-card:active {
+  border-color: var(--accent, var(--blue));
+  background: color-mix(in srgb, var(--accent, var(--blue)) 5%, white);
+}
+
+.category-card__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--gray-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.category-card__label {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.category-card__desc {
+  font-size: 12px;
+  color: var(--gray-mid);
+  margin-top: 2px;
+}
+
+.category-card__arrow {
+  margin-left: auto;
+  font-size: 18px;
+  color: var(--gray-mid);
+}
+
+/* ─── Details Screen ─── */
+.detail-section {
+  margin-bottom: 20px;
+}
+
+.detail-label {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.detail-map {
+  height: 180px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--gray-light);
+}
+
+.detail-map-hint {
+  font-size: 11px;
+  color: var(--gray-mid);
+  margin-top: 6px;
+}
+
+/* ─── Photos ─── */
+.photo-grid {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.photo-thumb {
+  width: 72px;
+  height: 72px;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.photo-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-thumb__remove {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--red);
+  color: var(--white);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--white);
+}
+
+.photo-add {
+  width: 72px;
+  height: 72px;
+  border-radius: 12px;
+  border: 2px dashed var(--gray-mid);
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: var(--gray-mid);
+  font-size: 24px;
+  transition: all 0.2s;
+}
+
+.photo-add small {
+  font-size: 9px;
+  font-weight: 500;
+}
+
+.photo-add:active {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+/* ─── Comment ─── */
+.comment-input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1.5px solid var(--gray-light);
+  font-size: 14px;
+  color: var(--gray);
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s;
+  min-height: 80px;
+}
+
+.comment-input:focus {
+  border-color: var(--blue);
+}
+
+.comment-input::placeholder {
+  color: var(--gray-mid);
+}
+
+/* ─── Primary Button ─── */
+.btn-primary {
+  width: 100%;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--blue), var(--green));
+  color: var(--white);
+  font-size: 16px;
+  font-weight: 700;
+  box-shadow: 0 4px 16px rgba(26,95,168,0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 8px rgba(26,95,168,0.2);
+}
+
+.btn-secondary {
+  width: 100%;
+  padding: 14px;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--blue);
+  background: transparent;
+  color: var(--blue);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* ─── GPS Status ─── */
+.gps-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--gray-mid);
+  padding: 8px 14px;
+  background: var(--white);
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+}
+
+.gps-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.gps-status--good .gps-dot { background: var(--ampel-green); }
+.gps-status--ok .gps-dot { background: var(--yellow); }
+.gps-status--poor .gps-dot { background: var(--red); }
+.gps-dot--error { background: var(--red); animation: none; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ─── Confirm Screen ─── */
+.confirm-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 32px;
+}
+
+.confirm-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--ampel-green), var(--blue));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  color: var(--white);
+  margin-bottom: 20px;
+  box-shadow: 0 8px 32px rgba(0,168,54,0.3);
+  animation: scaleIn 0.4s ease-out;
+}
+
+@keyframes scaleIn {
+  0% { transform: scale(0); }
+  70% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.confirm-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.confirm-text {
+  font-size: 14px;
+  color: var(--gray-mid);
+  line-height: 1.5;
+  margin-bottom: 32px;
+}
+
+/* ─── Report List ─── */
+.report-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  background: var(--white);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 8px;
+}
+
+.report-item__icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.report-item__label {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.report-item__meta {
+  font-size: 11px;
+  color: var(--gray-mid);
+  margin-top: 2px;
+}
+
+.report-item__comment {
+  font-size: 12px;
+  color: var(--gray);
+  opacity: 0.7;
+  margin-top: 4px;
+}
+
+.report-item__delete {
+  background: none;
+  font-size: 16px;
+  padding: 4px;
+  opacity: 0.4;
+  flex-shrink: 0;
+}
+
+.report-item__delete:active { opacity: 1; }
+
+/* ─── Empty State ─── */
+.empty-state {
+  text-align: center;
+  padding: 48px 20px;
+}
+
+.empty-state__icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.empty-state p {
+  color: var(--gray-mid);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ─── Report Badge ─── */
+.report-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 15;
+}
+
+.report-badge__btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--white);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gray);
+}
+
+/* ─── Export Buttons ─── */
+.export-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: var(--blue-light);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--blue);
+}
+
+.export-btn:active {
+  background: var(--blue);
+  color: var(--white);
+}
+
+/* ─── Toast ─── */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--gray);
+  color: var(--white);
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  z-index: 100;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.toast--visible {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* ─── Leaflet Overrides ─── */
+.leaflet-control-zoom a {
+  border-radius: 10px !important;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 12px !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+  </style>
 </head>
 <body>
+
 
 <div class="app">
 
@@ -208,7 +857,1372 @@
 </div>
 
 <!-- App JS (als Module) -->
-<script type="module" src="./js/app.js"></script>
 
+
+
+<script>
+// ═══ categories.js ═══
+// ─── 2Rat Radmelder – Kategorien-System ───
+
+const CATEGORIES = {
+  // ─── ROT: Probleme / Mängel ───
+  problems: {
+    id: 'problems',
+    label: 'Problem melden',
+    emoji: '⚠️',
+    color: '#E00000',
+    bgColor: '#FFE5E5',
+    items: [
+      {
+        id: 'surface',
+        icon: '🕳️',
+        label: 'Oberfläche',
+        description: 'Schlaglöcher, Wurzelaufbrüche, Rillen, Kopfsteinpflaster',
+        tags: ['schlagloch', 'wurzel', 'rille', 'pflaster', 'belag'],
+      },
+      {
+        id: 'narrow',
+        icon: '↔️',
+        label: 'Engstelle',
+        description: 'Zu schmaler Radweg, Hindernisse, Poller',
+        tags: ['eng', 'schmal', 'hindernis', 'poller', 'breite'],
+      },
+      {
+        id: 'crossing',
+        icon: '🔀',
+        label: 'Kreuzung / Knoten',
+        description: 'Gefährliche Führung, schlechte Sicht, fehlende Signalisierung',
+        tags: ['kreuzung', 'knoten', 'sicht', 'signal', 'ampel'],
+      },
+      {
+        id: 'traverse',
+        icon: '🚶',
+        label: 'Querung',
+        description: 'Fehlende Querungshilfe, Umwege, Barrieren',
+        tags: ['querung', 'umweg', 'barriere', 'überweg'],
+      },
+      {
+        id: 'conflict',
+        icon: '💥',
+        label: 'Konflikte',
+        description: 'Dooring-Gefahr, Fußgängerkonflikte, Kfz-Konflikte',
+        tags: ['dooring', 'fussgänger', 'auto', 'konflikt', 'gefahr'],
+      },
+      {
+        id: 'parking',
+        icon: '🅿️',
+        label: 'Parken',
+        description: 'Zugeparkte Radwege, Falschparker, fehlende Kontrolle',
+        tags: ['parken', 'zugeparkt', 'falschparker', 'zweite-reihe'],
+      },
+      {
+        id: 'signage',
+        icon: '🪧',
+        label: 'Wegweisung',
+        description: 'Fehlend, beschädigt, verwirrend',
+        tags: ['schild', 'wegweisung', 'beschilderung', 'markierung'],
+      },
+      {
+        id: 'lighting',
+        icon: '💡',
+        label: 'Beleuchtung',
+        description: 'Fehlend, defekt, unzureichend',
+        tags: ['licht', 'dunkel', 'laterne', 'beleuchtung'],
+      },
+      {
+        id: 'winter',
+        icon: '❄️',
+        label: 'Winterdienst / Reinigung',
+        description: 'Nicht geräumt, Laub, Scherben, Verschmutzung',
+        tags: ['winter', 'schnee', 'eis', 'laub', 'glas', 'dreck'],
+      },
+      {
+        id: 'barrier_free',
+        icon: '♿',
+        label: 'Barrierefreiheit',
+        description: 'Hohe Bordsteine, fehlende Absenkung, Umlaufsperren',
+        tags: ['bordstein', 'absenkung', 'rampe', 'umlaufsperre', 'barriere'],
+      },
+      {
+        id: 'other_problem',
+        icon: '❓',
+        label: 'Sonstiges',
+        description: 'Anderes Problem (Freitext)',
+        tags: ['sonstiges'],
+      },
+    ],
+  },
+
+  // ─── GELB: Wünsche ───
+  wishes: {
+    id: 'wishes',
+    label: 'Wunsch äußern',
+    emoji: '💬',
+    color: '#E5A700',
+    bgColor: '#FFF6D4',
+    items: [
+      {
+        id: 'new_path',
+        icon: '🛤️',
+        label: 'Radweg gewünscht',
+        description: 'Neue Verbindung, Lückenschluss',
+        tags: ['radweg', 'verbindung', 'lücke', 'neu'],
+      },
+      {
+        id: 'bike_parking',
+        icon: '🔒',
+        label: 'Abstellanlage',
+        description: 'Fahrradbügel, überdacht, Ladestation',
+        tags: ['abstellen', 'bügel', 'parkplatz', 'laden'],
+      },
+      {
+        id: 'tempo30',
+        icon: '🐌',
+        label: 'Tempo 30',
+        description: 'Geschwindigkeitsreduzierung gewünscht',
+        tags: ['tempo', 'geschwindigkeit', '30', 'zone'],
+      },
+      {
+        id: 'traffic_light',
+        icon: '🚦',
+        label: 'Ampelschaltung',
+        description: 'Grüne Welle, kürzere Wartezeit, Anforderungstaster',
+        tags: ['ampel', 'grün', 'welle', 'wartezeit', 'taster'],
+      },
+      {
+        id: 'bike_street',
+        icon: '🚲',
+        label: 'Fahrradstraße',
+        description: 'Umwidmung gewünscht',
+        tags: ['fahrradstrasse', 'fahrradzone', 'umwidmung'],
+      },
+      {
+        id: 'oneway',
+        icon: '↩️',
+        label: 'Einbahnstraße öffnen',
+        description: 'Freigabe für Radverkehr in Gegenrichtung',
+        tags: ['einbahnstrasse', 'gegenrichtung', 'freigabe', 'öffnen'],
+      },
+    ],
+  },
+
+  // ─── GRÜN: Positiv ───
+  positive: {
+    id: 'positive',
+    label: 'Lob aussprechen',
+    emoji: '👍',
+    color: '#00A836',
+    bgColor: '#E0F7E6',
+    items: [
+      {
+        id: 'good_infra',
+        icon: '⭐',
+        label: 'Gute Infrastruktur',
+        description: 'Vorbildlicher Radweg, gute Lösung',
+        tags: ['gut', 'vorbild', 'radweg', 'lösung'],
+      },
+      {
+        id: 'safe_crossing',
+        icon: '✅',
+        label: 'Sichere Querung',
+        description: 'Gut gestaltete Kreuzung oder Überweg',
+        tags: ['sicher', 'kreuzung', 'querung', 'überweg'],
+      },
+      {
+        id: 'service',
+        icon: '🔧',
+        label: 'Service',
+        description: 'Reparaturstation, Luftpumpe, Trinkwasser',
+        tags: ['reparatur', 'pumpe', 'service', 'wasser'],
+      },
+    ],
+  },
+};
+
+/**
+ * Kategorie nach ID finden
+ */
+function getCategoryById(categoryId) {
+  return CATEGORIES[categoryId] || null;
+}
+
+/**
+ * Unterkategorie nach IDs finden
+ */
+function getSubcategoryById(categoryId, subcategoryId) {
+  const cat = CATEGORIES[categoryId];
+  if (!cat) return null;
+  return cat.items.find((item) => item.id === subcategoryId) || null;
+}
+
+/**
+ * Alle Kategorien als flache Liste (für Export)
+ */
+function getAllSubcategories() {
+  const result = [];
+  for (const [catId, cat] of Object.entries(CATEGORIES)) {
+    for (const item of cat.items) {
+      result.push({
+        categoryId: catId,
+        categoryLabel: cat.label,
+        ...item,
+      });
+    }
+  }
+  return result;
+}
+
+
+
+// ═══ db.js ═══
+// ─── 2Rat Radmelder – Datenbank (IndexedDB via Dexie.js) ───
+// Dexie wird per CDN in index.html geladen
+
+const DB_NAME = 'radmelder';
+const DB_VERSION = 1;
+
+let db;
+
+/**
+ * Datenbank initialisieren
+ */
+function initDB() {
+  db = new Dexie(DB_NAME);
+
+  db.version(DB_VERSION).stores({
+    // Haupttabelle für Meldungen
+    reports: '++localId, id, category, subcategory, timestamp, syncStatus',
+    // Fotos separat (wegen Größe)
+    photos: '++id, reportLocalId, data, timestamp',
+    // Einstellungen
+    settings: 'key',
+  });
+
+  console.log('[DB] Initialisiert');
+  return db;
+}
+
+// ─── REPORTS ───
+
+/**
+ * Neue Meldung speichern
+ * @param {Object} report - Meldungsdaten
+ * @returns {number} localId
+ */
+async function saveReport(report) {
+  const entry = {
+    id: crypto.randomUUID(),
+    latitude: report.latitude,
+    longitude: report.longitude,
+    accuracy: report.accuracy || null,
+    heading: report.heading || null,
+    timestamp: new Date().toISOString(),
+    category: report.category,
+    subcategory: report.subcategory,
+    comment: report.comment || '',
+    photoCount: report.photoCount || 0,
+    syncStatus: 'local', // local | queued | synced
+    serverId: null,
+  };
+
+  const localId = await db.reports.add(entry);
+  console.log(`[DB] Meldung gespeichert: ${localId}`);
+  return localId;
+}
+
+/**
+ * Alle Meldungen laden
+ * @returns {Array} Meldungen sortiert nach Zeitstempel (neueste zuerst)
+ */
+async function getAllReports() {
+  return db.reports.orderBy('timestamp').reverse().toArray();
+}
+
+/**
+ * Einzelne Meldung laden
+ * @param {number} localId
+ * @returns {Object} Meldung
+ */
+async function getReport(localId) {
+  return db.reports.get(localId);
+}
+
+/**
+ * Meldung löschen
+ * @param {number} localId
+ */
+async function deleteReport(localId) {
+  await db.photos.where('reportLocalId').equals(localId).delete();
+  await db.reports.delete(localId);
+  console.log(`[DB] Meldung gelöscht: ${localId}`);
+}
+
+/**
+ * Anzahl der Meldungen
+ * @returns {number}
+ */
+async function getReportCount() {
+  return db.reports.count();
+}
+
+// ─── FOTOS ───
+
+/**
+ * Foto zu Meldung hinzufügen
+ * @param {number} reportLocalId
+ * @param {string} dataUrl - Base64-kodiertes Foto
+ */
+async function savePhoto(reportLocalId, dataUrl) {
+  await db.photos.add({
+    reportLocalId,
+    data: dataUrl,
+    timestamp: new Date().toISOString(),
+  });
+}
+
+/**
+ * Alle Fotos einer Meldung laden
+ * @param {number} reportLocalId
+ * @returns {Array}
+ */
+async function getPhotosForReport(reportLocalId) {
+  return db.photos.where('reportLocalId').equals(reportLocalId).toArray();
+}
+
+// ─── EINSTELLUNGEN ───
+
+/**
+ * Einstellung speichern
+ */
+async function setSetting(key, value) {
+  await db.settings.put({ key, value });
+}
+
+/**
+ * Einstellung laden
+ */
+async function getSetting(key, defaultValue = null) {
+  const entry = await db.settings.get(key);
+  return entry ? entry.value : defaultValue;
+}
+
+// ─── STATISTIKEN ───
+
+/**
+ * Statistik-Übersicht
+ */
+async function getStats() {
+  const all = await db.reports.toArray();
+  const stats = {
+    total: all.length,
+    problems: all.filter((r) => r.category === 'problems').length,
+    wishes: all.filter((r) => r.category === 'wishes').length,
+    positive: all.filter((r) => r.category === 'positive').length,
+    synced: all.filter((r) => r.syncStatus === 'synced').length,
+    local: all.filter((r) => r.syncStatus === 'local').length,
+  };
+  return stats;
+}
+
+
+
+
+// ═══ router.js ═══
+// ─── 2Rat Radmelder – Router (Screen-Navigation) ───
+
+/**
+ * Einfacher Hash-basierter Router für Single-Page-Navigation.
+ * Screens werden per CSS-Klasse ein-/ausgeblendet.
+ *
+ * Verwendung:
+ *   initRouter({
+ *     default: 'home',
+ *     routes: {
+ *       'home':        () => showHomeScreen(),
+ *       'category':    (params) => showCategoryScreen(params),
+ *       'details':     (params) => showDetailsScreen(params),
+ *       'confirm':     () => showConfirmScreen(),
+ *       'list':        () => showListScreen(),
+ *     }
+ *   });
+ *
+ *   navigate('category', { type: 'problems' });
+ *   goBack();
+ */
+
+let routerConfig = null;
+let history = [];
+
+/**
+ * Router initialisieren
+ */
+function initRouter(config) {
+  routerConfig = config;
+  history = [];
+
+  // Hash-Änderungen abfangen
+  window.addEventListener('hashchange', () => {
+    const screen = getScreenFromHash();
+    activateScreen(screen);
+  });
+
+  // Initiales Routing
+  const initial = getScreenFromHash() || config.default || 'home';
+  navigate(initial);
+}
+
+/**
+ * Screen-Name aus Hash extrahieren
+ */
+function getScreenFromHash() {
+  const hash = window.location.hash.replace('#', '');
+  return hash || null;
+}
+
+/**
+ * Zu Screen navigieren
+ * @param {string} screenId - Name des Screens
+ * @param {Object} params - Optionale Parameter
+ */
+function navigate(screenId, params = {}) {
+  // In History pushen
+  history.push({ screen: screenId, params });
+
+  // Hash aktualisieren (ohne hashchange auszulösen)
+  window.location.hash = screenId;
+
+  // Screen aktivieren
+  activateScreen(screenId, params);
+}
+
+/**
+ * Zurück navigieren
+ */
+function goBack() {
+  if (history.length > 1) {
+    history.pop(); // Aktuellen entfernen
+    const prev = history[history.length - 1];
+    window.location.hash = prev.screen;
+    activateScreen(prev.screen, prev.params);
+  } else {
+    navigate(routerConfig.default || 'home');
+  }
+}
+
+/**
+ * Screen aktivieren (CSS-Klasse + Callback)
+ */
+function activateScreen(screenId, params = {}) {
+  // Alle Screens ausblenden
+  document.querySelectorAll('[data-screen]').forEach((el) => {
+    el.classList.remove('screen--active');
+    el.setAttribute('aria-hidden', 'true');
+  });
+
+  // Ziel-Screen einblenden
+  const target = document.querySelector(`[data-screen="${screenId}"]`);
+  if (target) {
+    target.classList.add('screen--active');
+    target.setAttribute('aria-hidden', 'false');
+    target.scrollTop = 0; // Scroll zurücksetzen
+  }
+
+  // Route-Callback ausführen
+  if (routerConfig?.routes?.[screenId]) {
+    routerConfig.routes[screenId](params);
+  }
+}
+
+/**
+ * Aktuellen Screen abfragen
+ */
+function getCurrentScreen() {
+  return history.length > 0 ? history[history.length - 1] : null;
+}
+
+/**
+ * Hardware-Zurück-Button abfangen (Android)
+ */
+function enableBackButton() {
+  window.addEventListener('popstate', (e) => {
+    if (history.length > 1) {
+      e.preventDefault();
+      goBack();
+    }
+  });
+}
+
+
+
+// ═══ camera.js ═══
+// ─── 2Rat Radmelder – Kamera-Modul ───
+
+/**
+ * Foto aufnehmen via HTML5 Input (zuverlässigste Methode auf Mobile)
+ * Gibt ein Promise zurück mit Base64-Daten und Thumbnail
+ *
+ * @param {Object} options
+ * @param {number} options.maxWidth - Max Breite in Pixel (default: 1280)
+ * @param {number} options.quality - JPEG-Qualität 0-1 (default: 0.8)
+ * @returns {Promise<{dataUrl: string, thumbnail: string, width: number, height: number}>}
+ */
+function capturePhoto(options = {}) {
+  const maxWidth = options.maxWidth || 1280;
+  const quality = options.quality || 0.8;
+
+  return new Promise((resolve, reject) => {
+    // Verstecktes File-Input erstellen
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.capture = 'environment'; // Rückkamera bevorzugen
+
+    input.addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (!file) {
+        reject(new Error('Keine Datei ausgewählt'));
+        return;
+      }
+
+      processImage(file, maxWidth, quality)
+        .then(resolve)
+        .catch(reject);
+    });
+
+    input.addEventListener('cancel', () => {
+      reject(new Error('Abgebrochen'));
+    });
+
+    // Dialog öffnen
+    input.click();
+  });
+}
+
+/**
+ * Bild verarbeiten: Resize + Komprimierung
+ */
+function processImage(file, maxWidth, quality) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        // Resize wenn nötig
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxWidth) {
+          height = Math.round(height * (maxWidth / width));
+          width = maxWidth;
+        }
+
+        // Canvas für Komprimierung
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const dataUrl = canvas.toDataURL('image/jpeg', quality);
+
+        // Thumbnail erstellen (200px breit)
+        const thumbWidth = 200;
+        const thumbHeight = Math.round(height * (thumbWidth / width));
+        canvas.width = thumbWidth;
+        canvas.height = thumbHeight;
+        ctx.drawImage(img, 0, 0, thumbWidth, thumbHeight);
+        const thumbnail = canvas.toDataURL('image/jpeg', 0.6);
+
+        resolve({
+          dataUrl,
+          thumbnail,
+          width,
+          height,
+          originalName: file.name,
+          size: dataUrl.length,
+        });
+      };
+
+      img.onerror = () => reject(new Error('Bild konnte nicht geladen werden'));
+      img.src = e.target.result;
+    };
+
+    reader.onerror = () => reject(new Error('Datei konnte nicht gelesen werden'));
+    reader.readAsDataURL(file);
+  });
+}
+
+/**
+ * Prüfen ob Kamera verfügbar ist
+ */
+function isCameraAvailable() {
+  return 'mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices;
+}
+
+
+
+// ═══ map.js ═══
+// ─── 2Rat Radmelder – Kartenmodul (Leaflet + GPS) ───
+
+let map = null;
+let userMarker = null;
+let reportMarkers = [];
+let currentPosition = null;
+let watchId = null;
+
+// Marker-Farben passend zu Kategorien (Ampel)
+const MARKER_COLORS = {
+  problems: '#E00000',
+  wishes: '#E5A700',
+  positive: '#00A836',
+};
+
+/**
+ * Karte initialisieren
+ * @param {string} containerId - ID des HTML-Containers
+ * @param {Object} options - Optionen
+ */
+function initMap(containerId, options = {}) {
+  const defaultCenter = [49.41, 6.78]; // Lebach, Saarland (2Rat Standort)
+  const defaultZoom = 14;
+
+  map = L.map(containerId, {
+    center: options.center || defaultCenter,
+    zoom: options.zoom || defaultZoom,
+    zoomControl: false, // Eigene Position stattdessen
+    attributionControl: true,
+  });
+
+  // OpenStreetMap Tiles
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>',
+    maxZoom: 19,
+  }).addTo(map);
+
+  // Zoom-Control rechts unten
+  L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+  console.log('[Map] Initialisiert');
+  return map;
+}
+
+/**
+ * GPS-Tracking starten
+ * @param {Function} onUpdate - Callback bei Positionsupdate
+ * @param {Function} onError - Callback bei Fehler
+ */
+function startGPS(onUpdate, onError) {
+  if (!navigator.geolocation) {
+    onError && onError('GPS nicht verfügbar');
+    return;
+  }
+
+  const gpsOptions = {
+    enableHighAccuracy: true,
+    timeout: 15000,
+    maximumAge: 5000,
+  };
+
+  // Einmalige Position holen
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      handlePosition(pos, onUpdate);
+    },
+    (err) => {
+      console.warn('[GPS] Fehler:', err.message);
+      onError && onError(err.message);
+    },
+    gpsOptions
+  );
+
+  // Kontinuierliches Tracking
+  watchId = navigator.geolocation.watchPosition(
+    (pos) => handlePosition(pos, onUpdate),
+    (err) => console.warn('[GPS] Watch-Fehler:', err.message),
+    gpsOptions
+  );
+}
+
+/**
+ * GPS-Tracking stoppen
+ */
+function stopGPS() {
+  if (watchId !== null) {
+    navigator.geolocation.clearWatch(watchId);
+    watchId = null;
+  }
+}
+
+/**
+ * Position verarbeiten
+ */
+function handlePosition(pos, callback) {
+  currentPosition = {
+    latitude: pos.coords.latitude,
+    longitude: pos.coords.longitude,
+    accuracy: Math.round(pos.coords.accuracy),
+    heading: pos.coords.heading,
+    timestamp: pos.timestamp,
+  };
+
+  // User-Marker aktualisieren
+  if (map) {
+    const latlng = [currentPosition.latitude, currentPosition.longitude];
+
+    if (userMarker) {
+      userMarker.setLatLng(latlng);
+    } else {
+      userMarker = L.circleMarker(latlng, {
+        radius: 8,
+        fillColor: '#1A5FA8',
+        fillOpacity: 1,
+        color: '#FFFFFF',
+        weight: 3,
+      }).addTo(map);
+
+      // Beim ersten Fix: Karte zentrieren
+      map.setView(latlng, 16);
+    }
+
+    // Genauigkeitskreis
+    if (userMarker._accuracyCircle) {
+      userMarker._accuracyCircle.setLatLng(latlng);
+      userMarker._accuracyCircle.setRadius(currentPosition.accuracy);
+    } else {
+      userMarker._accuracyCircle = L.circle(latlng, {
+        radius: currentPosition.accuracy,
+        fillColor: '#1A5FA8',
+        fillOpacity: 0.1,
+        color: '#1A5FA8',
+        weight: 1,
+        opacity: 0.3,
+      }).addTo(map);
+    }
+  }
+
+  callback && callback(currentPosition);
+}
+
+/**
+ * Aktuelle GPS-Position holen
+ * @returns {Object|null}
+ */
+function getCurrentPosition() {
+  return currentPosition;
+}
+
+/**
+ * Karte auf Position zentrieren
+ */
+function centerOnPosition() {
+  if (map && currentPosition) {
+    map.setView([currentPosition.latitude, currentPosition.longitude], 17);
+  }
+}
+
+/**
+ * Meldungs-Marker auf Karte setzen
+ * @param {Array} reports - Array von Meldungen aus der DB
+ */
+function displayReports(reports) {
+  // Alte Marker entfernen
+  reportMarkers.forEach((m) => map.removeLayer(m));
+  reportMarkers = [];
+
+  reports.forEach((report) => {
+    if (!report.latitude || !report.longitude) return;
+
+    const color = MARKER_COLORS[report.category] || '#5A6A72';
+
+    const marker = L.circleMarker([report.latitude, report.longitude], {
+      radius: 10,
+      fillColor: color,
+      fillOpacity: 0.85,
+      color: '#FFFFFF',
+      weight: 2,
+    }).addTo(map);
+
+    // Popup mit Infos
+    marker.bindPopup(`
+      <div style="font-family: sans-serif; min-width: 150px;">
+        <strong>${report.subcategory || report.category}</strong><br>
+        <small style="color: #888;">${new Date(report.timestamp).toLocaleString('de-DE')}</small>
+        ${report.comment ? `<p style="margin: 6px 0 0; font-size: 13px;">${report.comment}</p>` : ''}
+      </div>
+    `);
+
+    reportMarkers.push(marker);
+  });
+}
+
+/**
+ * Karte auf alle Meldungen zoomen
+ */
+function fitToReports() {
+  if (reportMarkers.length === 0) return;
+  const group = L.featureGroup(reportMarkers);
+  map.fitBounds(group.getBounds().pad(0.1));
+}
+
+
+
+
+// ═══ export.js ═══
+// ─── 2Rat Radmelder – Export-Modul ───
+
+
+/**
+ * Alle Meldungen als GeoJSON exportieren
+ * @returns {Object} GeoJSON FeatureCollection
+ */
+async function exportGeoJSON() {
+  const reports = await getAllReports();
+
+  const features = reports.map((report) => {
+    const sub = getSubcategoryById(report.category, report.subcategory);
+
+    return {
+      type: 'Feature',
+      geometry: {
+        type: 'Point',
+        coordinates: [report.longitude, report.latitude],
+      },
+      properties: {
+        id: report.id,
+        category: report.category,
+        subcategory: report.subcategory,
+        categoryLabel: sub?.label || report.subcategory,
+        comment: report.comment || '',
+        timestamp: report.timestamp,
+        accuracy: report.accuracy,
+        heading: report.heading,
+        photoCount: report.photoCount || 0,
+        syncStatus: report.syncStatus,
+      },
+    };
+  });
+
+  const geojson = {
+    type: 'FeatureCollection',
+    name: '2Rat_Radmelder_Export',
+    crs: {
+      type: 'name',
+      properties: {
+        name: 'urn:ogc:def:crs:OGC:1.3:CRS84',
+      },
+    },
+    features,
+    metadata: {
+      exportDate: new Date().toISOString(),
+      app: '2Rat Radmelder',
+      version: '1.0.0',
+      totalReports: features.length,
+    },
+  };
+
+  return geojson;
+}
+
+/**
+ * Alle Meldungen als CSV exportieren
+ * @returns {string} CSV-String
+ */
+async function exportCSV() {
+  const reports = await getAllReports();
+
+  const headers = [
+    'id',
+    'latitude',
+    'longitude',
+    'accuracy',
+    'timestamp',
+    'category',
+    'subcategory',
+    'comment',
+    'photoCount',
+    'syncStatus',
+  ];
+
+  const rows = reports.map((r) =>
+    headers.map((h) => {
+      const val = r[h] ?? '';
+      // CSV-Escaping: Anführungszeichen verdoppeln
+      const str = String(val).replace(/"/g, '""');
+      return str.includes(',') || str.includes('"') || str.includes('\n')
+        ? `"${str}"`
+        : str;
+    }).join(',')
+  );
+
+  // BOM für Excel-Kompatibilität mit Umlauten
+  return '\uFEFF' + headers.join(',') + '\n' + rows.join('\n');
+}
+
+/**
+ * Datei zum Download anbieten
+ * @param {string} content - Dateiinhalt
+ * @param {string} filename - Dateiname
+ * @param {string} mimeType - MIME-Type
+ */
+function downloadFile(content, filename, mimeType) {
+  const blob = new Blob(
+    [typeof content === 'string' ? content : JSON.stringify(content, null, 2)],
+    { type: mimeType }
+  );
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+
+  console.log(`[Export] ${filename} heruntergeladen`);
+}
+
+/**
+ * GeoJSON-Export starten
+ */
+async function downloadGeoJSON() {
+  const geojson = await exportGeoJSON();
+  const date = new Date().toISOString().split('T')[0];
+  downloadFile(geojson, `radmelder_${date}.geojson`, 'application/geo+json');
+}
+
+/**
+ * CSV-Export starten
+ */
+async function downloadCSV() {
+  const csv = await exportCSV();
+  const date = new Date().toISOString().split('T')[0];
+  downloadFile(csv, `radmelder_${date}.csv`, 'text/csv;charset=utf-8');
+}
+
+/**
+ * QGIS-Stildatei (.qml) generieren
+ * Farbcodierung nach Ampel-Schema
+ */
+function downloadQGISStyle() {
+  const qml = `<?xml version="1.0" encoding="UTF-8"?>
+<qgis version="3.28" styleCategories="Symbology">
+  <renderer-v2 type="categorizedSymbol" attr="category" symbollevels="0">
+    <categories>
+      <category symbol="0" value="problems" label="Probleme/Mängel"/>
+      <category symbol="1" value="wishes" label="Wünsche"/>
+      <category symbol="2" value="positive" label="Positiv"/>
+    </categories>
+    <symbols>
+      <symbol type="marker" name="0">
+        <layer class="SimpleMarker">
+          <Option type="Map">
+            <Option type="QString" value="circle" name="name"/>
+            <Option type="QString" value="224,0,0,220" name="color"/>
+            <Option type="QString" value="3.5" name="size"/>
+          </Option>
+        </layer>
+      </symbol>
+      <symbol type="marker" name="1">
+        <layer class="SimpleMarker">
+          <Option type="Map">
+            <Option type="QString" value="circle" name="name"/>
+            <Option type="QString" value="229,167,0,220" name="color"/>
+            <Option type="QString" value="3.5" name="size"/>
+          </Option>
+        </layer>
+      </symbol>
+      <symbol type="marker" name="2">
+        <layer class="SimpleMarker">
+          <Option type="Map">
+            <Option type="QString" value="circle" name="name"/>
+            <Option type="QString" value="0,168,54,220" name="color"/>
+            <Option type="QString" value="3.5" name="size"/>
+          </Option>
+        </layer>
+      </symbol>
+    </symbols>
+  </renderer-v2>
+</qgis>`;
+
+  downloadFile(qml, 'radmelder_stil.qml', 'application/xml');
+}
+
+
+
+
+// ═══ app.js ═══
+// ─── 2Rat Radmelder – Haupt-App ───
+
+
+// ─── App-State ───
+const state = {
+  selectedCategory: null,   // 'problems' | 'wishes' | 'positive'
+  selectedSubcategory: null, // z.B. 'surface'
+  comment: '',
+  photos: [],               // Array von { dataUrl, thumbnail }
+  gpsPosition: null,
+  gpsAccuracy: null,
+};
+
+// ─── INITIALISIERUNG ───
+
+document.addEventListener('DOMContentLoaded', async () => {
+  console.log('[App] 2Rat Radmelder wird geladen...');
+
+  // 1. Datenbank
+  initDB();
+
+  // 2. Service Worker registrieren
+  registerSW();
+
+  // 3. Karte
+  initMap('map-container');
+
+  // 4. GPS starten
+  startGPS(
+    (pos) => {
+      state.gpsPosition = pos;
+      updateGPSDisplay(pos);
+    },
+    (err) => {
+      console.warn('[App] GPS-Fehler:', err);
+      showGPSError(err);
+    }
+  );
+
+  // 5. Router
+  initRouter({
+    default: 'home',
+    routes: {
+      home: onHomeScreen,
+      subcategory: onSubcategoryScreen,
+      details: onDetailsScreen,
+      confirm: onConfirmScreen,
+      list: onListScreen,
+    },
+  });
+
+  // 6. Event-Listener
+  bindEvents();
+
+  // 7. Meldungsanzahl aktualisieren
+  updateReportBadge();
+
+  console.log('[App] ✓ Bereit');
+});
+
+// ─── SERVICE WORKER ───
+
+async function registerSW() {
+  if ('serviceWorker' in navigator) {
+    try {
+      const reg = await navigator.serviceWorker.register('./sw.js');
+      console.log('[SW] Registriert:', reg.scope);
+    } catch (err) {
+      console.warn('[SW] Registrierung fehlgeschlagen:', err);
+    }
+  }
+}
+
+// ─── SCREEN-CALLBACKS ───
+
+async function onHomeScreen() {
+  // Meldungen auf Karte anzeigen
+  const reports = await getAllReports();
+  displayReports(reports);
+  updateReportBadge();
+}
+
+function onSubcategoryScreen(params) {
+  if (params?.type) {
+    state.selectedCategory = params.type;
+  }
+  renderSubcategories();
+}
+
+function onDetailsScreen() {
+  renderDetailsForm();
+}
+
+function onConfirmScreen() {
+  // Nichts zu tun – statischer Screen
+}
+
+async function onListScreen() {
+  renderReportList();
+}
+
+// ─── RENDERING ───
+
+function renderSubcategories() {
+  const cat = CATEGORIES[state.selectedCategory];
+  if (!cat) return;
+
+  const container = document.getElementById('subcategory-list');
+  const title = document.getElementById('subcategory-title');
+
+  title.textContent = cat.label;
+  title.style.color = cat.color;
+
+  container.innerHTML = cat.items
+    .map(
+      (item) => `
+    <button class="category-card" data-sub="${item.id}" style="--accent: ${cat.color}">
+      <div class="category-card__icon">${item.icon}</div>
+      <div class="category-card__text">
+        <div class="category-card__label">${item.label}</div>
+        <div class="category-card__desc">${item.description}</div>
+      </div>
+      <div class="category-card__arrow">›</div>
+    </button>
+  `
+    )
+    .join('');
+
+  // Click-Handler
+  container.querySelectorAll('.category-card').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      state.selectedSubcategory = btn.dataset.sub;
+      navigate('details');
+    });
+  });
+}
+
+function renderDetailsForm() {
+  const sub = getSubcategoryById(state.selectedCategory, state.selectedSubcategory);
+  if (!sub) return;
+
+  document.getElementById('detail-title').textContent = `${sub.icon} ${sub.label}`;
+  document.getElementById('detail-description').textContent = sub.description;
+  document.getElementById('comment-input').value = state.comment;
+
+  // GPS-Anzeige aktualisieren
+  if (state.gpsPosition) {
+    updateGPSDisplay(state.gpsPosition);
+  }
+
+  // Fotos anzeigen
+  renderPhotoPreview();
+}
+
+function renderPhotoPreview() {
+  const container = document.getElementById('photo-preview');
+  container.innerHTML =
+    state.photos
+      .map(
+        (p, i) => `
+    <div class="photo-thumb">
+      <img src="${p.thumbnail}" alt="Foto ${i + 1}">
+      <button class="photo-thumb__remove" data-index="${i}">×</button>
+    </div>
+  `
+      )
+      .join('') +
+    `<button id="btn-add-photo" class="photo-add">
+      <span>+</span>
+      <small>Foto</small>
+    </button>`;
+
+  // Event-Handler
+  document.getElementById('btn-add-photo')?.addEventListener('click', handleAddPhoto);
+  container.querySelectorAll('.photo-thumb__remove').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      state.photos.splice(parseInt(btn.dataset.index), 1);
+      renderPhotoPreview();
+    });
+  });
+}
+
+async function renderReportList() {
+  const reports = await getAllReports();
+  const container = document.getElementById('report-list');
+
+  if (reports.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state__icon">🗺️</div>
+        <p>Noch keine Meldungen.<br>Erstelle deine erste Meldung!</p>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = reports
+    .map((r) => {
+      const cat = CATEGORIES[r.category];
+      const sub = getSubcategoryById(r.category, r.subcategory);
+      const date = new Date(r.timestamp).toLocaleString('de-DE');
+
+      return `
+      <div class="report-item" style="--cat-bg: ${cat?.bgColor || '#f0f0f0'}">
+        <div class="report-item__icon" style="background: ${cat?.bgColor}">${sub?.icon || '📍'}</div>
+        <div class="report-item__text">
+          <div class="report-item__label">${sub?.label || r.subcategory}</div>
+          <div class="report-item__meta">${date} · ${r.photoCount || 0} Foto${r.photoCount !== 1 ? 's' : ''}</div>
+          ${r.comment ? `<div class="report-item__comment">„${r.comment.substring(0, 60)}${r.comment.length > 60 ? '...' : ''}"</div>` : ''}
+        </div>
+        <button class="report-item__delete" data-id="${r.localId}" title="Löschen">🗑️</button>
+      </div>`;
+    })
+    .join('');
+
+  // Löschen-Handler
+  container.querySelectorAll('.report-item__delete').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      if (confirm('Meldung wirklich löschen?')) {
+        await deleteReport(parseInt(btn.dataset.id));
+        renderReportList();
+        updateReportBadge();
+      }
+    });
+  });
+}
+
+// ─── EVENT-HANDLER ───
+
+function bindEvents() {
+  // Hauptkategorien
+  document.querySelectorAll('[data-category]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      state.selectedCategory = btn.dataset.category;
+      state.selectedSubcategory = null;
+      state.comment = '';
+      state.photos = [];
+      navigate('subcategory', { type: btn.dataset.category });
+    });
+  });
+
+  // Zurück-Buttons
+  document.querySelectorAll('[data-back]').forEach((btn) => {
+    btn.addEventListener('click', goBack);
+  });
+
+  // Meldung speichern
+  document.getElementById('btn-save-report')?.addEventListener('click', handleSaveReport);
+
+  // Meine Meldungen
+  document.getElementById('btn-my-reports')?.addEventListener('click', () => navigate('list'));
+
+  // GPS zentrieren
+  document.getElementById('btn-center-gps')?.addEventListener('click', centerOnPosition);
+
+  // Neue Meldung (nach Bestätigung)
+  document.getElementById('btn-new-report')?.addEventListener('click', () => navigate('home'));
+
+  // Export-Buttons
+  document.getElementById('btn-export-geojson')?.addEventListener('click', downloadGeoJSON);
+  document.getElementById('btn-export-csv')?.addEventListener('click', downloadCSV);
+  document.getElementById('btn-export-qgis')?.addEventListener('click', downloadQGISStyle);
+
+  // Kommentar speichern bei Eingabe
+  document.getElementById('comment-input')?.addEventListener('input', (e) => {
+    state.comment = e.target.value;
+  });
+}
+
+// ─── AKTIONEN ───
+
+async function handleAddPhoto() {
+  if (state.photos.length >= 3) {
+    showToast('Maximal 3 Fotos');
+    return;
+  }
+
+  try {
+    const photo = await capturePhoto({ maxWidth: 1280, quality: 0.8 });
+    state.photos.push(photo);
+    renderPhotoPreview();
+    showToast('📷 Foto hinzugefügt');
+  } catch (err) {
+    if (err.message !== 'Abgebrochen') {
+      showToast('Foto konnte nicht aufgenommen werden');
+    }
+  }
+}
+
+async function handleSaveReport() {
+  const pos = getCurrentPosition();
+
+  if (!pos) {
+    showToast('⚠️ Kein GPS-Signal – bitte warten');
+    return;
+  }
+
+  // Meldung speichern
+  const localId = await saveReport({
+    latitude: pos.latitude,
+    longitude: pos.longitude,
+    accuracy: pos.accuracy,
+    heading: pos.heading,
+    category: state.selectedCategory,
+    subcategory: state.selectedSubcategory,
+    comment: state.comment,
+    photoCount: state.photos.length,
+  });
+
+  // Fotos speichern
+  for (const photo of state.photos) {
+    await savePhoto(localId, photo.dataUrl);
+  }
+
+  // State zurücksetzen
+  state.selectedCategory = null;
+  state.selectedSubcategory = null;
+  state.comment = '';
+  state.photos = [];
+
+  navigate('confirm');
+}
+
+// ─── UI-HELPER ───
+
+function updateGPSDisplay(pos) {
+  const el = document.getElementById('gps-status');
+  if (el) {
+    el.innerHTML = `<span class="gps-dot"></span> GPS ±${pos.accuracy}m`;
+    el.classList.toggle('gps-status--good', pos.accuracy <= 10);
+    el.classList.toggle('gps-status--ok', pos.accuracy > 10 && pos.accuracy <= 30);
+    el.classList.toggle('gps-status--poor', pos.accuracy > 30);
+  }
+}
+
+function showGPSError(msg) {
+  const el = document.getElementById('gps-status');
+  if (el) {
+    el.innerHTML = `<span class="gps-dot gps-dot--error"></span> Kein GPS`;
+  }
+}
+
+async function updateReportBadge() {
+  const count = await getReportCount();
+  const badge = document.getElementById('report-badge');
+  if (badge) {
+    badge.textContent = count;
+    badge.style.display = count > 0 ? 'flex' : 'none';
+  }
+}
+
+let toastTimeout;
+function showToast(message) {
+  let toast = document.getElementById('toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'toast';
+    toast.className = 'toast';
+    document.body.appendChild(toast);
+  }
+
+  toast.textContent = message;
+  toast.classList.add('toast--visible');
+
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => {
+    toast.classList.remove('toast--visible');
+  }, 2500);
+}
+
+</script>
 </body>
 </html>
