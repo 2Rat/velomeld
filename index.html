@@ -36,11 +36,11 @@
 
   /* Ampelfarben */
   --red: #E00000;
-  --red-light: #FFE5E5;
+  --red-light: #FFD4D4;
   --yellow: #E5A700;
-  --yellow-light: #FFF6D4;
+  --yellow-light: #FFECB3;
   --ampel-green: #00A836;
-  --ampel-green-light: #E0F7E6;
+  --ampel-green-light: #C8F0D0;
 
   --radius-sm: 10px;
   --radius-md: 14px;
@@ -247,7 +247,7 @@ input, textarea {
   gap: 12px;
   padding: 16px 20px;
   background: var(--white);
-  border-bottom: 1px solid var(--gray-light);
+  border-bottom: 2px solid var(--gray-light);
   flex-shrink: 0;
 }
 
@@ -280,9 +280,10 @@ input, textarea {
   align-items: center;
   gap: 14px;
   padding: 14px 16px;
-  border: 2px solid transparent;
+  border: 2px solid var(--accent-border, transparent);
+  border-left: 4px solid var(--accent, var(--blue));
   border-radius: var(--radius-md);
-  background: var(--white);
+  background: var(--accent-bg, var(--white));
   width: 100%;
   text-align: left;
   box-shadow: var(--shadow-sm);
@@ -299,7 +300,7 @@ input, textarea {
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  background: var(--gray-light);
+  background: var(--accent-bg, var(--gray-light));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -310,6 +311,7 @@ input, textarea {
 .category-card__label {
   font-weight: 600;
   font-size: 15px;
+  color: var(--accent, var(--gray));
 }
 
 .category-card__desc {
@@ -688,6 +690,15 @@ input, textarea {
   <!-- SCREEN: Home (Karte + Kategorien)          -->
   <!-- ═══════════════════════════════════════════ -->
   <div data-screen="home" class="screen--active">
+    
+    <!-- Header mit Logo -->
+    <div style="display:flex; align-items:center; padding:10px 16px; background:var(--white); border-bottom:1px solid var(--gray-light); z-index:20; flex-shrink:0;">
+      <img src="./icons/icon-192.png" alt="2Rat" style="height:32px; width:32px; border-radius:8px; margin-right:10px;">
+      <div>
+        <span style="font-weight:700; font-size:16px; color:var(--blue);">2</span><span style="font-weight:700; font-size:16px; color:var(--green);">Rat</span>
+        <span style="font-size:12px; color:var(--gray-mid); margin-left:4px;">Radmelder</span>
+      </div>
+    </div>
 
     <!-- Karte -->
     <div class="map-container">
@@ -871,7 +882,7 @@ const CATEGORIES = {
     label: 'Problem melden',
     emoji: '⚠️',
     color: '#E00000',
-    bgColor: '#FFE5E5',
+    bgColor: '#FFD4D4',
     items: [
       {
         id: 'surface',
@@ -959,7 +970,7 @@ const CATEGORIES = {
     label: 'Wunsch äußern',
     emoji: '💬',
     color: '#E5A700',
-    bgColor: '#FFF6D4',
+    bgColor: '#FFECB3',
     items: [
       {
         id: 'new_path',
@@ -1012,7 +1023,7 @@ const CATEGORIES = {
     label: 'Lob aussprechen',
     emoji: '👍',
     color: '#00A836',
-    bgColor: '#E0F7E6',
+    bgColor: '#C8F0D0',
     items: [
       {
         id: 'good_infra',
@@ -1970,8 +1981,8 @@ function renderSubcategories() {
   container.innerHTML = cat.items
     .map(
       (item) => `
-    <button class="category-card" data-sub="${item.id}" style="--accent: ${cat.color}">
-      <div class="category-card__icon">${item.icon}</div>
+    <button class="category-card" data-sub="${item.id}" style="--accent: ${cat.color}; --accent-bg: ${cat.bgColor}; --accent-border: ${cat.color}20">
+      <div class="category-card__icon" style="background:${cat.bgColor}; font-size:22px;">${item.icon}</div>
       <div class="category-card__text">
         <div class="category-card__label">${item.label}</div>
         <div class="category-card__desc">${item.description}</div>
