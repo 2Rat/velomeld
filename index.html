@@ -2009,9 +2009,9 @@ function downloadQGISStyle() {
 // ─── 2Rat Radwegemelder – Supabase Sync-Modul ───
 
 // ╔═══════════════════════════════════════════════════════╗
-// ║  KONFIGURATION: Hier deine Supabase-Daten eintragen  ║
+// ║  KONFIGURATION:  ║eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpbXNpa2p5b3VwaWhvZ21xdXVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0NTIyMjYsImV4cCI6MjA4NjAyODIyNn0._Foa5ZVr4nwoOlZ4T-ORX0U4sNUjgRJJRyBDHvHV2vo
 // ╚═══════════════════════════════════════════════════════╝
-const SUPABASE_URL = 'DEINE_SUPABASE_URL';       // z.B. https://abc123.supabase.co
+const SUPABASE_URL = 'https://vimsikjyoupihogmquul.supabase.co';       // z.B. https://abc123.supabase.co
 const SUPABASE_ANON_KEY = 'DEIN_SUPABASE_ANON_KEY'; // Anon/Public Key
 
 let supabase = null;
@@ -2027,7 +2027,7 @@ async function initSync() {
   syncMode = await getSetting('syncMode', 'wifi');
 
   // Prüfen ob Supabase konfiguriert ist
-  if (SUPABASE_URL === 'DEINE_SUPABASE_URL' || SUPABASE_ANON_KEY === 'DEIN_SUPABASE_ANON_KEY') {
+  if (SUPABASE_URL === 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpbXNpa2p5b3VwaWhvZ21xdXVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0NTIyMjYsImV4cCI6MjA4NjAyODIyNn0._Foa5ZVr4nwoOlZ4T-ORX0U4sNUjgRJJRyBDHvHV2vo' || SUPABASE_ANON_KEY === 'DEIN_SUPABASE_ANON_KEY') {
     console.log('[Sync] Supabase nicht konfiguriert – Sync deaktiviert');
     updateSyncUI('offline', 'Nur lokal');
     return;
