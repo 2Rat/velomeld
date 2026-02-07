@@ -800,7 +800,7 @@ input, textarea {
         <div class="cat-btn__icon">⚠️</div>
         <div>
           <div class="cat-btn__label">Problem melden</div>
-          <div class="cat-btn__count">11 Unterkategorien</div>
+          <div class="cat-btn__count">12 Unterkategorien</div>
         </div>
         <div class="cat-btn__arrow">›</div>
       </button>
@@ -820,7 +820,7 @@ input, textarea {
         <div class="cat-btn__icon">👍</div>
         <div>
           <div class="cat-btn__label">Lob aussprechen</div>
-          <div class="cat-btn__count">3 Unterkategorien</div>
+          <div class="cat-btn__count">4 Unterkategorien</div>
         </div>
         <div class="cat-btn__arrow">›</div>
       </button>
@@ -1103,6 +1103,13 @@ const CATEGORIES = {
         tags: ['bordstein', 'absenkung', 'rampe', 'umlaufsperre', 'barriere'],
       },
       {
+        id: 'detour',
+        icon: '🔄',
+        label: 'Umleitung fehlt',
+        description: 'Keine Umleitung ausgeschildert, fehlende Umleitungsbeschilderung',
+        tags: ['umleitung', 'beschilderung', 'baustelle', 'sperrung', 'gesperrt'],
+      },
+      {
         id: 'other_problem',
         icon: '❓',
         label: 'Sonstiges',
@@ -1193,6 +1200,13 @@ const CATEGORIES = {
         label: 'Service',
         description: 'Reparaturstation, Luftpumpe, Trinkwasser',
         tags: ['reparatur', 'pumpe', 'service', 'wasser'],
+      },
+      {
+        id: 'bike_friendly',
+        icon: '🍺',
+        label: 'Fahrradfreundliche Einkehr',
+        description: 'Gaststätte, Café oder Biergarten mit Abstellmöglichkeit',
+        tags: ['gaststätte', 'café', 'biergarten', 'einkehr', 'essen', 'trinken'],
       },
     ],
   },
