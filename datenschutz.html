@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Datenschutzerklärung – 2Rat Radmelder</title>
+  <title>Impressum & Datenschutz – 2Rat Radwegemelder</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     body {
@@ -14,24 +14,60 @@
       color: #3D4F58;
       line-height: 1.6;
     }
-    h1 { font-size: 22px; color: #1A5FA8; }
+    h1 { font-size: 22px; color: #1A5FA8; margin-top: 32px; }
     h2 { font-size: 17px; margin-top: 28px; color: #3D4F58; }
     a { color: #1A5FA8; }
     .back { display: inline-block; margin-bottom: 16px; font-size: 14px; }
+    .divider { border: none; border-top: 2px solid #E5E7EB; margin: 40px 0; }
+    ul { padding-left: 20px; }
+    li { margin-bottom: 4px; }
   </style>
 </head>
 <body>
   <a href="index.html" class="back">← Zurück zur App</a>
+
+  <!-- ═══ IMPRESSUM ═══ -->
+  <h1>📋 Impressum</h1>
+  <p>Angaben gemäß § 5 TMG</p>
+
+  <h2>Betreiber</h2>
+  <p>
+    <strong>2RAT – Büro für Radverkehrsplanung</strong><br>
+    Armin Jung<br>
+    Radverkehrsplaner EIPOS<br>
+    Ritter von Hagen Straße 13<br>
+    66822 Lebach
+  </p>
+
+  <h2>Kontakt</h2>
+  <p>
+    Telefon: +49 151 29443794<br>
+    E-Mail: <a href="mailto:fahr2rat@gmail.com">fahr2rat@gmail.com</a><br>
+    Web: <a href="https://www.2rat.org" target="_blank">www.2rat.org</a>
+  </p>
+
+  <h2>Haftung für Inhalte</h2>
+  <p>Die Meldungen in der App und auf der öffentlichen Karte werden von Nutzern erstellt. 2RAT übernimmt keine Gewähr für die Richtigkeit, Vollständigkeit oder Aktualität der gemeldeten Inhalte. Offensichtlich rechtswidrige Inhalte werden nach Bekanntwerden umgehend entfernt.</p>
+
+  <h2>Haftung für Links</h2>
+  <p>Die App enthält Links zu externen Websites (OpenStreetMap). Für die Inhalte der verlinkten Seiten sind die jeweiligen Betreiber verantwortlich.</p>
+
+  <h2>Urheberrecht</h2>
+  <p>Die App „2Rat Radwegemelder" einschließlich Design, Code und Inhalte ist urheberrechtlich geschützt. © 2026 Armin Jung / 2RAT – Büro für Radverkehrsplanung.</p>
+
+  <hr class="divider">
+
+  <!-- ═══ DATENSCHUTZ ═══ -->
   <h1>🔒 Datenschutzerklärung</h1>
-  <p><strong>2Rat Radmelder</strong> – App zur Erfassung von Radverkehrsinfrastruktur</p>
+  <p><strong>2Rat Radwegemelder</strong> – App zur Erfassung von Radverkehrsinfrastruktur</p>
 
   <h2>1. Verantwortlicher</h2>
   <p>
-    2Rat Planungsbüro für Radverkehr<br>
+    2RAT – Büro für Radverkehrsplanung<br>
     Armin Jung<br>
     Ritter von Hagen Straße 13, 66822 Lebach<br>
     E-Mail: <a href="mailto:fahr2rat@gmail.com">fahr2rat@gmail.com</a><br>
-    Tel: +49 151 29443794
+    Telefon: +49 151 29443794
   </p>
 
   <h2>2. Welche Daten werden erhoben?</h2>
@@ -42,17 +78,20 @@
     <li><strong>Fotos:</strong> Optional aufgenommene Bilder</li>
     <li><strong>Kommentare:</strong> Optional eingegebene Texte</li>
     <li><strong>Zeitstempel:</strong> Datum und Uhrzeit der Meldung</li>
+    <li><strong>Geräte-ID:</strong> Zufällig generierte, anonyme Kennung für die Synchronisation</li>
   </ul>
-  <p>Es werden <strong>keine personenbezogenen Daten</strong> wie Name, E-Mail-Adresse oder Geräte-ID erhoben. Es ist keine Registrierung erforderlich.</p>
+  <p>Es werden <strong>keine personenbezogenen Daten</strong> wie Name oder E-Mail-Adresse erhoben. Es ist keine Registrierung erforderlich.</p>
 
   <h2>3. Wo werden die Daten gespeichert?</h2>
-  <p>Alle Daten werden <strong>ausschließlich lokal auf Ihrem Gerät</strong> gespeichert (IndexedDB im Browser). Es findet keine automatische Übertragung an einen Server statt.</p>
-  <p>Eine Datenübertragung erfolgt nur, wenn Sie aktiv einen Export durchführen (GeoJSON, CSV) oder die optionale Server-Synchronisation aktivieren.</p>
+  <p>Meldungen werden zunächst <strong>lokal auf Ihrem Gerät</strong> gespeichert (IndexedDB im Browser).</p>
+  <p>Bei aktivierter Synchronisation werden die Meldungen zusätzlich an einen Server übertragen. Wir nutzen dafür <strong>Supabase</strong> mit Serverstandort <strong>Frankfurt am Main (EU)</strong>. Die Datenübertragung erfolgt verschlüsselt (HTTPS).</p>
+  <p>Die synchronisierten Meldungen sind auf der öffentlichen Karte sichtbar. Dabei werden nur Standort, Kategorie, Kommentar und Zeitstempel angezeigt – <strong>keine Fotos und keine Angaben zur Person</strong>.</p>
 
   <h2>4. Externe Dienste</h2>
   <p>Die App nutzt folgende externe Dienste:</p>
   <ul>
     <li><strong>OpenStreetMap:</strong> Kartendarstellung. Dabei wird Ihre IP-Adresse an die OpenStreetMap-Server übermittelt. <a href="https://wiki.openstreetmap.org/wiki/Privacy_Policy" target="_blank">Datenschutz von OpenStreetMap</a></li>
+    <li><strong>Supabase:</strong> Serverseitige Datenspeicherung (Serverstandort: Frankfurt/EU). <a href="https://supabase.com/privacy" target="_blank">Datenschutz von Supabase</a></li>
     <li><strong>Google Fonts:</strong> Schriftart „DM Sans". <a href="https://policies.google.com/privacy" target="_blank">Datenschutz von Google</a></li>
   </ul>
 
@@ -60,16 +99,19 @@
   <p>Die App nutzt die GPS-Funktion Ihres Geräts ausschließlich zur Verortung von Meldungen. Der Standort wird nur bei aktiver Nutzung der App abgefragt. Es findet kein Tracking im Hintergrund statt.</p>
 
   <h2>6. Fotos</h2>
-  <p>Aufgenommene Fotos werden lokal auf Ihrem Gerät gespeichert. Bitte achten Sie darauf, keine erkennbaren Personen oder Kfz-Kennzeichen zu fotografieren.</p>
+  <p>Aufgenommene Fotos werden lokal auf Ihrem Gerät gespeichert und bei aktivierter Synchronisation verschlüsselt an den Server übertragen. Fotos werden <strong>nicht öffentlich angezeigt</strong> und dienen ausschließlich der Dokumentation. Bitte achten Sie darauf, keine erkennbaren Personen oder Kfz-Kennzeichen zu fotografieren.</p>
 
-  <h2>7. Cookies und Tracking</h2>
-  <p>Die App verwendet <strong>keine Cookies</strong> und <strong>keine Tracking- oder Analyse-Tools</strong>.</p>
+  <h2>7. Öffentliche Karte</h2>
+  <p>Synchronisierte Meldungen werden auf einer öffentlichen Karte dargestellt. Dabei sind sichtbar: Standort (Marker auf der Karte), Kategorie und Unterkategorie, Kommentar (falls eingegeben) und Datum. Es ist <strong>nicht nachvollziehbar</strong>, wer eine Meldung erstellt hat.</p>
 
-  <h2>8. Ihre Rechte</h2>
-  <p>Da alle Daten lokal auf Ihrem Gerät gespeichert werden, haben Sie jederzeit die volle Kontrolle. Sie können alle Meldungen in der App einsehen und löschen.</p>
+  <h2>8. Cookies und Tracking</h2>
+  <p>Die App verwendet <strong>keine Cookies</strong> und <strong>keine Tracking- oder Analyse-Tools</strong>. Es wird lediglich eine zufällig generierte Geräte-ID im lokalen Speicher (localStorage) abgelegt, die ausschließlich der Synchronisation dient.</p>
 
-  <h2>9. Kontakt</h2>
-  <p>Bei Fragen zum Datenschutz wenden Sie sich an:<br>
+  <h2>9. Ihre Rechte</h2>
+  <p>Sie haben das Recht auf Auskunft, Berichtigung und Löschung Ihrer Daten. Lokal gespeicherte Daten können Sie jederzeit in der App einsehen und löschen. Für die Löschung synchronisierter Daten wenden Sie sich an uns.</p>
+
+  <h2>10. Kontakt</h2>
+  <p>Bei Fragen zum Datenschutz:<br>
   <a href="mailto:fahr2rat@gmail.com">fahr2rat@gmail.com</a></p>
 
   <p style="margin-top: 32px; font-size: 12px; color: #8A9BA4;">Stand: Februar 2026</p>
