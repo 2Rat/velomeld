@@ -1,5 +1,5 @@
-// 2Rat Radwegemelder – Service Worker
-const CACHE_NAME = 'radmelder-v2';
+// 2Rat Radwegemelder – Service Worker v3
+const CACHE_NAME = 'radmelder-v3';
 const BASE = self.location.pathname.replace(/\/sw\.js$/, '/');
 
 const APP_SHELL_PATHS = [
@@ -10,7 +10,7 @@ const APP_SHELL_PATHS = [
 ];
 
 self.addEventListener('install', (event) => {
-  console.log('[SW] Install v2');
+  console.log('[SW] Install v3');
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       const urls = APP_SHELL_PATHS.map(p => BASE + p);
@@ -24,7 +24,7 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activate v2');
+  console.log('[SW] Activate v3');
   event.waitUntil(
     caches.keys().then((keys) =>
       Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
@@ -36,10 +36,9 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // Supabase CDN: immer vom Netz laden, nicht cachen
-  if (url.hostname.includes('cdn.jsdelivr.net')) {
-    event.respondWith(fetch(event.request).catch(() => new Response('')));
-    return;
+  // Supabase API und CDN: immer direkt zum Netz, kein Cache
+  if (url.hostname.includes('supabase') || url.hostname.includes('cdn.jsdelivr.net')) {
+    return; // SW greift nicht ein, Browser macht normal fetch
   }
 
   // OSM Tiles: Network-first, Cache-Fallback
