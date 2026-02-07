@@ -2051,8 +2051,10 @@ async function initSync() {
     supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     syncEnabled = true;
     console.log('[Sync] Supabase verbunden');
+    showToast('Supabase verbunden ✓', 'success');
   } catch (err) {
     console.warn('[Sync] Supabase-Verbindung fehlgeschlagen:', err);
+    showToast('Sync-Fehler: ' + err.message, 'error');
     updateSyncUI('error', 'Sync-Fehler');
     return;
   }
@@ -2179,21 +2181,25 @@ async function syncReport(report) {
 
   try {
     // 1. Meldung hochladen
+    const insertData = {
+      id: report.id,
+      latitude: report.latitude,
+      longitude: report.longitude,
+      accuracy: report.accuracy ? Math.round(report.accuracy) : null,
+      heading: report.heading || null,
+      timestamp: report.timestamp || new Date().toISOString(),
+      category: report.category,
+      subcategory: report.subcategory,
+      comment: report.comment || '',
+      photo_count: report.photoCount || 0,
+      device_id: deviceId,
+    };
+    
+    console.log('[Sync] Sende Meldung:', JSON.stringify(insertData));
+    
     const { data, error } = await supabase
       .from('reports')
-      .insert({
-        id: report.id,
-        latitude: report.latitude,
-        longitude: report.longitude,
-        accuracy: report.accuracy,
-        heading: report.heading,
-        timestamp: report.timestamp,
-        category: report.category,
-        subcategory: report.subcategory,
-        comment: report.comment || '',
-        photo_count: report.photoCount || 0,
-        device_id: deviceId,
-      })
+      .insert(insertData)
       .select()
       .single();
 
@@ -2224,6 +2230,7 @@ async function syncReport(report) {
 
   } catch (err) {
     console.error(`[Sync] ✗ Fehler bei Meldung ${report.id}:`, err.message);
+    showToast('Sync-Fehler: ' + err.message, 'error');
     return false;
   }
 }
