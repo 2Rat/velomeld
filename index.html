@@ -616,7 +616,7 @@ input, textarea {
   position: absolute;
   top: 16px;
   right: 16px;
-  z-index: 15;
+  z-index: 1000;
 }
 
 .report-badge__btn {
@@ -773,7 +773,7 @@ input, textarea {
       <div id="map-container"></div>
 
       <!-- GPS-Status (Overlay auf Karte) -->
-      <div style="position:absolute; top:12px; left:12px; z-index:15; display:flex; gap:6px;">
+      <div style="position:absolute; top:12px; left:12px; z-index:1000; display:flex; gap:6px;">
         <div id="gps-status" class="gps-status">
           <span class="gps-dot"></span> GPS wird gesucht…
         </div>
@@ -2009,10 +2009,10 @@ function downloadQGISStyle() {
 // ─── 2Rat Radwegemelder – Supabase Sync-Modul ───
 
 // ╔═══════════════════════════════════════════════════════╗
-// ║  KONFIGURATION:  ║eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpbXNpa2p5b3VwaWhvZ21xdXVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0NTIyMjYsImV4cCI6MjA4NjAyODIyNn0._Foa5ZVr4nwoOlZ4T-ORX0U4sNUjgRJJRyBDHvHV2vo
+// ║  KONFIGURATION: Hier deine Supabase-Daten eintragen  ║
 // ╚═══════════════════════════════════════════════════════╝
-const SUPABASE_URL = 'https://vimsikjyoupihogmquul.supabase.co';       // z.B. https://abc123.supabase.co
-const SUPABASE_ANON_KEY = 'DEIN_SUPABASE_ANON_KEY'; // Anon/Public Key
+const SUPABASE_URL = 'https://vimsikjyoupihogmquul.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpbXNpa2p5b3VwaWhvZ21xdXVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0NTIyMjYsImV4cCI6MjA4NjAyODIyNn0._Foa5ZVr4nwoOlZ4T-ORX0U4sNUjgRJJRyBDHvHV2vo';
 
 let supabase = null;
 let syncEnabled = false;
@@ -2027,10 +2027,17 @@ async function initSync() {
   syncMode = await getSetting('syncMode', 'wifi');
 
   // Prüfen ob Supabase konfiguriert ist
-  if (SUPABASE_URL === 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpbXNpa2p5b3VwaWhvZ21xdXVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0NTIyMjYsImV4cCI6MjA4NjAyODIyNn0._Foa5ZVr4nwoOlZ4T-ORX0U4sNUjgRJJRyBDHvHV2vo' || SUPABASE_ANON_KEY === 'DEIN_SUPABASE_ANON_KEY') {
+  if (SUPABASE_URL === 'DEINE_SUPABASE_URL' || SUPABASE_ANON_KEY === 'DEIN_SUPABASE_ANON_KEY') {
     console.log('[Sync] Supabase nicht konfiguriert – Sync deaktiviert');
     updateSyncUI('offline', 'Nur lokal');
     return;
+  }
+
+  // Warten bis Supabase-Library geladen ist (max 10 Sekunden)
+  let attempts = 0;
+  while (typeof window.supabase === 'undefined' && attempts < 20) {
+    await new Promise(r => setTimeout(r, 500));
+    attempts++;
   }
 
   try {
