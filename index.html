@@ -2025,6 +2025,7 @@ let syncMode = 'wifi'; // 'auto' | 'wifi' | 'manual'
  * Sync-Modul initialisieren
  */
 async function initSync() {
+  alert('DEBUG: initSync gestartet');
   // Sync-Modus aus Einstellungen laden
   syncMode = await getSetting('syncMode', 'wifi');
 
@@ -2046,6 +2047,7 @@ async function initSync() {
       document.head.appendChild(script);
     });
   } catch (err) {
+    alert('SUPABASE SCRIPT FEHLER:\n\n' + err.message + '\n\nDas Supabase-Script konnte nicht geladen werden.');
     console.log('[Sync] Supabase-Library konnte nicht geladen werden – Sync deaktiviert');
     updateSyncUI('offline', 'Nur lokal');
     return;
