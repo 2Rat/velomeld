@@ -2068,7 +2068,7 @@ async function initSync() {
     showToast('Supabase verbunden ✓', 'success');
   } catch (err) {
     console.warn('[Sync] Supabase-Verbindung fehlgeschlagen:', err);
-    showToast('Sync-Fehler: ' + err.message, 'error');
+    alert('SYNC-FEHLER DEBUG:\n\n' + err.message + '\n\nTyp: ' + (typeof window.supabase) + '\nKeys: ' + (window.supabase ? Object.keys(window.supabase).join(', ') : 'N/A'));
     updateSyncUI('error', 'Sync-Fehler');
     return;
   }
