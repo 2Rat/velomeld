@@ -155,7 +155,7 @@ input, textarea {
 /* ─── Home Screen ─── */
 .map-container {
   flex: 1;
-  min-height: 0;
+  min-height: 200px;
   position: relative;
 }
 
@@ -1654,6 +1654,10 @@ function initMap(containerId, options = {}) {
   // Zoom-Control rechts unten
   L.control.zoom({ position: 'bottomright' }).addTo(map);
 
+  // Karte nach kurzer Verzögerung aktualisieren (Fix für Container-Größe)
+  setTimeout(() => { map.invalidateSize(); }, 300);
+  setTimeout(() => { map.invalidateSize(); }, 1000);
+
   console.log('[Map] Initialisiert');
   return map;
 }
@@ -2048,7 +2052,17 @@ async function initSync() {
   }
 
   try {
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // Supabase UMD exports unter verschiedenen Namen
+    const sb = window.supabase;
+    if (sb && typeof sb.createClient === 'function') {
+      supabase = sb.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    } else if (sb && sb.supabase && typeof sb.supabase.createClient === 'function') {
+      supabase = sb.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    } else {
+      // Debug: Was ist window.supabase?
+      const keys = sb ? Object.keys(sb).join(', ') : 'undefined';
+      throw new Error('createClient nicht gefunden. window.supabase keys: ' + keys);
+    }
     syncEnabled = true;
     console.log('[Sync] Supabase verbunden');
     showToast('Supabase verbunden ✓', 'success');
