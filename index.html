@@ -19,6 +19,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://unpkg.com/dexie@3/dist/dexie.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <style>
 /* ─── 2Rat Radmelder – Stylesheet ─── */
 
@@ -2025,7 +2026,6 @@ let syncMode = 'wifi'; // 'auto' | 'wifi' | 'manual'
  * Sync-Modul initialisieren
  */
 async function initSync() {
-  alert('DEBUG: initSync gestartet');
   // Sync-Modus aus Einstellungen laden
   syncMode = await getSetting('syncMode', 'wifi');
 
@@ -2036,41 +2036,27 @@ async function initSync() {
     return;
   }
 
-  // Supabase-Library dynamisch laden
-  try {
-    await new Promise((resolve, reject) => {
-      if (typeof window.supabase !== 'undefined') { resolve(); return; }
-      const script = document.createElement('script');
-      script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
-      script.onload = resolve;
-      script.onerror = reject;
-      document.head.appendChild(script);
-    });
-  } catch (err) {
-    alert('SUPABASE SCRIPT FEHLER:\n\n' + err.message + '\n\nDas Supabase-Script konnte nicht geladen werden.');
-    console.log('[Sync] Supabase-Library konnte nicht geladen werden – Sync deaktiviert');
-    updateSyncUI('offline', 'Nur lokal');
-    return;
-  }
-
   try {
     // Supabase UMD exports unter verschiedenen Namen
     const sb = window.supabase;
-    if (sb && typeof sb.createClient === 'function') {
-      supabase = sb.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    } else if (sb && sb.supabase && typeof sb.supabase.createClient === 'function') {
-      supabase = sb.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    } else {
-      // Debug: Was ist window.supabase?
-      const keys = sb ? Object.keys(sb).join(', ') : 'undefined';
-      throw new Error('createClient nicht gefunden. window.supabase keys: ' + keys);
+    if (!sb) {
+      console.log('[Sync] Supabase-Library nicht geladen');
+      updateSyncUI('offline', 'Nur lokal');
+      return;
     }
+    
+    if (typeof sb.createClient === 'function') {
+      supabase = sb.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    } else if (sb.default && typeof sb.default.createClient === 'function') {
+      supabase = sb.default.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    } else {
+      throw new Error('createClient nicht gefunden. Keys: ' + Object.keys(sb).join(', '));
+    }
+    
     syncEnabled = true;
     console.log('[Sync] Supabase verbunden');
-    showToast('Supabase verbunden ✓', 'success');
   } catch (err) {
     console.warn('[Sync] Supabase-Verbindung fehlgeschlagen:', err);
-    alert('SYNC-FEHLER DEBUG:\n\n' + err.message + '\n\nTyp: ' + (typeof window.supabase) + '\nKeys: ' + (window.supabase ? Object.keys(window.supabase).join(', ') : 'N/A'));
     updateSyncUI('error', 'Sync-Fehler');
     return;
   }

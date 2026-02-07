@@ -1,5 +1,5 @@
-// 2Rat Radwegemelder – Service Worker v3
-const CACHE_NAME = 'radmelder-v3';
+// 2Rat Radwegemelder – Service Worker v4
+const CACHE_NAME = 'radmelder-v4';
 const BASE = self.location.pathname.replace(/\/sw\.js$/, '/');
 
 const APP_SHELL_PATHS = [
@@ -9,22 +9,26 @@ const APP_SHELL_PATHS = [
   'datenschutz.html',
 ];
 
+const CDN_URLS = [
+  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
+  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
+  'https://unpkg.com/dexie@3/dist/dexie.js',
+  'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js',
+];
+
 self.addEventListener('install', (event) => {
-  console.log('[SW] Install v3');
+  console.log('[SW] Install v4');
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       const urls = APP_SHELL_PATHS.map(p => BASE + p);
-      urls.push('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
-      urls.push('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js');
-      urls.push('https://unpkg.com/dexie@3/dist/dexie.js');
-      return cache.addAll(urls);
+      return cache.addAll([...urls, ...CDN_URLS]);
     })
   );
   self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activate v3');
+  console.log('[SW] Activate v4');
   event.waitUntil(
     caches.keys().then((keys) =>
       Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
@@ -36,9 +40,9 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // Supabase API und CDN: immer direkt zum Netz, kein Cache
-  if (url.hostname.includes('supabase') || url.hostname.includes('cdn.jsdelivr.net')) {
-    return; // SW greift nicht ein, Browser macht normal fetch
+  // Supabase API-Aufrufe: immer direkt zum Netz
+  if (url.hostname.includes('supabase')) {
+    return;
   }
 
   // OSM Tiles: Network-first, Cache-Fallback
@@ -51,10 +55,15 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // App-Dateien: Network-first, Cache-Fallback
+  // Alles andere (App + CDN-Libraries): Cache-first, Network-Fallback
   event.respondWith(
-    fetch(event.request)
-      .then((r) => { const c = r.clone(); caches.open(CACHE_NAME).then((cache) => cache.put(event.request, c)); return r; })
-      .catch(() => caches.match(event.request))
+    caches.match(event.request).then((cached) => {
+      if (cached) return cached;
+      return fetch(event.request).then((r) => {
+        const c = r.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, c));
+        return r;
+      });
+    })
   );
 });
