@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Radwegemelder – Öffentliche Karte</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --red: #E00000;
+      --yellow: #E5A700;
+      --green: #00A836;
+      --gray: #3D4F58;
+      --gray-mid: #8A9BA4;
+      --white: #FFFFFF;
+      --font: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      font-family: var(--font);
+      color: var(--gray);
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ─── Header ─── */
+    .header {
+      background: var(--white);
+      padding: 12px 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .header__brand {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header__title {
+      font-weight: 800;
+      font-size: 18px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    .header__title span:first-child { color: #1A5FA8; }
+    .header__title span:last-child { color: #2D8C28; }
+
+    .header__subtitle {
+      font-size: 10px;
+      color: var(--gray-mid);
+      font-weight: 500;
+    }
+
+    .header__stats {
+      display: flex;
+      gap: 12px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .stat {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: #f5f5f5;
+    }
+
+    .stat__dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    /* ─── Karte ─── */
+    #map {
+      flex: 1;
+      min-height: 0;
+    }
+
+    /* ─── Filter-Leiste ─── */
+    .filters {
+      position: absolute;
+      top: 80px;
+      left: 10px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .filter-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border: 2px solid transparent;
+      border-radius: 24px;
+      background: var(--white);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .filter-btn:hover { transform: scale(1.03); }
+
+    .filter-btn.active { border-color: currentColor; }
+
+    .filter-btn--problems { color: var(--red); }
+    .filter-btn--problems.active { background: #FFF0F0; }
+
+    .filter-btn--wishes { color: var(--yellow); }
+    .filter-btn--wishes.active { background: #FFF8E0; }
+
+    .filter-btn--positive { color: var(--green); }
+    .filter-btn--positive.active { background: #EEFBF0; }
+
+    .filter-btn--all { color: var(--gray); }
+    .filter-btn--all.active { background: #F0F2F4; border-color: var(--gray); }
+
+    .filter-count {
+      background: currentColor;
+      color: white;
+      font-size: 11px;
+      padding: 1px 7px;
+      border-radius: 10px;
+      min-width: 22px;
+      text-align: center;
+    }
+
+    /* ─── Popup ─── */
+    .leaflet-popup-content-wrapper {
+      border-radius: 14px !important;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
+      padding: 0 !important;
+    }
+
+    .leaflet-popup-content {
+      margin: 0 !important;
+      min-width: 220px;
+    }
+
+    .popup {
+      padding: 16px;
+    }
+
+    .popup__header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .popup__icon {
+      font-size: 24px;
+    }
+
+    .popup__category {
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .popup__badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: white;
+    }
+
+    .popup__comment {
+      margin-top: 10px;
+      padding: 10px;
+      background: #F7F8F9;
+      border-radius: 10px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: #4A5568;
+    }
+
+    .popup__meta {
+      margin-top: 10px;
+      font-size: 11px;
+      color: var(--gray-mid);
+    }
+
+    .popup__photo {
+      margin-top: 10px;
+      width: 100%;
+      border-radius: 10px;
+      max-height: 180px;
+      object-fit: cover;
+    }
+
+    /* ─── Cluster-Styling ─── */
+    .marker-cluster-problems {
+      background: rgba(224, 0, 0, 0.25);
+    }
+    .marker-cluster-problems div {
+      background: var(--red);
+      color: white;
+      font-weight: 700;
+      font-family: var(--font);
+    }
+
+    .marker-cluster-wishes {
+      background: rgba(229, 167, 0, 0.25);
+    }
+    .marker-cluster-wishes div {
+      background: var(--yellow);
+      color: white;
+      font-weight: 700;
+      font-family: var(--font);
+    }
+
+    .marker-cluster-positive {
+      background: rgba(0, 168, 54, 0.25);
+    }
+    .marker-cluster-positive div {
+      background: var(--green);
+      color: white;
+      font-weight: 700;
+      font-family: var(--font);
+    }
+
+    .marker-cluster-all {
+      background: rgba(61, 79, 88, 0.2);
+    }
+    .marker-cluster-all div {
+      background: var(--gray);
+      color: white;
+      font-weight: 700;
+      font-family: var(--font);
+    }
+
+    /* ─── Loading ─── */
+    .loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1000;
+      background: white;
+      padding: 20px 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .loading__spinner {
+      width: 20px;
+      height: 20px;
+      border: 3px solid #E5E7EB;
+      border-top-color: #1A5FA8;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─── Info-Box ─── */
+    .info-box {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      background: white;
+      padding: 10px 20px;
+      border-radius: 24px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+      font-size: 12px;
+      color: var(--gray-mid);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .info-box a {
+      color: #1A5FA8;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 480px) {
+      .header { padding: 10px 14px; }
+      .header__title { font-size: 15px; letter-spacing: 2px; }
+      .header__stats { gap: 6px; font-size: 11px; }
+      .stat { padding: 3px 8px; }
+      .filters { top: 70px; left: 6px; }
+      .filter-btn { padding: 6px 10px; font-size: 12px; }
+      .info-box { font-size: 11px; padding: 8px 14px; bottom: 10px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header__brand">
+      <div class="header__title">
+        <span>Radwege</span><span>melder</span>
+      </div>
+      <div class="header__subtitle">Öffentliche Meldungskarte · Saarland</div>
+    </div>
+    <div class="header__stats" id="stats"></div>
+  </div>
+
+  <!-- Karte -->
+  <div id="map"></div>
+
+  <!-- Filter -->
+  <div class="filters">
+    <button class="filter-btn filter-btn--all active" data-filter="all" onclick="setFilter('all')">
+      📍 Alle <span class="filter-count" id="count-all">0</span>
+    </button>
+    <button class="filter-btn filter-btn--problems" data-filter="problems" onclick="setFilter('problems')">
+      ⚠️ Probleme <span class="filter-count" id="count-problems">0</span>
+    </button>
+    <button class="filter-btn filter-btn--wishes" data-filter="wishes" onclick="setFilter('wishes')">
+      💬 Wünsche <span class="filter-count" id="count-wishes">0</span>
+    </button>
+    <button class="filter-btn filter-btn--positive" data-filter="positive" onclick="setFilter('positive')">
+      👍 Positiv <span class="filter-count" id="count-positive">0</span>
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" id="loading">
+    <div class="loading__spinner"></div>
+    Meldungen werden geladen…
+  </div>
+
+  <!-- Info -->
+  <div class="info-box">
+    🚲 Mitmachen? <a href="https://2rat.github.io/velomeld/">Radwegemelder-App öffnen</a>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+  <script>
+    // ─── Supabase Config ───
+    const SUPABASE_URL = 'https://vimsikjyoupihogmquul.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpbXNpa2p5b3VwaWhvZ21xdXVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0NTIyMjYsImV4cCI6MjA4NjAyODIyNn0._Foa5ZVr4nwoOlZ4T-ORX0U4sNUjgRJJRyBDHvHV2vo';
+
+    // ─── Kategorien ───
+    const CATEGORIES = {
+      problems: {
+        label: 'Problem', color: '#E00000', emoji: '⚠️',
+        subs: {
+          surface: { icon: '🕳️', label: 'Oberfläche' },
+          narrow: { icon: '↔️', label: 'Engstelle' },
+          crossing: { icon: '🔀', label: 'Kreuzung / Knoten' },
+          traverse: { icon: '🚶', label: 'Querung' },
+          conflict: { icon: '💥', label: 'Konflikte' },
+          parking: { icon: '🅿️', label: 'Parken' },
+          signage: { icon: '🪧', label: 'Wegweisung' },
+          lighting: { icon: '💡', label: 'Beleuchtung' },
+          construction: { icon: '🚧', label: 'Baustelle' },
+          drainage: { icon: '💧', label: 'Entwässerung' },
+          other: { icon: '📝', label: 'Sonstiges' },
+        }
+      },
+      wishes: {
+        label: 'Wunsch', color: '#E5A700', emoji: '💬',
+        subs: {
+          new_path: { icon: '🛤️', label: 'Radweg gewünscht' },
+          bike_parking: { icon: '🔒', label: 'Abstellanlage' },
+          tempo30: { icon: '🐌', label: 'Tempo 30' },
+          traffic_light: { icon: '🚦', label: 'Ampelschaltung' },
+          bike_street: { icon: '🚲', label: 'Fahrradstraße' },
+          oneway: { icon: '↩️', label: 'Einbahnstraße öffnen' },
+        }
+      },
+      positive: {
+        label: 'Positiv', color: '#00A836', emoji: '👍',
+        subs: {
+          good_infra: { icon: '⭐', label: 'Gute Infrastruktur' },
+          safe_crossing: { icon: '✅', label: 'Sichere Querung' },
+          service: { icon: '🛠️', label: 'Service' },
+        }
+      }
+    };
+
+    function getSubInfo(category, subcategory) {
+      const cat = CATEGORIES[category];
+      if (!cat) return { icon: '📍', label: subcategory, color: '#888' };
+      const sub = cat.subs[subcategory];
+      return {
+        icon: sub ? sub.icon : cat.emoji,
+        label: sub ? sub.label : subcategory,
+        color: cat.color,
+        catLabel: cat.label,
+      };
+    }
+
+    // ─── SVG Marker ───
+    function createMarkerIcon(color) {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="38" viewBox="0 0 28 38">
+        <path d="M14 0C6.27 0 0 6.27 0 14c0 10.5 14 24 14 24s14-13.5 14-24C28 6.27 21.73 0 14 0z" fill="${color}" stroke="white" stroke-width="2"/>
+        <circle cx="14" cy="14" r="6" fill="white" opacity="0.9"/>
+      </svg>`;
+      return L.divIcon({
+        html: svg,
+        className: '',
+        iconSize: [28, 38],
+        iconAnchor: [14, 38],
+        popupAnchor: [0, -34],
+      });
+    }
+
+    const ICONS = {
+      problems: createMarkerIcon('#E00000'),
+      wishes: createMarkerIcon('#E5A700'),
+      positive: createMarkerIcon('#00A836'),
+    };
+
+    // ─── State ───
+    let map, allReports = [], currentFilter = 'all';
+    let clusterGroup;
+
+    // ─── Map Init ───
+    map = L.map('map', {
+      center: [49.41, 6.78],
+      zoom: 12,
+      zoomControl: true,
+    });
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a> · <a href="https://2rat.github.io/velomeld/">2Rat Radwegemelder</a>',
+      maxZoom: 19,
+    }).addTo(map);
+
+    // ─── Daten laden ───
+    async function loadReports() {
+      try {
+        const resp = await fetch(
+          SUPABASE_URL + '/rest/v1/reports?select=*&order=timestamp.desc&limit=5000',
+          { headers: { 'apikey': SUPABASE_KEY } }
+        );
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        allReports = await resp.json();
+        console.log(`${allReports.length} Meldungen geladen`);
+
+        updateCounts();
+        renderMarkers();
+
+        // Auf Meldungen zoomen
+        if (allReports.length > 0) {
+          const bounds = allReports.map(r => [r.latitude, r.longitude]);
+          map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
+        }
+      } catch (err) {
+        console.error('Fehler:', err);
+        document.getElementById('loading').innerHTML = '❌ Meldungen konnten nicht geladen werden';
+      }
+      document.getElementById('loading').style.display = 'none';
+    }
+
+    // ─── Marker rendern ───
+    function renderMarkers() {
+      if (clusterGroup) map.removeLayer(clusterGroup);
+
+      clusterGroup = L.markerClusterGroup({
+        maxClusterRadius: 50,
+        spiderfyOnMaxZoom: true,
+        showCoverageOnHover: false,
+        iconCreateFunction: function(cluster) {
+          const count = cluster.getChildCount();
+          const size = count < 10 ? 36 : count < 50 ? 44 : 52;
+          let cls = 'marker-cluster-all';
+          if (currentFilter !== 'all') cls = 'marker-cluster-' + currentFilter;
+          return L.divIcon({
+            html: '<div style="width:' + (size-10) + 'px;height:' + (size-10) + 'px;line-height:' + (size-10) + 'px;text-align:center;border-radius:50%;font-size:13px;">' + count + '</div>',
+            className: 'marker-cluster ' + cls,
+            iconSize: [size, size],
+          });
+        }
+      });
+
+      const filtered = currentFilter === 'all'
+        ? allReports
+        : allReports.filter(r => r.category === currentFilter);
+
+      filtered.forEach(report => {
+        const info = getSubInfo(report.category, report.subcategory);
+        const icon = ICONS[report.category] || ICONS.problems;
+
+        const marker = L.marker([report.latitude, report.longitude], { icon });
+
+        const date = new Date(report.timestamp);
+        const dateStr = date.toLocaleDateString('de-DE', {
+          day: '2-digit', month: '2-digit', year: 'numeric',
+          hour: '2-digit', minute: '2-digit',
+        });
+
+        let popup = `
+          <div class="popup">
+            <div class="popup__header">
+              <span class="popup__icon">${info.icon}</span>
+              <div>
+                <div class="popup__category">${info.label}</div>
+                <span class="popup__badge" style="background:${info.color}">${info.catLabel}</span>
+              </div>
+            </div>
+            ${report.comment ? `<div class="popup__comment">${escapeHtml(report.comment)}</div>` : ''}
+            <div class="popup__meta">📅 ${dateStr}</div>
+          </div>
+        `;
+
+        marker.bindPopup(popup);
+        clusterGroup.addLayer(marker);
+      });
+
+      map.addLayer(clusterGroup);
+    }
+
+    // ─── Filter ───
+    function setFilter(filter) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === filter);
+      });
+      renderMarkers();
+    }
+
+    // ─── Zähler ───
+    function updateCounts() {
+      const counts = { all: allReports.length, problems: 0, wishes: 0, positive: 0 };
+      allReports.forEach(r => {
+        if (counts[r.category] !== undefined) counts[r.category]++;
+      });
+
+      Object.entries(counts).forEach(([key, count]) => {
+        const el = document.getElementById('count-' + key);
+        if (el) el.textContent = count;
+      });
+
+      // Stats im Header
+      document.getElementById('stats').innerHTML = `
+        <div class="stat"><div class="stat__dot" style="background:var(--red)"></div>${counts.problems}</div>
+        <div class="stat"><div class="stat__dot" style="background:var(--yellow)"></div>${counts.wishes}</div>
+        <div class="stat"><div class="stat__dot" style="background:var(--green)"></div>${counts.positive}</div>
+      `;
+    }
+
+    // ─── Helpers ───
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ─── Start ───
+    loadReports();
+
+    // Auto-Refresh alle 60 Sekunden
+    setInterval(loadReports, 60000);
+  </script>
+</body>
+</html>
