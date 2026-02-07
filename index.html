@@ -19,7 +19,6 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://unpkg.com/dexie@3/dist/dexie.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <style>
 /* ─── 2Rat Radmelder – Stylesheet ─── */
 
@@ -2009,70 +2008,52 @@ function downloadQGISStyle() {
 
 
 // ═══ sync.js ═══
-// ─── 2Rat Radwegemelder – Supabase Sync-Modul ───
+// ─── 2Rat Radwegemelder – Supabase Sync (REST-API, kein JS-Client nötig) ───
 
-// ╔═══════════════════════════════════════════════════════╗
-// ║  KONFIGURATION: Hier deine Supabase-Daten eintragen  ║
-// ╚═══════════════════════════════════════════════════════╝
 const SUPABASE_URL = 'https://vimsikjyoupihogmquul.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpbXNpa2p5b3VwaWhvZ21xdXVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0NTIyMjYsImV4cCI6MjA4NjAyODIyNn0._Foa5ZVr4nwoOlZ4T-ORX0U4sNUjgRJJRyBDHvHV2vo';
 
-let supabase = null;
 let syncEnabled = false;
 let deviceId = null;
-let syncMode = 'wifi'; // 'auto' | 'wifi' | 'manual'
+let syncMode = 'wifi';
 
-/**
- * Sync-Modul initialisieren
- */
+const sbHeaders = {
+  'apikey': SUPABASE_ANON_KEY,
+  'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+  'Content-Type': 'application/json',
+  'Prefer': 'return=representation',
+};
+
 async function initSync() {
-  // Sync-Modus aus Einstellungen laden
   syncMode = await getSetting('syncMode', 'wifi');
 
-  // Prüfen ob Supabase konfiguriert ist
-  if (SUPABASE_URL === 'DEINE_SUPABASE_URL' || SUPABASE_ANON_KEY === 'DEIN_SUPABASE_ANON_KEY') {
-    console.log('[Sync] Supabase nicht konfiguriert – Sync deaktiviert');
+  if (!SUPABASE_URL || SUPABASE_URL === 'DEINE_SUPABASE_URL') {
     updateSyncUI('offline', 'Nur lokal');
     return;
   }
 
-  try {
-    // Supabase UMD exports unter verschiedenen Namen
-    const sb = window.supabase;
-    if (!sb) {
-      console.log('[Sync] Supabase-Library nicht geladen');
-      updateSyncUI('offline', 'Nur lokal');
-      return;
-    }
-    
-    if (typeof sb.createClient === 'function') {
-      supabase = sb.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    } else if (sb.default && typeof sb.default.createClient === 'function') {
-      supabase = sb.default.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    } else {
-      throw new Error('createClient nicht gefunden. Keys: ' + Object.keys(sb).join(', '));
-    }
-    
-    syncEnabled = true;
-    console.log('[Sync] Supabase verbunden');
-  } catch (err) {
-    console.warn('[Sync] Supabase-Verbindung fehlgeschlagen:', err);
-    updateSyncUI('error', 'Sync-Fehler');
-    return;
-  }
-
-  // Anonyme Geräte-ID generieren/laden
   deviceId = localStorage.getItem('radmelder_device_id');
   if (!deviceId) {
     deviceId = crypto.randomUUID();
     localStorage.setItem('radmelder_device_id', deviceId);
   }
 
-  // Online/Offline-Events
+  try {
+    const resp = await fetch(SUPABASE_URL + '/rest/v1/reports?select=id&limit=1', {
+      headers: { 'apikey': SUPABASE_ANON_KEY }
+    });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    syncEnabled = true;
+    console.log('[Sync] Verbunden (REST-API)');
+  } catch (err) {
+    console.warn('[Sync] Nicht erreichbar:', err.message);
+    updateSyncUI('offline', 'Nur lokal');
+    return;
+  }
+
   window.addEventListener('online', onOnline);
   window.addEventListener('offline', onOffline);
 
-  // Initiale Sync-Prüfung
   if (navigator.onLine) {
     updateSyncUI('synced', 'Online');
     attemptSync();
@@ -2081,33 +2062,19 @@ async function initSync() {
   }
 }
 
-/**
- * Prüfen ob aktuell gesynced werden soll
- */
 function shouldSync() {
   if (!syncEnabled || !navigator.onLine) return false;
   if (syncMode === 'manual') return false;
   if (syncMode === 'wifi') return isOnWifi();
-  return true; // auto
-}
-
-/**
- * Prüfen ob WLAN-Verbindung besteht
- * Nutzt die Network Information API (falls verfügbar)
- */
-function isOnWifi() {
-  const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-  if (conn) {
-    return conn.type === 'wifi' || conn.type === 'ethernet';
-  }
-  // Fallback: Wenn API nicht verfügbar, gehen wir optimistisch von WLAN aus
-  // (auf Desktop ist das fast immer der Fall)
   return true;
 }
 
-/**
- * Sync versuchen (prüft Modus)
- */
+function isOnWifi() {
+  const c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  if (c) return c.type === 'wifi' || c.type === 'ethernet';
+  return true;
+}
+
 function attemptSync() {
   if (shouldSync()) {
     syncPendingReports();
@@ -2120,52 +2087,25 @@ function attemptSync() {
   }
 }
 
-/**
- * Online-Event: Ausstehende Meldungen synchronisieren
- */
 function onOnline() {
-  console.log('[Sync] Online');
   updateSyncUI('synced', 'Online');
   attemptSync();
 }
 
-/**
- * Offline-Event
- */
 function onOffline() {
-  console.log('[Sync] Offline');
   updateSyncUI('offline', 'Offline');
 }
 
-/**
- * Sync-Modus ändern und speichern
- */
 async function setSyncMode(mode) {
   syncMode = mode;
   await setSetting('syncMode', mode);
-  console.log(`[Sync] Modus geändert: ${mode}`);
-
-  // UI aktualisieren
-  const manualSection = document.getElementById('manual-sync-section');
-  if (manualSection) {
-    manualSection.style.display = (mode === 'manual') ? 'block' : 'none';
-  }
-
-  // Bei Wechsel zu auto oder wifi: sofort versuchen
-  if (mode !== 'manual' && navigator.onLine) {
-    attemptSync();
-  }
+  const ms = document.getElementById('manual-sync-section');
+  if (ms) ms.style.display = mode === 'manual' ? 'block' : 'none';
+  if (navigator.onLine) attemptSync();
 }
 
-/**
- * Ausstehende Meldungen zählen und anzeigen
- */
 async function updatePendingInfo() {
-  const pending = await db.reports
-    .where('syncStatus')
-    .equals('local')
-    .count();
-  
+  const pending = await db.reports.where('syncStatus').equals('local').count();
   const el = document.getElementById('pending-count');
   if (el) {
     el.textContent = pending > 0
@@ -2175,15 +2115,10 @@ async function updatePendingInfo() {
   return pending;
 }
 
-/**
- * Einzelne Meldung an Supabase senden
- */
 async function syncReport(report) {
-  if (!supabase || !syncEnabled) return false;
-
+  if (!syncEnabled) return false;
   try {
-    // 1. Meldung hochladen
-    const insertData = {
+    const body = {
       id: report.id,
       latitude: report.latitude,
       longitude: report.longitude,
@@ -2196,157 +2131,104 @@ async function syncReport(report) {
       photo_count: report.photoCount || 0,
       device_id: deviceId,
     };
-    
-    console.log('[Sync] Sende Meldung:', JSON.stringify(insertData));
-    
-    const { data, error } = await supabase
-      .from('reports')
-      .insert(insertData)
-      .select()
-      .single();
 
-    if (error) {
-      // Duplikat? Dann war schon gesynced
-      if (error.code === '23505') {
-        console.log(`[Sync] Meldung ${report.id} existiert bereits`);
+    const resp = await fetch(SUPABASE_URL + '/rest/v1/reports', {
+      method: 'POST',
+      headers: sbHeaders,
+      body: JSON.stringify(body),
+    });
+
+    if (!resp.ok) {
+      const errData = await resp.json().catch(() => ({}));
+      if (errData.code === '23505') {
         await db.reports.update(report.localId, { syncStatus: 'synced' });
         return true;
       }
-      throw error;
+      throw new Error(errData.message || 'HTTP ' + resp.status);
     }
 
-    // 2. Fotos hochladen
+    // Fotos hochladen
     const photos = await getPhotosForReport(report.localId);
     for (let i = 0; i < photos.length; i++) {
       await syncPhoto(report.id, photos[i], i);
     }
 
-    // 3. Status in lokaler DB aktualisieren
-    await db.reports.update(report.localId, {
-      syncStatus: 'synced',
-      serverId: data.id,
-    });
-
-    console.log(`[Sync] ✓ Meldung ${report.id} synchronisiert`);
+    await db.reports.update(report.localId, { syncStatus: 'synced', serverId: report.id });
+    console.log('[Sync] ✓ ' + report.id);
     return true;
-
   } catch (err) {
-    console.error(`[Sync] ✗ Fehler bei Meldung ${report.id}:`, err.message);
-    showToast('Sync-Fehler: ' + err.message, 'error');
+    console.error('[Sync] ✗', err.message);
     return false;
   }
 }
 
-/**
- * Foto an Supabase Storage senden
- */
 async function syncPhoto(reportId, photo, index) {
-  if (!supabase) return;
-
   try {
-    // Base64 zu Blob konvertieren
     const base64Data = photo.data.split(',')[1];
-    const byteCharacters = atob(base64Data);
-    const byteNumbers = new Array(byteCharacters.length);
-    for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i);
-    }
-    const byteArray = new Uint8Array(byteNumbers);
-    const blob = new Blob([byteArray], { type: 'image/jpeg' });
+    const bytes = atob(base64Data);
+    const arr = new Uint8Array(bytes.length);
+    for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
+    const blob = new Blob([arr], { type: 'image/jpeg' });
+    const path = reportId + '/' + index + '.jpg';
 
-    // Pfad: photos/{report_id}/{index}.jpg
-    const path = `${reportId}/${index}.jpg`;
+    await fetch(SUPABASE_URL + '/storage/v1/object/photos/' + path, {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY },
+      body: blob,
+    });
 
-    const { error: uploadError } = await supabase.storage
-      .from('photos')
-      .upload(path, blob, {
-        contentType: 'image/jpeg',
-        upsert: true,
-      });
-
-    if (uploadError) throw uploadError;
-
-    // Foto-Metadaten in DB speichern
-    await supabase
-      .from('photos')
-      .insert({
-        report_id: reportId,
-        storage_path: path,
-      });
-
-    console.log(`[Sync] ✓ Foto ${index} für ${reportId} hochgeladen`);
-
+    await fetch(SUPABASE_URL + '/rest/v1/photos', {
+      method: 'POST',
+      headers: sbHeaders,
+      body: JSON.stringify({ report_id: reportId, storage_path: path }),
+    });
   } catch (err) {
-    console.error(`[Sync] ✗ Foto-Upload fehlgeschlagen:`, err.message);
+    console.warn('[Sync] Foto-Fehler:', err.message);
   }
 }
 
-/**
- * Alle ausstehenden Meldungen synchronisieren
- */
 async function syncPendingReports() {
-  if (!supabase || !syncEnabled || !navigator.onLine) return;
+  if (!syncEnabled || !navigator.onLine) return;
+  updateSyncUI('pending', 'Synchronisiere…');
 
-  const pending = await db.reports
-    .where('syncStatus')
-    .equals('local')
-    .toArray();
-
+  const pending = await db.reports.where('syncStatus').equals('local').toArray();
   if (pending.length === 0) {
     updateSyncUI('synced', 'Online');
+    updatePendingInfo();
     return;
   }
 
-  updateSyncUI('pending', `Sync ${pending.length}…`);
-  console.log(`[Sync] ${pending.length} Meldungen ausstehend`);
-
   let synced = 0;
-  for (const report of pending) {
-    const success = await syncReport(report);
-    if (success) synced++;
+  for (const r of pending) {
+    if (await syncReport(r)) synced++;
   }
 
   if (synced === pending.length) {
     updateSyncUI('synced', 'Online');
-    showToast(`✓ ${synced} Meldung${synced > 1 ? 'en' : ''} synchronisiert`);
+    showToast(synced + ' Meldung' + (synced > 1 ? 'en' : '') + ' synchronisiert ✓');
   } else {
-    updateSyncUI('pending', `${pending.length - synced} ausstehend`);
+    updateSyncUI('pending', (pending.length - synced) + ' ausstehend');
   }
+  updatePendingInfo();
 }
 
-/**
- * Sync-UI aktualisieren
- */
 function updateSyncUI(status, text) {
-  const container = document.getElementById('sync-status');
-  const textEl = document.getElementById('sync-text');
-  if (!container || !textEl) return;
-
-  container.className = `sync-status sync-status--${status}`;
-  textEl.textContent = text;
+  const c = document.getElementById('sync-status');
+  if (!c) return;
+  c.className = 'sync-status sync-status--' + status;
+  const t = document.getElementById('sync-text');
+  if (t) t.textContent = text;
 }
 
-/**
- * Alle Meldungen von Supabase laden (für öffentliche Karte)
- */
 async function fetchAllPublicReports() {
-  if (!supabase || !syncEnabled) return [];
-
+  if (!syncEnabled) return [];
   try {
-    const { data, error } = await supabase
-      .from('reports')
-      .select('*')
-      .order('timestamp', { ascending: false })
-      .limit(1000);
-
-    if (error) throw error;
-    return data || [];
-  } catch (err) {
-    console.error('[Sync] Fehler beim Laden öffentlicher Meldungen:', err);
-    return [];
-  }
+    const resp = await fetch(SUPABASE_URL + '/rest/v1/reports?select=*&order=timestamp.desc&limit=1000', {
+      headers: { 'apikey': SUPABASE_ANON_KEY }
+    });
+    return resp.ok ? await resp.json() : [];
+  } catch (err) { return []; }
 }
-
 
 // ═══ app.js ═══
 // ─── 2Rat Radmelder – Haupt-App ───
