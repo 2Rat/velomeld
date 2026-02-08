@@ -196,28 +196,86 @@ function $(id){return document.getElementById(id);}
 // Projects
 function loadProj(){projs=JSON.parse(localStorage.getItem('rp')||'[]');rProjSel();rProjList();}
 function saveProj(){localStorage.setItem('rp',JSON.stringify(projs));rProjSel();rProjList();}
-function addProj(){try{const n=$('pName').value.trim(),k=$('pKom').value.trim(),f=$('pFrom').value,t=$('pTo').value;if(!n)return alert('Name fehlt.');const proj={id:Date.now()+'',name:n,kommune:k,dateFrom:f,dateTo:t};projs.push(proj);saveProj();$('pName').value='';$('pKom').value='';$('pFrom').value='';$('pTo').value='';
-var msg=$('projMsg');if(msg){msg.textContent='\u2705 Projekt "'+n+'" angelegt!';msg.style.display='block';setTimeout(function(){msg.style.display='none';},3000);}
-}catch(e){alert('Fehler: '+e.message);console.error(e);}}
-function delProj(id){if(!confirm('Löschen?'))return;projs=projs.filter(p=>p.id!==id);if(aProj&&aProj.id===id){aProj=null;$('projSel').value='all';}saveProj();af();}
-function rProjSel(){const s=$('projSel');s.innerHTML='<option value="all">Alle Meldungen</option>';projs.forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=p.name+(p.kommune?' ('+p.kommune+')':'');s.appendChild(o);});}
-function rProjList(){const c=$('pmList');if(!projs.length){c.innerHTML='<div style="color:var(--text-light);font-size:13px;text-align:center;padding:20px">Noch keine Projekte.</div>';return;}
-let html='';projs.forEach(p=>{const link=getProjLink(p);
-html+='<div style="padding:14px;border:1px solid #E2E8F0;border-radius:8px;margin-bottom:10px;background:#fff">';
-html+='<div style="display:flex;justify-content:space-between;align-items:flex-start">';
-html+='<div><div style="font-weight:700;font-size:14px">'+esc(p.name)+'</div>';
-html+='<div style="font-size:11px;color:#7B8A9A;margin-top:2px">'+(p.kommune?'📍 '+esc(p.kommune):'')+(p.dateFrom?' · 📅 '+p.dateFrom+' – '+(p.dateTo||'…'):'')+'</div></div>';
-html+='<button onclick="delProj(\''+p.id+'\')" style="background:none;border:none;color:#E00000;cursor:pointer;font-size:16px;padding:2px 6px" title="Löschen">🗑️</button></div>';
-if(p.kommune){var safeLink=link.replace(/&/g,'&amp;').replace(/'/g,'&#39;');
-html+='<div style="margin-top:10px;padding-top:10px;border-top:1px solid #E2E8F0">';
-html+='<div style="font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#7B8A9A;font-weight:600;margin-bottom:6px">🔗 Öffentlicher Aktions-Link</div>';
-html+='<div style="display:flex;gap:6px">';
-html+='<input type="text" readonly value="'+link.replace(/"/g,'&quot;')+'" style="flex:1;padding:6px 8px;border:1px solid #E2E8F0;border-radius:6px;font-family:inherit;font-size:11px;color:#2C3E50;background:#F8FAFC" onclick="this.select()">';
-html+='<button onclick="cpLink(this)" data-link="'+link.replace(/"/g,'&quot;')+'" style="padding:6px 12px;background:#1A5FA8;color:#fff;border:none;border-radius:6px;font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap">📋 Kopieren</button>';
-html+='</div></div>';}
-html+='</div>';});c.innerHTML=html;}
-function getProjLink(p){const base='https://2rat.github.io/velomeld/karte.html';const params=[];if(p.kommune)params.push('kommune='+encodeURIComponent(p.kommune));if(p.dateFrom)params.push('von='+p.dateFrom);if(p.dateTo)params.push('bis='+p.dateTo);if(p.name)params.push('titel='+encodeURIComponent(p.name));return params.length?base+'?'+params.join('&'):base;}
-function cpLink(btn){const link=btn.getAttribute('data-link');navigator.clipboard.writeText(link).then(()=>{btn.textContent='✅ Kopiert!';setTimeout(()=>btn.textContent='📋 Kopieren',2000);}).catch(()=>prompt('Link kopieren:',link));}
+function addProj(){
+  var n=$('pName').value.trim();
+  var k=$('pKom').value.trim();
+  var f=$('pFrom').value;
+  var t=$('pTo').value;
+  if(!n){alert('Bitte Projektname eingeben.');return;}
+  projs.push({id:Date.now()+'',name:n,kommune:k,dateFrom:f,dateTo:t});
+  saveProj();
+  $('pName').value='';$('pKom').value='';$('pFrom').value='';$('pTo').value='';
+  var msg=$('projMsg');
+  msg.textContent='Projekt "'+n+'" wurde angelegt!';
+  msg.style.display='block';
+  setTimeout(function(){msg.style.display='none';},4000);
+}
+function delProj(id){if(!confirm('Projekt wirklich loeschen?'))return;projs=projs.filter(function(p){return p.id!==id;});if(aProj&&aProj.id===id){aProj=null;$('projSel').value='all';}saveProj();af();}
+function rProjSel(){var s=$('projSel');s.innerHTML='<option value="all">Alle Meldungen</option>';projs.forEach(function(p){var o=document.createElement('option');o.value=p.id;o.textContent=p.name+(p.kommune?' ('+p.kommune+')':'');s.appendChild(o);});}
+function rProjList(){
+  var c=$('pmList');
+  if(!projs.length){c.innerHTML='<div style="color:#7B8A9A;font-size:13px;text-align:center;padding:20px">Noch keine Projekte angelegt.</div>';return;}
+  c.innerHTML='';
+  projs.forEach(function(p){
+    var card=document.createElement('div');
+    card.style.cssText='padding:14px;border:1px solid #E2E8F0;border-radius:8px;margin-bottom:10px;background:#fff';
+    var header=document.createElement('div');
+    header.style.cssText='display:flex;justify-content:space-between;align-items:flex-start';
+    var info=document.createElement('div');
+    var title=document.createElement('div');
+    title.style.cssText='font-weight:700;font-size:14px';
+    title.textContent=p.name;
+    var meta=document.createElement('div');
+    meta.style.cssText='font-size:11px;color:#7B8A9A;margin-top:2px';
+    meta.textContent=(p.kommune?'📍 '+p.kommune:'')+(p.dateFrom?' · 📅 '+p.dateFrom+' – '+(p.dateTo||'offen'):'');
+    info.appendChild(title);
+    info.appendChild(meta);
+    var delBtn=document.createElement('button');
+    delBtn.textContent='🗑️';
+    delBtn.title='Loeschen';
+    delBtn.style.cssText='background:none;border:none;color:#E00000;cursor:pointer;font-size:16px;padding:2px 6px';
+    delBtn.setAttribute('data-id',p.id);
+    delBtn.onclick=function(){delProj(this.getAttribute('data-id'));};
+    header.appendChild(info);
+    header.appendChild(delBtn);
+    card.appendChild(header);
+    if(p.kommune){
+      var linkUrl=getProjLink(p);
+      var linkSection=document.createElement('div');
+      linkSection.style.cssText='margin-top:10px;padding-top:10px;border-top:1px solid #E2E8F0';
+      var linkLabel=document.createElement('div');
+      linkLabel.style.cssText='font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#7B8A9A;font-weight:600;margin-bottom:6px';
+      linkLabel.textContent='🔗 Oeffentlicher Aktions-Link';
+      var linkRow=document.createElement('div');
+      linkRow.style.cssText='display:flex;gap:6px';
+      var linkInp=document.createElement('input');
+      linkInp.type='text';
+      linkInp.readOnly=true;
+      linkInp.value=linkUrl;
+      linkInp.style.cssText='flex:1;padding:6px 8px;border:1px solid #E2E8F0;border-radius:6px;font-family:inherit;font-size:11px;color:#2C3E50;background:#F8FAFC';
+      linkInp.onclick=function(){this.select();};
+      var copyBtn=document.createElement('button');
+      copyBtn.textContent='📋 Kopieren';
+      copyBtn.style.cssText='padding:6px 12px;background:#1A5FA8;color:#fff;border:none;border-radius:6px;font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap';
+      copyBtn.setAttribute('data-url',linkUrl);
+      copyBtn.onclick=function(){
+        var url=this.getAttribute('data-url');
+        var btn=this;
+        navigator.clipboard.writeText(url).then(function(){
+          btn.textContent='Kopiert!';
+          setTimeout(function(){btn.textContent='📋 Kopieren';},2000);
+        }).catch(function(){prompt('Link kopieren:',url);});
+      };
+      linkRow.appendChild(linkInp);
+      linkRow.appendChild(copyBtn);
+      linkSection.appendChild(linkLabel);
+      linkSection.appendChild(linkRow);
+      card.appendChild(linkSection);
+    }
+    c.appendChild(card);
+  });
+}
+function getProjLink(p){var base='https://2rat.github.io/velomeld/karte.html';var params=[];if(p.kommune)params.push('kommune='+encodeURIComponent(p.kommune));if(p.dateFrom)params.push('von='+p.dateFrom);if(p.dateTo)params.push('bis='+p.dateTo);if(p.name)params.push('titel='+encodeURIComponent(p.name));return params.length?base+'?'+params.join('&'):base;}
 function selProj(){const id=$('projSel').value;if(id==='all'){aProj=null;$('headerProject').textContent='Alle Projekte';$('komInp').value='';$('fFrom').value='';$('fTo').value='';clearGeo();return;}
 aProj=projs.find(p=>p.id===id);if(!aProj)return;$('headerProject').textContent=aProj.name;
 if(aProj.kommune){$('komInp').value=aProj.kommune;applyGeo();}
