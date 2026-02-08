@@ -213,7 +213,7 @@
     // ─── Kommune-Geofence laden ───
     async function loadKommuneGeofence(name) {
       try {
-        const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(name + ', Saarland, Deutschland')}&format=json&polygon_geojson=1&limit=1`, {
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(name + ', Deutschland')}&format=json&polygon_geojson=1&limit=1`, {
           headers: { 'User-Agent': '2Rat-Radwegemelder/1.0' }
         });
         const data = await res.json();
