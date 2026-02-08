@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Radwegemelder Dashboard – 2Rat</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--blue:#1A5FA8;--blue-dark:#14498A;--green:#2D8C28;--red:#E00000;--yellow:#E5A700;--green-pos:#00A836;--bg:#F4F6F9;--card:#FFF;--text:#2C3E50;--text-light:#7B8A9A;--border:#E2E8F0;--sidebar-w:400px;--header-h:56px}
+    *{margin:0;padding:0;box-sizing:border-box}body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden}
+    .login-overlay{position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#1A5FA8,#14498A);display:flex;align-items:center;justify-content:center}.login-overlay.hidden{display:none}
+    .login-box{background:#fff;border-radius:16px;padding:40px;width:380px;box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center}
+    .login-box__logo{font-size:22px;font-weight:800;color:var(--blue);margin-bottom:4px}.login-box__logo span{color:var(--green)}
+    .login-box__sub{font-size:12px;color:var(--text-light);margin-bottom:28px}
+    .login-box input{width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:14px;margin-bottom:12px;outline:none}
+    .login-box input:focus{border-color:var(--blue)}
+    .login-box__btn{width:100%;padding:12px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer}
+    .login-box__btn:hover{background:var(--blue-dark)}
+    .login-box__error{color:var(--red);font-size:12px;margin-top:8px;display:none}
+    .login-box__hint{font-size:11px;color:var(--text-light);margin-top:16px}
+    .header{height:var(--header-h);background:var(--blue);display:flex;align-items:center;justify-content:space-between;padding:0 20px;color:#fff;z-index:1000;position:relative}
+    .header__left{display:flex;align-items:center;gap:16px}.header__logo{font-size:18px;font-weight:800;letter-spacing:1px}.header__logo span{color:#7BC67E}
+    .header__sub{font-size:12px;opacity:.7}.header__badge{background:rgba(255,255,255,.15);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}
+    .header__right{display:flex;align-items:center;gap:12px;font-size:13px}
+    .hbtn{background:rgba(255,255,255,.15);border:none;color:#fff;padding:6px 14px;border-radius:6px;cursor:pointer;font-family:inherit;font-size:13px}.hbtn:hover{background:rgba(255,255,255,.25)}
+    .layout{display:flex;height:calc(100vh - var(--header-h))}
+    .sidebar{width:var(--sidebar-w);background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+    .pbar{padding:12px 16px;border-bottom:1px solid var(--border);background:#F8FAFC}
+    .pbar__lbl{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-light);margin-bottom:6px;font-weight:600}
+    .pbar__sel{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px;font-weight:600;color:var(--text);background:#fff;cursor:pointer}
+    .pbar__meta{font-size:11px;color:var(--text-light);margin-top:6px;display:flex;gap:12px}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--border)}
+    .stat{padding:14px 8px;text-align:center;cursor:pointer;transition:background .2s;border-right:1px solid var(--border)}.stat:last-child{border-right:none}.stat:hover,.stat.active{background:var(--bg)}
+    .stat__num{font-size:22px;font-weight:800}.stat__num--all{color:var(--blue)}.stat__num--problems{color:var(--red)}.stat__num--wishes{color:var(--yellow)}.stat__num--positive{color:var(--green-pos)}
+    .stat__label{font-size:10px;color:var(--text-light);margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
+    .filters{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:8px}
+    .filters__row{display:flex;gap:8px}.flbl{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-light);font-weight:600}
+    .fsel,.finp,.fdate{flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:12px;color:var(--text);background:#fff}
+    .kf{padding:12px 16px;border-bottom:1px solid var(--border);background:#F8FAFC}
+    .kf__row{display:flex;gap:8px;align-items:center}
+    .kf__inp{flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px;color:var(--text)}.kf__inp:focus{outline:none;border-color:var(--blue)}
+    .kf__btn{padding:8px 14px;background:var(--blue);color:#fff;border:none;border-radius:6px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap}.kf__btn:hover{background:var(--blue-dark)}
+    .kf__clr{background:none;color:var(--text-light);padding:8px 6px;font-size:16px}.kf__clr:hover{color:var(--red);background:none}
+    .kf__st{font-size:11px;margin-top:6px}.kf__st--ok{color:var(--green);font-weight:600}.kf__st--err{color:var(--red)}
+    .ebar{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;gap:8px}
+    .ebtn{padding:5px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;color:var(--text)}.ebtn:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
+    .chtog{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:13px;font-weight:600}.chtog:hover{background:var(--bg)}
+    .chpan{display:none;padding:16px;border-bottom:1px solid var(--border)}.chpan.open{display:block}
+    .chbar{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px}.chbar__l{width:100px;text-align:right;color:var(--text-light);flex-shrink:0;font-size:11px}.chbar__f{height:18px;border-radius:4px;transition:width .5s;min-width:2px}.chbar__n{font-weight:700;font-size:12px;min-width:24px}
+    .reports{flex:1;overflow-y:auto}
+    .rpt{padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;display:flex;gap:12px;align-items:flex-start}.rpt:hover{background:var(--bg)}.rpt.active{background:#EBF5FF;border-left:3px solid var(--blue)}
+    .rpt__dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:4px}.rpt__dot--problems{background:var(--red)}.rpt__dot--wishes{background:var(--yellow)}.rpt__dot--positive{background:var(--green-pos)}
+    .rpt__body{flex:1;min-width:0}.rpt__cat{font-size:13px;font-weight:700}.rpt__com{font-size:12px;color:var(--text-light);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .rpt__meta{font-size:11px;color:var(--text-light);margin-top:4px;display:flex;gap:10px}
+    .map-container{flex:1;position:relative}#map{width:100%;height:100%}
+    .geoinfo{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:1000;background:#fff;padding:8px 16px;border-radius:20px;box-shadow:0 2px 12px rgba(0,0,0,.12);font-size:12px;font-weight:600;display:none;align-items:center;gap:8px}.geoinfo.active{display:flex}
+    .geoinfo__dot{width:8px;height:8px;border-radius:50%;background:var(--blue)}
+    .detail{width:360px;background:var(--card);border-left:1px solid var(--border);overflow-y:auto;display:none;flex-shrink:0}.detail.open{display:block}
+    .detail__hdr{padding:16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+    .detail__title{font-size:16px;font-weight:700}.detail__close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-light);padding:4px 8px;border-radius:4px}.detail__close:hover{background:var(--bg)}
+    .detail__photo{width:100%;max-height:250px;object-fit:cover;border-bottom:1px solid var(--border)}
+    .detail__body{padding:16px}.detail__row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px}.detail__row:last-child{border-bottom:none}
+    .detail__label{color:var(--text-light)}.detail__value{font-weight:600;text-align:right;max-width:200px}
+    .detail__comment{padding:16px;background:var(--bg);border-radius:8px;margin-top:12px;font-size:13px;line-height:1.6}
+    .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;color:#fff}.badge--problems{background:var(--red)}.badge--wishes{background:var(--yellow)}.badge--positive{background:var(--green-pos)}
+    .empty{padding:40px 20px;text-align:center;color:var(--text-light);font-size:14px}.empty__icon{font-size:40px;margin-bottom:12px}
+    .loading{display:flex;align-items:center;justify-content:center;padding:40px;color:var(--text-light);font-size:14px}
+    @media(max-width:1024px){.sidebar{width:340px}.detail{width:320px}}
+    @media(max-width:768px){.layout{flex-direction:column}.sidebar{width:100%;height:50vh}.map-container{height:50vh}.detail{display:none!important}}
+  </style>
+</head>
+<body>
+  <div class="login-overlay" id="loginOverlay">
+    <div class="login-box">
+      <div class="login-box__logo">RADWEGE<span>MELDER</span></div>
+      <div class="login-box__sub">Dashboard · Anmeldung</div>
+      <input type="text" id="loginUser" placeholder="Benutzername" autocomplete="username">
+      <input type="password" id="loginPass" placeholder="Passwort" autocomplete="current-password">
+      <button class="login-box__btn" onclick="doLogin()">Anmelden</button>
+      <div class="login-box__error" id="loginError">Benutzername oder Passwort falsch.</div>
+      <div class="login-box__hint">Zugang über 2Rat Planungsbüro</div>
+    </div>
+  </div>
+
+  <header class="header">
+    <div class="header__left">
+      <div><div class="header__logo">RADWEGE<span>MELDER</span></div><span class="header__sub">Dashboard</span></div>
+      <div class="header__badge" id="headerProject">Alle Projekte</div>
+    </div>
+    <div class="header__right">
+      <span id="lastUpdate"></span>
+      <button class="hbtn" onclick="loadReports()">🔄</button>
+      <button class="hbtn" onclick="openPM()">⚙️ Projekte</button>
+      <a href="https://2rat.github.io/velomeld/" style="color:#fff;text-decoration:none;font-size:13px" target="_blank">← App</a>
+      <span id="headerUser" style="font-size:12px;opacity:.7"></span>
+      <button class="hbtn" onclick="doLogout()" title="Abmelden">🚪</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="pbar">
+        <div class="pbar__lbl">📋 Projekt</div>
+        <select class="pbar__sel" id="projSel" onchange="selProj()"><option value="all">Alle Meldungen</option></select>
+        <div class="pbar__meta" id="projMeta"></div>
+      </div>
+      <div class="kf">
+        <div class="flbl" style="margin-bottom:6px">📍 Kommune / Geofence</div>
+        <div class="kf__row">
+          <input type="text" class="kf__inp" id="komInp" placeholder="z.B. Lebach, Schmelz, Saarlouis…">
+          <button class="kf__btn" onclick="applyGeo()">Filtern</button>
+          <button class="kf__btn kf__clr" onclick="clearGeo()" title="Löschen">✕</button>
+        </div>
+        <div class="kf__st" id="komSt"></div>
+      </div>
+      <div class="stats">
+        <div class="stat active" onclick="fCat('all',this)"><div class="stat__num stat__num--all" id="cAll">–</div><div class="stat__label">Alle</div></div>
+        <div class="stat" onclick="fCat('problems',this)"><div class="stat__num stat__num--problems" id="cProb">–</div><div class="stat__label">Probleme</div></div>
+        <div class="stat" onclick="fCat('wishes',this)"><div class="stat__num stat__num--wishes" id="cWish">–</div><div class="stat__label">Wünsche</div></div>
+        <div class="stat" onclick="fCat('positive',this)"><div class="stat__num stat__num--positive" id="cPos">–</div><div class="stat__label">Positiv</div></div>
+      </div>
+      <div class="filters">
+        <div class="filters__row"><select class="fsel" id="fSub" onchange="af()"><option value="">Alle Unterkategorien</option></select></div>
+        <div class="flbl" style="margin-top:4px">Zeitraum</div>
+        <div class="filters__row">
+          <input type="date" class="fdate" id="fFrom" onchange="af()">
+          <span style="color:var(--text-light);font-size:12px;padding:6px 2px">bis</span>
+          <input type="date" class="fdate" id="fTo" onchange="af()">
+        </div>
+        <div class="filters__row"><input type="text" class="finp" id="fSearch" placeholder="🔍 Kommentar durchsuchen…" oninput="af()"></div>
+      </div>
+      <div class="ebar">
+        <button class="ebtn" onclick="exGJ()">📥 GeoJSON</button>
+        <button class="ebtn" onclick="exCSV()">📥 CSV</button>
+        <button class="ebtn" onclick="exPDF()">📄 PDF-Bericht</button>
+      </div>
+      <div class="chtog" onclick="togCh()"><span>📊 Statistiken</span><span id="chArr">▼</span></div>
+      <div class="chpan" id="chPan"><div id="chBars"></div></div>
+      <div class="reports" id="rptList"><div class="loading">Meldungen werden geladen…</div></div>
+    </aside>
+    <div class="map-container">
+      <div id="map"></div>
+      <div class="geoinfo" id="geoInfo"><div class="geoinfo__dot"></div><span id="geoLbl"></span></div>
+    </div>
+    <aside class="detail" id="detPan">
+      <div class="detail__hdr"><div class="detail__title" id="detTitle">Meldung</div><button class="detail__close" onclick="closeDet()">✕</button></div>
+      <img class="detail__photo" id="detPhoto" style="display:none">
+      <div class="detail__body" id="detBody"></div>
+    </aside>
+  </div>
+
+  <div id="pmModal" style="display:none;position:fixed;inset:0;z-index:5000;background:rgba(0,0,0,.5);align-items:center;justify-content:center">
+    <div style="background:#fff;border-radius:16px;padding:32px;width:520px;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <h2 style="font-size:18px;font-weight:800">Projekte verwalten</h2>
+        <button onclick="closePM()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-light)">✕</button>
+      </div>
+      <div style="background:var(--bg);border-radius:10px;padding:20px;margin-bottom:16px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:12px">Neues Projekt anlegen</div>
+        <input type="text" id="pName" placeholder="Projektname" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px;margin-bottom:8px">
+        <input type="text" id="pKom" placeholder="Kommune" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px;margin-bottom:8px">
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <input type="date" id="pFrom" style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px">
+          <span style="padding:8px 2px;color:var(--text-light);font-size:12px">bis</span>
+          <input type="date" id="pTo" style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px">
+        </div>
+        <button onclick="addProj()" style="width:100%;padding:10px;background:var(--blue);color:#fff;border:none;border-radius:6px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">+ Projekt anlegen</button>
+      </div>
+      <div id="pmList"></div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+  <script>
+const SB_URL='https://vimsikjyoupihogmquul.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpbXNpa2p5b3VwaWhvZ21xdXVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0NTIyMjYsImV4cCI6MjA4NjAyODIyNn0._Foa5ZVr4nwoOlZ4T-ORX0U4sNUjgRJJRyBDHvHV2vo';
+const USERS={admin:{pass:'2rat2026',name:'2Rat Admin'},planer:{pass:'radverkehr',name:'Fachplaner'}};
+let curUser=null;
+function doLogin(){const u=$('loginUser').value.trim(),p=$('loginPass').value;if(USERS[u]&&USERS[u].pass===p){curUser={...USERS[u],id:u};localStorage.setItem('du',JSON.stringify(curUser));showDB();}else $('loginError').style.display='block';}
+function doLogout(){localStorage.removeItem('du');curUser=null;$('loginOverlay').classList.remove('hidden');}
+function showDB(){$('loginOverlay').classList.add('hidden');$('headerUser').textContent=curUser.name;loadProj();loadRpts();}
+$('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+const sv=localStorage.getItem('du');if(sv){const parsed=JSON.parse(sv);if(parsed.id&&USERS[parsed.id]){curUser=parsed;showDB();}else{localStorage.removeItem('du');}}
+
+const CL={problems:'Problem',wishes:'Wunsch',positive:'Positiv'};
+const SL={surface:'Oberfläche',narrow:'Engstelle',crossing:'Kreuzung/Knoten',traverse:'Querung',conflict:'Konflikte',parking:'Parken',signage:'Wegweisung',lighting:'Beleuchtung',construction:'Baustelle',drainage:'Entwässerung',other:'Sonstiges',new_path:'Radweg gewünscht',bike_parking:'Abstellanlage',tempo30:'Tempo 30',traffic_light:'Ampelschaltung',bike_street:'Fahrradstraße',oneway:'Einbahnstraße öffnen',good_infra:'Gute Infrastruktur',safe_crossing:'Sichere Querung',service:'Service',detour:'Umleitung fehlt',bike_friendly_stop:'Fahrradfreundl. Einkehr'};
+const CC={problems:'#E00000',wishes:'#E5A700',positive:'#00A836'};
+let all=[],filt=[],aCat='all',mkrs={},mc,gfPoly=null,gfOn=false,projs=[],aProj=null;
+function $(id){return document.getElementById(id);}
+
+// Projects
+function loadProj(){projs=JSON.parse(localStorage.getItem('rp')||'[]');rProjSel();rProjList();}
+function saveProj(){localStorage.setItem('rp',JSON.stringify(projs));rProjSel();rProjList();}
+function addProj(){const n=$('pName').value.trim(),k=$('pKom').value.trim(),f=$('pFrom').value,t=$('pTo').value;if(!n)return alert('Name fehlt.');projs.push({id:Date.now()+'',name:n,kommune:k,dateFrom:f,dateTo:t});saveProj();$('pName').value='';$('pKom').value='';$('pFrom').value='';$('pTo').value='';}
+function delProj(id){if(!confirm('Löschen?'))return;projs=projs.filter(p=>p.id!==id);if(aProj&&aProj.id===id){aProj=null;$('projSel').value='all';}saveProj();af();}
+function rProjSel(){const s=$('projSel');s.innerHTML='<option value="all">Alle Meldungen</option>';projs.forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=p.name+(p.kommune?' ('+p.kommune+')':'');s.appendChild(o);});}
+function rProjList(){const c=$('pmList');if(!projs.length){c.innerHTML='<div style="color:var(--text-light);font-size:13px;text-align:center;padding:20px">Noch keine Projekte.</div>';return;}
+c.innerHTML='';projs.forEach(p=>{const link=getProjLink(p);const div=document.createElement('div');div.style.cssText='padding:14px;border:1px solid var(--border);border-radius:8px;margin-bottom:10px';
+div.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div><div style="font-weight:700;font-size:14px"></div><div style="font-size:11px;color:var(--text-light);margin-top:2px"></div></div></div>';
+div.querySelector('div div div').textContent=p.name;
+div.querySelector('div div div:nth-child(2)').textContent=(p.kommune?'📍 '+p.kommune:'')+(p.dateFrom?' · 📅 '+p.dateFrom+' – '+(p.dateTo||'…'):'');
+// Delete button
+const del=document.createElement('button');del.textContent='🗑️';del.style.cssText='background:none;border:none;color:var(--red);cursor:pointer;font-size:16px';del.onclick=()=>delProj(p.id);
+div.querySelector('div').appendChild(del);
+// Link section
+if(p.kommune){const linkDiv=document.createElement('div');linkDiv.style.marginTop='10px';
+linkDiv.innerHTML='<div style="font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-light);font-weight:600;margin-bottom:4px">🔗 Öffentlicher Aktions-Link</div><div style="display:flex;gap:6px"></div>';
+const inp=document.createElement('input');inp.type='text';inp.readOnly=true;inp.value=link;inp.style.cssText='flex:1;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:11px;color:var(--text);background:#F8FAFC';inp.onclick=function(){this.select();};
+const btn=document.createElement('button');btn.textContent='📋 Kopieren';btn.style.cssText='padding:6px 12px;background:var(--blue);color:#fff;border:none;border-radius:6px;font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap';
+btn.onclick=function(){navigator.clipboard.writeText(link).then(()=>{btn.textContent='✅ Kopiert!';setTimeout(()=>btn.textContent='📋 Kopieren',2000);}).catch(()=>prompt('Link kopieren:',link));};
+linkDiv.querySelector('div:last-child').appendChild(inp);linkDiv.querySelector('div:last-child').appendChild(btn);
+div.appendChild(linkDiv);}
+c.appendChild(div);});}
+function getProjLink(p){const base='https://2rat.github.io/velomeld/karte.html';const params=[];if(p.kommune)params.push('kommune='+encodeURIComponent(p.kommune));if(p.dateFrom)params.push('von='+p.dateFrom);if(p.dateTo)params.push('bis='+p.dateTo);if(p.name)params.push('titel='+encodeURIComponent(p.name));return params.length?base+'?'+params.join('&'):base;}
+function selProj(){const id=$('projSel').value;if(id==='all'){aProj=null;$('headerProject').textContent='Alle Projekte';$('komInp').value='';$('fFrom').value='';$('fTo').value='';clearGeo();return;}
+aProj=projs.find(p=>p.id===id);if(!aProj)return;$('headerProject').textContent=aProj.name;
+if(aProj.kommune){$('komInp').value=aProj.kommune;applyGeo();}
+if(aProj.dateFrom)$('fFrom').value=aProj.dateFrom;if(aProj.dateTo)$('fTo').value=aProj.dateTo;af();
+$('projMeta').innerHTML=(aProj.kommune?'<span>📍 '+esc(aProj.kommune)+'</span>':'')+(aProj.dateFrom?'<span>📅 '+aProj.dateFrom+' – '+(aProj.dateTo||'…')+'</span>':'')+(aProj.kommune?'<br><a href="'+getProjLink(aProj)+'" target="_blank" style="color:var(--blue);font-size:11px;text-decoration:none">🔗 Öffentliche Karte öffnen</a>':'');}
+function openPM(){$('pmModal').style.display='flex';}function closePM(){$('pmModal').style.display='none';}
+
+// Map
+const map=L.map('map').setView([49.35,6.85],10);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap · 2Rat',maxZoom:19}).addTo(map);
+mc=L.markerClusterGroup({maxClusterRadius:50,spiderfyOnMaxZoom:true,showCoverageOnHover:false,
+iconCreateFunction(cl){const n=cl.getChildCount(),sz=n<10?36:n<50?44:52,cats={};cl.getAllChildMarkers().forEach(m=>{if(m._c)cats[m._c]=(cats[m._c]||0)+1;});const top=Object.entries(cats).sort((a,b)=>b[1]-a[1])[0];const col=top?(CC[top[0]]||'#7B8A9A'):'#7B8A9A';return L.divIcon({html:'<div style="width:'+(sz-10)+'px;height:'+(sz-10)+'px;line-height:'+(sz-10)+'px;text-align:center;border-radius:50%;background:'+col+';color:#fff;font-weight:700;font-family:DM Sans,sans-serif;font-size:13px">'+n+'</div>',className:'',iconSize:[sz,sz]});}});
+map.addLayer(mc);
+function mkIco(cat){const c=CC[cat]||'#999';return L.divIcon({html:'<svg xmlns="http://www.w3.org/2000/svg" width="28" height="36" viewBox="0 0 28 36"><path d="M14 0C6.27 0 0 6.27 0 14c0 10.5 14 22 14 22s14-11.5 14-22C28 6.27 21.73 0 14 0z" fill="'+c+'" stroke="white" stroke-width="1.5"/><circle cx="14" cy="13" r="6" fill="white" opacity="0.9"/></svg>',iconSize:[28,36],iconAnchor:[14,36],popupAnchor:[0,-36],className:''});}
+
+// Geofence
+async function applyGeo(){const q=$('komInp').value.trim();if(!q)return;const st=$('komSt');st.textContent='Suche…';st.className='kf__st';
+try{const res=await fetch('https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(q+', Saarland, Deutschland')+'&format=json&polygon_geojson=1&limit=1',{headers:{'User-Agent':'2Rat-Dashboard/1.0'}});const data=await res.json();
+if(!data.length){st.textContent='❌ Nicht gefunden.';st.className='kf__st kf__st--err';return;}const r=data[0];
+if(gfPoly)map.removeLayer(gfPoly);
+if(r.geojson&&(r.geojson.type==='Polygon'||r.geojson.type==='MultiPolygon')){gfPoly=L.geoJSON(r.geojson,{style:{color:'#1A5FA8',weight:2,fillColor:'#1A5FA8',fillOpacity:.08,dashArray:'6,4'}}).addTo(map);map.fitBounds(gfPoly.getBounds(),{padding:[40,40]});}
+else if(r.boundingbox){const b=L.latLngBounds([+r.boundingbox[0],+r.boundingbox[2]],[+r.boundingbox[1],+r.boundingbox[3]]);gfPoly=L.rectangle(b,{color:'#1A5FA8',weight:2,fillColor:'#1A5FA8',fillOpacity:.08,dashArray:'6,4'}).addTo(map);map.fitBounds(b,{padding:[40,40]});}
+gfOn=true;st.textContent='✅ '+r.display_name.split(',').slice(0,2).join(',');st.className='kf__st kf__st--ok';
+$('geoInfo').classList.add('active');$('geoLbl').textContent=q;af();
+}catch(e){st.textContent='❌ Fehler.';st.className='kf__st kf__st--err';}}
+function clearGeo(){if(gfPoly){map.removeLayer(gfPoly);gfPoly=null;}gfOn=false;$('komInp').value='';$('komSt').textContent='';$('komSt').className='kf__st';$('geoInfo').classList.remove('active');af();}
+function inGeo(lat,lng){if(!gfOn||!gfPoly)return true;if(gfPoly.getLayers){for(const ly of gfPoly.getLayers()){if(ly.getLatLngs){const rings=ly.getLatLngs();const flat=Array.isArray(rings[0][0])?rings.flat():rings;for(const ring of flat)if(rc(L.latLng(lat,lng),ring))return true;}else if(ly.getBounds&&ly.getBounds().contains([lat,lng]))return true;}return false;}return gfPoly.getBounds?gfPoly.getBounds().contains([lat,lng]):true;}
+function rc(pt,poly){let ins=false;for(let i=0,j=poly.length-1;i<poly.length;j=i++){const yi=poly[i].lng,xi=poly[i].lat,yj=poly[j].lng,xj=poly[j].lat;if((yi>pt.lng)!==(yj>pt.lng)&&pt.lat<(xj-xi)*(pt.lng-yi)/(yj-yi)+xi)ins=!ins;}return ins;}
+$('komInp').addEventListener('keydown',e=>{if(e.key==='Enter')applyGeo();});
+
+// Load
+async function loadRpts(){try{const res=await fetch(SB_URL+'/rest/v1/reports?order=timestamp.desc&limit=5000',{headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}});if(!res.ok)throw 0;all=await res.json();$('lastUpdate').textContent='Stand: '+new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});af();}catch(e){$('rptList').innerHTML='<div class="empty"><div class="empty__icon">⚠️</div>Fehler beim Laden.</div>';}}
+
+// Filters
+function fCat(c,el){aCat=c;document.querySelectorAll('.stat').forEach(s=>s.classList.remove('active'));if(el)el.classList.add('active');af();}
+function af(){let r=[...all];if(aCat!=='all')r=r.filter(x=>x.category===aCat);
+const sc=$('fSub').value;if(sc)r=r.filter(x=>x.subcategory===sc);
+const df=$('fFrom').value,dt=$('fTo').value;if(df)r=r.filter(x=>x.timestamp&&x.timestamp>=df);if(dt)r=r.filter(x=>x.timestamp&&x.timestamp<=dt+'T23:59:59');
+if(gfOn)r=r.filter(x=>x.latitude&&x.longitude&&inGeo(x.latitude,x.longitude));
+const s=$('fSearch').value.toLowerCase();if(s)r=r.filter(x=>(x.comment&&x.comment.toLowerCase().includes(s))||(SL[x.subcategory]||'').toLowerCase().includes(s));
+filt=r;uStats();uSub();rList();rMap();rCh();}
+
+function uStats(){const b=(gfOn||$('fFrom').value||$('fTo').value)?filt:all;$('cAll').textContent=b.length;$('cProb').textContent=b.filter(r=>r.category==='problems').length;$('cWish').textContent=b.filter(r=>r.category==='wishes').length;$('cPos').textContent=b.filter(r=>r.category==='positive').length;}
+function uSub(){const sel=$('fSub'),cur=sel.value,rel=aCat==='all'?filt:filt.filter(r=>r.category===aCat);const subs=[...new Set(rel.map(r=>r.subcategory).filter(Boolean))].sort((a,b)=>(SL[a]||a).localeCompare(SL[b]||b));sel.innerHTML='<option value="">Alle Unterkategorien</option>';subs.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=SL[s]||s;if(s===cur)o.selected=true;sel.appendChild(o);});}
+
+function rList(){const c=$('rptList');if(!filt.length){c.innerHTML='<div class="empty"><div class="empty__icon">📭</div>Keine Meldungen.</div>';return;}
+c.innerHTML=filt.map(r=>'<div class="rpt" onclick="selRpt(\''+r.id+'\')" id="r-'+r.id+'"><div class="rpt__dot rpt__dot--'+r.category+'"></div><div class="rpt__body"><div class="rpt__cat">'+(SL[r.subcategory]||r.subcategory||CL[r.category])+'</div>'+(r.comment?'<div class="rpt__com">'+esc(r.comment)+'</div>':'')+'<div class="rpt__meta"><span>📅 '+fD(r.timestamp)+'</span>'+(r.has_photo?'<span style="color:var(--blue)">📷</span>':'')+'</div></div></div>').join('');}
+
+function rMap(){mc.clearLayers();mkrs={};filt.forEach(r=>{if(!r.latitude||!r.longitude)return;const m=L.marker([r.latitude,r.longitude],{icon:mkIco(r.category)});m._c=r.category;m.on('click',()=>selRpt(r.id));mc.addLayer(m);mkrs[r.id]=m;});
+if(filt.length&&mc.getLayers().length&&!gfOn)try{map.fitBounds(mc.getBounds(),{padding:[40,40],maxZoom:14});}catch(e){}}
+
+function rCh(){const c=$('chBars'),counts={};filt.forEach(r=>{const l=SL[r.subcategory]||r.subcategory||'?';counts[l]=(counts[l]||0)+1;});const sorted=Object.entries(counts).sort((a,b)=>b[1]-a[1]);const mx=sorted.length?sorted[0][1]:1;
+c.innerHTML=sorted.map(([l,n])=>{const rp=filt.find(r=>(SL[r.subcategory]||r.subcategory)===l);const col=rp?CC[rp.category]:'#999';return '<div class="chbar"><div class="chbar__l">'+l+'</div><div class="chbar__f" style="width:'+Math.max(n/mx*100,5)+'%;background:'+col+'"></div><div class="chbar__n">'+n+'</div></div>';}).join('')||'<div style="color:var(--text-light);font-size:12px;text-align:center">Keine Daten</div>';}
+function togCh(){const p=$('chPan'),a=$('chArr');p.classList.toggle('open');a.textContent=p.classList.contains('open')?'▲':'▼';}
+
+// Detail
+function selRpt(id){const r=all.find(x=>x.id===id);if(!r)return;document.querySelectorAll('.rpt').forEach(e=>e.classList.remove('active'));
+const el=$('r-'+id);if(el){el.classList.add('active');el.scrollIntoView({behavior:'smooth',block:'nearest'});}
+if(r.latitude&&r.longitude&&mkrs[id])map.setView([r.latitude,r.longitude],16);
+const ph=$('detPhoto'),bd=$('detBody');$('detTitle').textContent=SL[r.subcategory]||CL[r.category]||'Meldung';
+ph.style.display='none';if(r.has_photo||r.photo_url){ph.src=r.photo_url||SB_URL+'/storage/v1/object/public/photos/'+r.id+'.jpg';ph.style.display='block';ph.onerror=()=>{ph.style.display='none';};}
+bd.innerHTML='<div class="detail__row"><span class="detail__label">Kategorie</span><span class="badge badge--'+r.category+'">'+(CL[r.category]||r.category)+'</span></div><div class="detail__row"><span class="detail__label">Unterkategorie</span><span class="detail__value">'+(SL[r.subcategory]||r.subcategory||'–')+'</span></div><div class="detail__row"><span class="detail__label">Datum</span><span class="detail__value">'+fDT(r.timestamp)+'</span></div><div class="detail__row"><span class="detail__label">Koordinaten</span><span class="detail__value">'+(r.latitude?r.latitude.toFixed(5):'–')+', '+(r.longitude?r.longitude.toFixed(5):'–')+'</span></div>'+(r.accuracy?'<div class="detail__row"><span class="detail__label">GPS-Genauigkeit</span><span class="detail__value">'+Math.round(r.accuracy)+' m</span></div>':'')+(r.comment?'<div class="detail__comment">'+esc(r.comment)+'</div>':'');
+$('detPan').classList.add('open');}
+function closeDet(){$('detPan').classList.remove('open');document.querySelectorAll('.rpt').forEach(e=>e.classList.remove('active'));}
+
+// Export
+function exGJ(){const gj={type:'FeatureCollection',features:filt.filter(r=>r.latitude&&r.longitude).map(r=>({type:'Feature',geometry:{type:'Point',coordinates:[r.longitude,r.latitude]},properties:{id:r.id,category:r.category,subcategory:r.subcategory,comment:r.comment||'',timestamp:r.timestamp}}))};dlF(JSON.stringify(gj,null,2),'radwegemelder.geojson','application/json');}
+function exCSV(){const h='ID;Kategorie;Unterkategorie;Kommentar;Latitude;Longitude;Datum\n';const rows=filt.map(r=>'"'+r.id+'";"'+(CL[r.category]||'')+'";"'+(SL[r.subcategory]||'')+'";"'+((r.comment||'').replace(/"/g,'""'))+'";'+(r.latitude||'')+';'+(r.longitude||'')+';"'+fDT(r.timestamp)+'"').join('\n');dlF('\ufeff'+h+rows,'radwegemelder.csv','text/csv;charset=utf-8');}
+function exPDF(){const t=filt.length,p=filt.filter(r=>r.category==='problems').length,w=filt.filter(r=>r.category==='wishes').length,g=filt.filter(r=>r.category==='positive').length;
+const kom=$('komInp').value||'Gesamtgebiet',df=$('fFrom').value||'–',dt=$('fTo').value||'–';
+const counts={};filt.forEach(r=>{const l=SL[r.subcategory]||r.subcategory||'Sonstiges';counts[l]=(counts[l]||0)+1;});const sorted=Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+const h='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Radwegemelder Bericht</title><style>body{font-family:Segoe UI,sans-serif;max-width:700px;margin:40px auto;color:#2C3E50;line-height:1.6}h1{font-size:22px;border-bottom:3px solid #1A5FA8;padding-bottom:8px}h2{font-size:16px;color:#1A5FA8;margin-top:24px}.st{display:flex;gap:16px;margin:16px 0}.sb{flex:1;background:#F4F6F9;border-radius:8px;padding:12px;text-align:center}.sn{font-size:28px;font-weight:800}.sl{font-size:11px;color:#7B8A9A;text-transform:uppercase}table{width:100%;border-collapse:collapse;margin-top:12px}td,th{padding:8px 12px;text-align:left;border-bottom:1px solid #E2E8F0;font-size:13px}th{font-weight:700;background:#F4F6F9}.ft{margin-top:32px;font-size:11px;color:#7B8A9A;border-top:1px solid #E2E8F0;padding-top:12px}@media print{body{margin:20px}}</style></head><body><h1>🚲 Radwegemelder – Auswertungsbericht</h1><p><b>Gebiet:</b> '+esc(kom)+' · <b>Zeitraum:</b> '+df+' bis '+dt+'<br><b>Erstellt:</b> '+new Date().toLocaleDateString('de-DE')+' · <b>Quelle:</b> 2Rat Radwegemelder</p><div class="st"><div class="sb"><div class="sn" style="color:#1A5FA8">'+t+'</div><div class="sl">Gesamt</div></div><div class="sb"><div class="sn" style="color:#E00000">'+p+'</div><div class="sl">Probleme</div></div><div class="sb"><div class="sn" style="color:#E5A700">'+w+'</div><div class="sl">Wünsche</div></div><div class="sb"><div class="sn" style="color:#00A836">'+g+'</div><div class="sl">Positiv</div></div></div><h2>Verteilung</h2><table><tr><th>Kategorie</th><th>Anzahl</th></tr>'+sorted.map(([l,c])=>'<tr><td>'+l+'</td><td>'+c+'</td></tr>').join('')+'</table><h2>Einzelmeldungen</h2><table><tr><th>Datum</th><th>Typ</th><th>Kategorie</th><th>Kommentar</th></tr>'+filt.slice(0,100).map(r=>'<tr><td>'+fD(r.timestamp)+'</td><td>'+(CL[r.category]||'')+'</td><td>'+(SL[r.subcategory]||'')+'</td><td>'+esc(r.comment||'–')+'</td></tr>').join('')+(filt.length>100?'<tr><td colspan="4" style="color:#7B8A9A">… +'+(filt.length-100)+' weitere</td></tr>':'')+'</table><div class="ft">2Rat – Büro für Radverkehrsplanung · Armin Jung · www.2rat.org</div></body></html>';
+const win=window.open('','_blank');win.document.write(h);win.document.close();setTimeout(()=>win.print(),500);}
+function dlF(c,n,t){const b=new Blob([c],{type:t});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=n;a.click();URL.revokeObjectURL(u);}
+
+function fD(iso){if(!iso)return'–';return new Date(iso).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'});}
+function fDT(iso){if(!iso)return'–';const d=new Date(iso);return d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'})+', '+d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});}
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+setInterval(loadRpts,120000);
+  </script>
+</body>
+</html>
