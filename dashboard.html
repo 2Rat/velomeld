@@ -196,9 +196,9 @@ function $(id){return document.getElementById(id);}
 // Projects
 function loadProj(){projs=JSON.parse(localStorage.getItem('rp')||'[]');rProjSel();rProjList();}
 function saveProj(){localStorage.setItem('rp',JSON.stringify(projs));rProjSel();rProjList();}
-function addProj(){const n=$('pName').value.trim(),k=$('pKom').value.trim(),f=$('pFrom').value,t=$('pTo').value;if(!n)return alert('Name fehlt.');projs.push({id:Date.now()+'',name:n,kommune:k,dateFrom:f,dateTo:t});saveProj();$('pName').value='';$('pKom').value='';$('pFrom').value='';$('pTo').value='';
-// Bestätigung
-const msg=$('projMsg');msg.textContent='✅ Projekt "'+n+'" angelegt!';msg.style.display='block';setTimeout(()=>msg.style.display='none',3000);}
+function addProj(){try{const n=$('pName').value.trim(),k=$('pKom').value.trim(),f=$('pFrom').value,t=$('pTo').value;if(!n)return alert('Name fehlt.');const proj={id:Date.now()+'',name:n,kommune:k,dateFrom:f,dateTo:t};projs.push(proj);saveProj();$('pName').value='';$('pKom').value='';$('pFrom').value='';$('pTo').value='';
+var msg=$('projMsg');if(msg){msg.textContent='\u2705 Projekt "'+n+'" angelegt!';msg.style.display='block';setTimeout(function(){msg.style.display='none';},3000);}
+}catch(e){alert('Fehler: '+e.message);console.error(e);}}
 function delProj(id){if(!confirm('Löschen?'))return;projs=projs.filter(p=>p.id!==id);if(aProj&&aProj.id===id){aProj=null;$('projSel').value='all';}saveProj();af();}
 function rProjSel(){const s=$('projSel');s.innerHTML='<option value="all">Alle Meldungen</option>';projs.forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=p.name+(p.kommune?' ('+p.kommune+')':'');s.appendChild(o);});}
 function rProjList(){const c=$('pmList');if(!projs.length){c.innerHTML='<div style="color:var(--text-light);font-size:13px;text-align:center;padding:20px">Noch keine Projekte.</div>';return;}
@@ -208,11 +208,12 @@ html+='<div style="display:flex;justify-content:space-between;align-items:flex-s
 html+='<div><div style="font-weight:700;font-size:14px">'+esc(p.name)+'</div>';
 html+='<div style="font-size:11px;color:#7B8A9A;margin-top:2px">'+(p.kommune?'📍 '+esc(p.kommune):'')+(p.dateFrom?' · 📅 '+p.dateFrom+' – '+(p.dateTo||'…'):'')+'</div></div>';
 html+='<button onclick="delProj(\''+p.id+'\')" style="background:none;border:none;color:#E00000;cursor:pointer;font-size:16px;padding:2px 6px" title="Löschen">🗑️</button></div>';
-if(p.kommune){html+='<div style="margin-top:10px;padding-top:10px;border-top:1px solid #E2E8F0">';
+if(p.kommune){var safeLink=link.replace(/&/g,'&amp;').replace(/'/g,'&#39;');
+html+='<div style="margin-top:10px;padding-top:10px;border-top:1px solid #E2E8F0">';
 html+='<div style="font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#7B8A9A;font-weight:600;margin-bottom:6px">🔗 Öffentlicher Aktions-Link</div>';
 html+='<div style="display:flex;gap:6px">';
-html+='<input type="text" readonly value=\''+link+'\' style="flex:1;padding:6px 8px;border:1px solid #E2E8F0;border-radius:6px;font-family:inherit;font-size:11px;color:#2C3E50;background:#F8FAFC" onclick="this.select()">';
-html+='<button onclick="cpLink(this)" data-link=\''+link+'\' style="padding:6px 12px;background:#1A5FA8;color:#fff;border:none;border-radius:6px;font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap">📋 Kopieren</button>';
+html+='<input type="text" readonly value="'+link.replace(/"/g,'&quot;')+'" style="flex:1;padding:6px 8px;border:1px solid #E2E8F0;border-radius:6px;font-family:inherit;font-size:11px;color:#2C3E50;background:#F8FAFC" onclick="this.select()">';
+html+='<button onclick="cpLink(this)" data-link="'+link.replace(/"/g,'&quot;')+'" style="padding:6px 12px;background:#1A5FA8;color:#fff;border:none;border-radius:6px;font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap">📋 Kopieren</button>';
 html+='</div></div>';}
 html+='</div>';});c.innerHTML=html;}
 function getProjLink(p){const base='https://2rat.github.io/velomeld/karte.html';const params=[];if(p.kommune)params.push('kommune='+encodeURIComponent(p.kommune));if(p.dateFrom)params.push('von='+p.dateFrom);if(p.dateTo)params.push('bis='+p.dateTo);if(p.name)params.push('titel='+encodeURIComponent(p.name));return params.length?base+'?'+params.join('&'):base;}
