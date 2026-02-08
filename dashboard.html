@@ -180,7 +180,7 @@
 const SB_URL='https://vimsikjyoupihogmquul.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpbXNpa2p5b3VwaWhvZ21xdXVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0NTIyMjYsImV4cCI6MjA4NjAyODIyNn0._Foa5ZVr4nwoOlZ4T-ORX0U4sNUjgRJJRyBDHvHV2vo';
 const USERS={admin:{pass:'2rat2026',name:'2Rat Admin'},planer:{pass:'radverkehr',name:'Fachplaner'}};
-let curUser=null;
+var curUser=null;
 function doLogin(){const u=$('loginUser').value.trim(),p=$('loginPass').value;if(USERS[u]&&USERS[u].pass===p){curUser={...USERS[u],id:u};localStorage.setItem('du',JSON.stringify(curUser));showDB();}else $('loginError').style.display='block';}
 function doLogout(){localStorage.removeItem('du');curUser=null;$('loginOverlay').classList.remove('hidden');}
 function showDB(){$('loginOverlay').classList.add('hidden');$('headerUser').textContent=curUser.name;loadProj();loadRpts();}
@@ -190,7 +190,7 @@ const sv=localStorage.getItem('du');if(sv){const parsed=JSON.parse(sv);if(parsed
 const CL={problems:'Problem',wishes:'Wunsch',positive:'Positiv'};
 const SL={surface:'Oberfläche',narrow:'Engstelle',crossing:'Kreuzung/Knoten',traverse:'Querung',conflict:'Konflikte',parking:'Parken',signage:'Wegweisung',lighting:'Beleuchtung',construction:'Baustelle',drainage:'Entwässerung',other:'Sonstiges',new_path:'Radweg gewünscht',bike_parking:'Abstellanlage',tempo30:'Tempo 30',traffic_light:'Ampelschaltung',bike_street:'Fahrradstraße',oneway:'Einbahnstraße öffnen',good_infra:'Gute Infrastruktur',safe_crossing:'Sichere Querung',service:'Service',detour:'Umleitung fehlt',bike_friendly_stop:'Fahrradfreundl. Einkehr'};
 const CC={problems:'#E00000',wishes:'#E5A700',positive:'#00A836'};
-let all=[],filt=[],aCat='all',mkrs={},mc,gfPoly=null,gfOn=false,projs=[],aProj=null;
+var all=[],filt=[],aCat='all',mkrs={},mc,gfPoly=null,gfOn=false,projs=[],aProj=null;
 function $(id){return document.getElementById(id);}
 
 // Projects
@@ -293,7 +293,7 @@ function mkIco(cat){const c=CC[cat]||'#999';return L.divIcon({html:'<svg xmlns="
 
 // Geofence
 async function applyGeo(){const q=$('komInp').value.trim();if(!q)return;const st=$('komSt');st.textContent='Suche…';st.className='kf__st';
-try{const res=await fetch('https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(q+', Saarland, Deutschland')+'&format=json&polygon_geojson=1&limit=1',{headers:{'User-Agent':'2Rat-Dashboard/1.0'}});const data=await res.json();
+try{const res=await fetch('https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(q+', Deutschland')+'&format=json&polygon_geojson=1&limit=1',{headers:{'User-Agent':'2Rat-Dashboard/1.0'}});const data=await res.json();
 if(!data.length){st.textContent='❌ Nicht gefunden.';st.className='kf__st kf__st--err';return;}const r=data[0];
 if(gfPoly)map.removeLayer(gfPoly);
 if(r.geojson&&(r.geojson.type==='Polygon'||r.geojson.type==='MultiPolygon')){gfPoly=L.geoJSON(r.geojson,{style:{color:'#1A5FA8',weight:2,fillColor:'#1A5FA8',fillOpacity:.08,dashArray:'6,4'}}).addTo(map);map.fitBounds(gfPoly.getBounds(),{padding:[40,40]});}
