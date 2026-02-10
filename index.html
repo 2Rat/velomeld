@@ -2,2755 +2,342 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#1A5FA8">
-  <meta name="description" content="2Rat Radwegemelder – Radverkehrsinfrastruktur erfassen und Mängel melden">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Radmelder">
-  <title>2Rat Radwegemelder</title>
-  <link rel="manifest" href="./manifest.json">
-  <link rel="apple-touch-icon" href="data:image/png;base64,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">
-  
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/dexie@3/dist/dexie.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2RAT â€“ BÃ¼ro fÃ¼r Radverkehrsplanung</title>
+  <link rel="icon" type="image/png" href="Logo_2Rat_clean.png">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-/* ─── 2Rat Radmelder – Stylesheet ─── */
-
-/* ─── CSS Variables ─── */
-:root {
-  --blue: #1A5FA8;
-  --blue-dark: #0E3F73;
-  --blue-light: #DDEAF8;
-  --green: #2D8C28;
-  --green-dark: #1B6B17;
-  --green-light: #E0F2DE;
-  --gray: #3D4F58;
-  --gray-light: #F0F2F4;
-  --gray-mid: #8A9BA4;
-  --white: #FFFFFF;
-
-  /* Ampelfarben */
-  --red: #E00000;
-  --red-light: #FFAAAA;
-  --yellow: #E5A700;
-  --yellow-light: #FFE082;
-  --ampel-green: #00A836;
-  --ampel-green-light: #A5E6B5;
-
-  --radius-sm: 10px;
-  --radius-md: 14px;
-  --radius-lg: 20px;
-  --radius-xl: 24px;
-  --shadow-sm: 0 1px 4px rgba(0,0,0,0.06);
-  --shadow-md: 0 2px 12px rgba(0,0,0,0.1);
-  --shadow-lg: 0 4px 24px rgba(0,0,0,0.12);
-
-  --font: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-}
-
-/* ─── Reset ─── */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html, body {
-  height: 100%;
-  font-family: var(--font);
-  color: var(--gray);
-  background: var(--gray-light);
-  -webkit-font-smoothing: antialiased;
-  -webkit-tap-highlight-color: transparent;
-  overflow: hidden;
-  user-select: none;
-}
-
-button {
-  font-family: var(--font);
-  border: none;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-
-input, textarea {
-  font-family: var(--font);
-}
-
-/* ─── App Container ─── */
-.app {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  max-width: 480px;
-  margin: 0 auto;
-  background: var(--white);
-  position: relative;
-  overflow: hidden;
-}
-
-/* ─── Header ─── */
-.header {
-  display: flex;
-  align-items: center;
-  padding: 12px 16px;
-  background: var(--white);
-  border-bottom: 1px solid var(--gray-light);
-  z-index: 20;
-  flex-shrink: 0;
-}
-
-.header__logo {
-  display: flex;
-  align-items: baseline;
-  gap: 1px;
-  font-weight: 700;
-  font-size: 18px;
-}
-
-.header__logo-2 { color: var(--blue); }
-.header__logo-rat { color: var(--green); }
-.header__logo-sub {
-  font-size: 12px;
-  font-weight: 400;
-  color: var(--gray-mid);
-  margin-left: 6px;
-}
-
-/* ─── Screens ─── */
-[data-screen] {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: none;
-  flex-direction: column;
-  z-index: 1;
-}
-
-[data-screen].screen--active {
-  display: flex;
-  z-index: 10;
-  animation: screenSlideIn 0.25s ease-out;
-}
-
-@keyframes screenSlideIn {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-/* ─── Home Screen ─── */
-.map-container {
-  flex: 1;
-  min-height: 200px;
-  position: relative;
-}
-
-#map-container {
-  width: 100%;
-  height: 100%;
-}
-
-.home-bottom {
-  background: var(--white);
-  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-  padding: 24px 20px 28px;
-  box-shadow: 0 -4px 24px rgba(0,0,0,0.08);
-  position: relative;
-  z-index: 5;
-  flex-shrink: 1;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-.home-bottom__title {
-  font-size: 20px;
-  font-weight: 700;
-  margin-bottom: 4px;
-}
-
-.home-bottom__subtitle {
-  font-size: 13px;
-  color: var(--gray-mid);
-  margin-bottom: 18px;
-}
-
-/* ─── Kategorie-Buttons (Home) ─── */
-.cat-btn {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 16px 18px;
-  border-radius: var(--radius-md);
-  width: 100%;
-  text-align: left;
-  transition: transform 0.15s ease;
-  margin-bottom: 10px;
-}
-
-.cat-btn { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-.cat-btn:active { transform: scale(0.98); }
-
-.cat-btn--problems { background: var(--red-light); }
-.cat-btn--wishes { background: var(--yellow-light); }
-.cat-btn--positive { background: var(--ampel-green-light); }
-
-.cat-btn__icon {
-  width: 48px;
-  height: 48px;
-  border-radius: var(--radius-md);
-  background: var(--white);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  flex-shrink: 0;
-}
-
-.cat-btn__label {
-  font-weight: 700;
-  font-size: 16px;
-}
-
-.cat-btn--problems .cat-btn__label { color: var(--red); }
-.cat-btn--wishes .cat-btn__label { color: var(--yellow); }
-.cat-btn--positive .cat-btn__label { color: var(--ampel-green); }
-
-.cat-btn__count {
-  font-size: 12px;
-  color: var(--gray-mid);
-  margin-top: 2px;
-}
-
-.cat-btn__arrow {
-  margin-left: auto;
-  font-size: 18px;
-}
-
-.cat-btn--problems .cat-btn__arrow { color: var(--red); }
-.cat-btn--wishes .cat-btn__arrow { color: var(--yellow); }
-.cat-btn--positive .cat-btn__arrow { color: var(--ampel-green); }
-
-/* ─── Category Cards (Subcategory Screen) ─── */
-.screen-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 16px 20px;
-  background: var(--white);
-  border-bottom: 2px solid var(--gray-light);
-  flex-shrink: 0;
-}
-
-.screen-header__back {
-  background: none;
-  font-size: 22px;
-  color: var(--gray);
-  padding: 4px;
-}
-
-.screen-header__title {
-  font-size: 17px;
-  font-weight: 700;
-}
-
-.screen-header__subtitle {
-  font-size: 12px;
-  color: var(--gray-mid);
-}
-
-.screen-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: 12px 16px;
-  -webkit-overflow-scrolling: touch;
-}
-
-.category-card {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 14px 16px;
-  border: 1px solid #E8EBED;
-  border-left: 5px solid var(--accent, var(--blue));
-  border-radius: var(--radius-md);
-  background: var(--white);
-  width: 100%;
-  text-align: left;
-  box-shadow: var(--shadow-sm);
-  margin-bottom: 8px;
-  transition: all 0.2s ease;
-}
-
-.category-card:active {
-  border-color: var(--accent, var(--blue));
-  background: color-mix(in srgb, var(--accent, var(--blue)) 5%, white);
-}
-
-.category-card__icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: var(--accent-bg, var(--gray-light));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  flex-shrink: 0;
-}
-
-.category-card__label {
-  font-weight: 600;
-  font-size: 15px;
-  color: #2D3339;
-}
-
-.category-card__desc {
-  font-size: 12px;
-  color: var(--gray-mid);
-  margin-top: 2px;
-}
-
-.category-card__arrow {
-  margin-left: auto;
-  font-size: 18px;
-  color: var(--gray-mid);
-}
-
-/* ─── Details Screen ─── */
-.detail-section {
-  margin-bottom: 20px;
-}
-
-.detail-label {
-  font-size: 13px;
-  font-weight: 600;
-  margin-bottom: 8px;
-}
-
-.detail-map {
-  height: 200px;
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  border: 1px solid var(--gray-light);
-}
-
-.detail-map-hint {
-  font-size: 11px;
-  color: var(--gray-mid);
-  margin-top: 6px;
-}
-
-/* ─── Photos ─── */
-.photo-grid {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.photo-thumb {
-  width: 72px;
-  height: 72px;
-  border-radius: 12px;
-  overflow: hidden;
-  position: relative;
-}
-
-.photo-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.photo-thumb__remove {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: var(--red);
-  color: var(--white);
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid var(--white);
-}
-
-.photo-add {
-  width: 72px;
-  height: 72px;
-  border-radius: 12px;
-  border: 2px dashed var(--gray-mid);
-  background: transparent;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  color: var(--gray-mid);
-  font-size: 24px;
-  transition: all 0.2s;
-}
-
-.photo-add small {
-  font-size: 9px;
-  font-weight: 500;
-}
-
-.photo-add:active {
-  border-color: var(--blue);
-  color: var(--blue);
-}
-
-/* ─── Comment ─── */
-.comment-input {
-  width: 100%;
-  padding: 12px 14px;
-  border-radius: 12px;
-  border: 1.5px solid var(--gray-light);
-  font-size: 14px;
-  color: var(--gray);
-  resize: vertical;
-  outline: none;
-  transition: border-color 0.2s;
-  min-height: 80px;
-}
-
-.comment-input:focus {
-  border-color: var(--blue);
-}
-
-.comment-input::placeholder {
-  color: var(--gray-mid);
-}
-
-/* ─── Primary Button ─── */
-.btn-primary {
-  width: 100%;
-  padding: 16px;
-  border-radius: var(--radius-md);
-  background: linear-gradient(135deg, var(--blue), var(--green));
-  color: var(--white);
-  font-size: 16px;
-  font-weight: 700;
-  box-shadow: 0 4px 16px rgba(26,95,168,0.3);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.btn-primary:active {
-  transform: scale(0.98);
-  box-shadow: 0 2px 8px rgba(26,95,168,0.2);
-}
-
-.btn-secondary {
-  width: 100%;
-  padding: 14px;
-  border-radius: var(--radius-md);
-  border: 2px solid var(--blue);
-  background: transparent;
-  color: var(--blue);
-  font-size: 15px;
-  font-weight: 600;
-}
-
-/* ─── GPS Status ─── */
-.gps-status {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: var(--gray-mid);
-  padding: 8px 14px;
-  background: var(--white);
-  border-radius: 12px;
-  box-shadow: var(--shadow-md);
-}
-
-.gps-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  animation: pulse 2s ease-in-out infinite;
-}
-
-.gps-status--good .gps-dot { background: var(--ampel-green); }
-.gps-status--ok .gps-dot { background: var(--yellow); }
-.gps-status--poor .gps-dot { background: var(--red); }
-.gps-dot--error { background: var(--red); animation: none; }
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
-}
-
-/* ─── Confirm Screen ─── */
-.confirm-screen {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 32px;
-  background: linear-gradient(180deg, #fff 0%, #F0F7FF 100%);
-  height: 100%;
-}
-
-.confirm-icon {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--ampel-green), var(--blue));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 36px;
-  color: var(--white);
-  margin-bottom: 20px;
-  box-shadow: 0 8px 32px rgba(0,168,54,0.3);
-  animation: scaleIn 0.4s ease-out;
-}
-
-@keyframes scaleIn {
-  0% { transform: scale(0); }
-  70% { transform: scale(1.1); }
-  100% { transform: scale(1); }
-}
-
-.confirm-title {
-  font-size: 22px;
-  font-weight: 700;
-  margin-bottom: 8px;
-}
-
-.confirm-text {
-  font-size: 14px;
-  color: var(--gray-mid);
-  line-height: 1.5;
-  margin-bottom: 32px;
-}
-
-/* ─── Report List ─── */
-.report-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  border-radius: var(--radius-md);
-  background: var(--white);
-  box-shadow: var(--shadow-sm);
-  margin-bottom: 8px;
-}
-
-.report-item__icon {
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  flex-shrink: 0;
-}
-
-.report-item__label {
-  font-weight: 600;
-  font-size: 14px;
-}
-
-.report-item__meta {
-  font-size: 11px;
-  color: var(--gray-mid);
-  margin-top: 2px;
-}
-
-.report-item__comment {
-  font-size: 12px;
-  color: var(--gray);
-  opacity: 0.7;
-  margin-top: 4px;
-}
-
-.report-item__delete {
-  background: none;
-  font-size: 16px;
-  padding: 4px;
-  opacity: 0.4;
-  flex-shrink: 0;
-}
-
-.report-item__delete:active { opacity: 1; }
-
-/* ─── Empty State ─── */
-.empty-state {
-  text-align: center;
-  padding: 48px 20px;
-}
-
-.empty-state__icon {
-  font-size: 48px;
-  margin-bottom: 12px;
-}
-
-.empty-state p {
-  color: var(--gray-mid);
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-/* ─── Report Badge ─── */
-.report-badge {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  z-index: 1000;
-}
-
-.report-badge__btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  background: var(--white);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--gray);
-}
-
-/* ─── Export Buttons ─── */
-.export-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  background: var(--blue-light);
-  border-radius: var(--radius-sm);
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--blue);
-}
-
-.export-btn:active {
-  background: var(--blue);
-  color: var(--white);
-}
-
-/* ─── Toast ─── */
-.toast {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%) translateY(80px);
-  background: var(--gray);
-  color: var(--white);
-  padding: 10px 20px;
-  border-radius: 12px;
-  font-size: 13px;
-  font-weight: 500;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-  z-index: 100;
-  transition: transform 0.3s ease, opacity 0.3s ease;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.toast--visible {
-  transform: translateX(-50%) translateY(0);
-  opacity: 1;
-}
-
-/* ─── Leaflet Overrides ─── */
-
-/* ─── Sync Status ─── */
-
-/* ─── Settings ─── */
-.setting-option {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 14px 16px;
-  border: 1.5px solid #E8EBED;
-  border-radius: 12px;
-  background: var(--white);
-  margin-bottom: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.setting-option:has(input:checked) {
-  border-color: var(--blue);
-  background: #F0F7FF;
-}
-
-.setting-option input[type="radio"] {
-  margin-top: 3px;
-  accent-color: var(--blue);
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
-}
-
-.setting-option__label {
-  font-weight: 600;
-  font-size: 14px;
-  color: #2D3339;
-}
-
-.setting-option__desc {
-  font-size: 12px;
-  color: var(--gray-mid);
-  margin-top: 2px;
-}
-
-.sync-status {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  color: var(--gray-mid);
-  padding: 6px 12px;
-  background: var(--white);
-  border-radius: 10px;
-  box-shadow: var(--shadow-sm);
-}
-
-.sync-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-}
-
-.sync-status--synced .sync-dot { background: var(--ampel-green); }
-.sync-status--pending .sync-dot { background: var(--yellow); animation: pulse 1.5s ease-in-out infinite; }
-.sync-status--offline .sync-dot { background: var(--gray-mid); }
-.sync-status--error .sync-dot { background: var(--red); }
-
-.leaflet-control-zoom a {
-  border-radius: 10px !important;
-}
-
-.leaflet-popup-content-wrapper {
-  border-radius: 12px !important;
-  box-shadow: var(--shadow-md) !important;
-}
-
+    :root {
+      --green: #689246;
+      --green-dark: #567A3A;
+      --blue: #1678A9;
+      --blue-dark: #0F5C84;
+      --beige: #F5E6C8;
+      --beige-light: #FAEFD8;
+      --white: #FFFFFF;
+      --text: #3D3D3D;
+      --text-light: #6B6B6B;
+      --font: 'Outfit', -apple-system, sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font); color: var(--text); background: var(--beige); line-height: 1.65; }
+
+    .wrap { max-width: 1060px; margin: 0 auto; padding: 0 28px; }
+
+    /* â”€â”€â”€ Nav â”€â”€â”€ */
+    nav {
+      position: fixed; top: 0; width: 100%; z-index: 100;
+      background: rgba(245,230,200,0.92); backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      height: 60px; display: flex; align-items: center; justify-content: center;
+    }
+    .nav__inner { display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 1060px; padding: 0 28px; }
+    .nav__logo { height: 34px; }
+    .nav__links { display: flex; align-items: center; gap: 24px; list-style: none; }
+    .nav__links a { text-decoration: none; color: var(--text-light); font-size: 14px; font-weight: 500; transition: color 0.2s; }
+    .nav__links a:hover { color: var(--green); }
+    .nav__cta { background: var(--green) !important; color: white !important; padding: 8px 18px !important; border-radius: 8px !important; font-weight: 600 !important; }
+    .nav__cta:hover { background: var(--green-dark) !important; }
+
+    /* â”€â”€â”€ Hero â”€â”€â”€ */
+    .hero { padding: 130px 0 80px; }
+    .hero__grid { display: grid; grid-template-columns: 61.8fr 38.2fr; gap: 40px; align-items: center; }
+    .hero__left {}
+    .hero__right { display: flex; justify-content: center; align-items: center; }
+    .hero__logo { width: 200px; }
+    .hero__sub { font-size: 18px; font-weight: 600; color: var(--blue); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 16px; }
+    .hero__title { font-size: clamp(26px, 3.5vw, 38px); font-weight: 800; line-height: 1.15; margin-bottom: 18px; color: var(--text); }
+    .hero__title .gr { color: var(--green); }
+    .hero__title .bl { color: var(--blue); }
+    .hero__text { font-size: 16px; color: var(--text-light); max-width: 500px; margin: 0 0 28px; line-height: 1.7; }
+    .hero__btns { display: flex; gap: 12px; flex-wrap: wrap; }
+
+    .btn { display: inline-flex; align-items: center; gap: 7px; padding: 12px 24px; border-radius: 10px; font-family: var(--font); font-size: 15px; font-weight: 600; text-decoration: none; transition: all 0.2s; border: none; cursor: pointer; }
+    .btn--g { background: var(--green); color: white; }
+    .btn--g:hover { background: var(--green-dark); transform: translateY(-1px); }
+    .btn--b-o { background: transparent; color: var(--blue); border: 2px solid var(--blue); }
+    .btn--b-o:hover { background: var(--blue); color: white; transform: translateY(-1px); }
+
+    /* â”€â”€â”€ Sections â”€â”€â”€ */
+    .section { padding: 70px 0; }
+    .section--white { background: var(--beige-light); }
+    .section--beige { background: var(--beige); }
+    .s-label { font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--blue); margin-bottom: 8px; }
+    .s-title { font-size: clamp(24px, 3vw, 34px); font-weight: 800; line-height: 1.2; margin-bottom: 14px; color: var(--green); }
+    .s-text { font-size: 15px; color: var(--text-light); line-height: 1.7; max-width: 520px; margin-bottom: 36px; }
+
+    /* â”€â”€â”€ Leistungen â”€â”€â”€ */
+    .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .card { background: var(--white); border-radius: 14px; padding: 24px 20px; border: 1px solid rgba(0,0,0,0.04); transition: transform 0.2s, box-shadow 0.2s; }
+    .card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,0.06); }
+    .card__top { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .card__icon { font-size: 24px; }
+    .card__title { font-size: 16px; font-weight: 700; }
+    .card__text { font-size: 13px; color: var(--text-light); line-height: 1.6; }
+
+    /* â”€â”€â”€ Produkte (Radmelder + Schulweg) â”€â”€â”€ */
+    .produkt { display: flex; flex-direction: column; gap: 24px; margin-bottom: 56px; }
+    .produkt:last-child { margin-bottom: 0; }
+    .produkt--flip { direction: ltr; }
+
+    .produkt__preview { border-radius: 16px; padding: 28px 22px; position: relative; overflow: hidden; max-width: 400px; }
+    .produkt__preview::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+
+    /* Radmelder Preview */
+    .rm-preview { background: #FFFFFF; border: 1px solid #E5E7EB; box-shadow: 0 4px 20px rgba(0,0,0,0.05); font-family: 'DM Sans', sans-serif; }
+    .rm-preview::before { background: linear-gradient(90deg, #1A5FA8, #2D8C28); }
+    .rm-header { text-align: center; margin-bottom: 18px; }
+    .rm-title { font-size: 17px; font-weight: 800; letter-spacing: 3px; font-family: 'DM Sans', sans-serif; }
+    .rm-title .t-b { color: #1A5FA8; }
+    .rm-title .t-g { color: #2D8C28; }
+    .rm-sub { font-size: 10px; color: #8A9BA4; margin-top: 2px; }
+    .rm-items { display: flex; flex-direction: column; gap: 8px; }
+    .rm-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; font-size: 13px; font-weight: 600; color: #3D4F58; font-family: 'DM Sans', sans-serif; }
+    .rm-item--r { background: #FFF0F0; border-left: 3px solid #E00000; }
+    .rm-item--y { background: #FFF8E0; border-left: 3px solid #E5A700; }
+    .rm-item--g { background: #EEFBF0; border-left: 3px solid #00A836; }
+
+    /* Schulweg Preview */
+    .sw-preview { background: #F0F7FF; border: 1px solid #D8E8F8; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+    .sw-preview::before { background: linear-gradient(90deg, #FF9800, #4CAF50); }
+    .sw-header { text-align: center; margin-bottom: 18px; }
+    .sw-title { font-size: 17px; font-weight: 800; }
+    .sw-sub { font-size: 10px; color: #8A9BA4; margin-top: 2px; }
+    .sw-items { display: flex; flex-direction: column; gap: 8px; }
+    .sw-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; font-size: 13px; font-weight: 600; color: #3D4F58; }
+    .sw-item--r { background: #FFF3E0; border-left: 3px solid #FF9800; }
+    .sw-item--g { background: #E8F5E9; border-left: 3px solid #4CAF50; }
+
+    .produkt__info h3 { font-size: clamp(20px, 2.5vw, 28px); font-weight: 800; line-height: 1.2; margin-bottom: 12px; }
+    .produkt__info h3 .bl { color: var(--blue); }
+    .produkt__info h3 .gr { color: var(--green); }
+    .produkt__info p { font-size: 14px; color: var(--text-light); line-height: 1.7; margin-bottom: 16px; }
+    .feat-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
+    .feat { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; line-height: 1.5; }
+    .feat__dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+    .feat strong { white-space: nowrap; margin-right: 4px; }
+    .feat span { color: var(--text-light); }
+    .produkt__btns { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn--sm { padding: 10px 18px; font-size: 13px; border-radius: 8px; }
+
+    /* â”€â”€â”€ Kontakt â”€â”€â”€ */
+    .kontakt__grid { display: grid; grid-template-columns: 7fr 5fr; gap: 40px; margin-top: 28px; align-items: start; }
+    .kontakt__text { font-size: 15px; color: var(--text-light); line-height: 1.8; }
+    .kontakt__text p + p { margin-top: 12px; }
+    .kontakt__card { background: var(--white); border-radius: 16px; padding: 28px; border: 1px solid rgba(0,0,0,0.04); }
+    .kontakt__name { font-size: 18px; font-weight: 800; margin-bottom: 2px; }
+    .kontakt__role { font-size: 13px; color: var(--green); font-weight: 600; margin-bottom: 18px; }
+    .kontakt__items { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .kontakt__items li { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+    .kontakt__items a { color: var(--text); text-decoration: none; }
+    .kontakt__items a:hover { color: var(--blue); }
+    .kontakt__cta { margin-top: 20px; }
+    .kontakt__cta .btn { width: 100%; justify-content: center; }
+
+    /* â”€â”€â”€ Footer â”€â”€â”€ */
+    footer { background: var(--blue-dark); padding: 24px 0; font-size: 12px; }
+    .footer__inner { display: flex; justify-content: space-between; align-items: center; }
+    .footer__links { display: flex; gap: 18px; }
+    footer a { color: rgba(255,255,255,0.6); text-decoration: none; }
+    footer a:hover { color: white; }
+    footer span { color: rgba(255,255,255,0.4); }
+
+    /* â”€â”€â”€ Mobile â”€â”€â”€ */
+    @media (max-width: 768px) {
+      .nav__links { display: none; }
+      .hero { padding: 100px 0 50px; }
+      .hero__grid { grid-template-columns: 1fr; text-align: center; }
+      .hero__right { order: -1; margin-bottom: 20px; }
+      .hero__logo { width: 120px; }
+      .hero__btns { justify-content: center; }
+      .hero__text { margin: 0 auto 28px; }
+      .cards { grid-template-columns: 1fr; }
+      .produkt, .produkt--flip { flex-direction: column; }
+      .produkt__preview { max-width: 100%; }
+      .produkt__preview { margin-bottom: 0; }
+      .kontakt__grid { grid-template-columns: 1fr; }
+      .footer__inner { flex-direction: column; gap: 8px; text-align: center; }
+      .s-title { font-size: 24px; }
+      .produkt__info h3 { font-size: 22px; }
+    }
   </style>
 </head>
 <body>
 
-
-<div class="app">
-
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- SCREEN: Home (Karte + Kategorien)          -->
-  <!-- ═══════════════════════════════════════════ -->
-  <div data-screen="home" class="screen--active">
-    
-    <!-- Header mit Logo -->
-    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:16px 20px 12px; background:#fff; border-bottom:none; z-index:20; flex-shrink:0; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-      <div style="font-weight:800; font-size:26px; letter-spacing:4px; text-transform:uppercase;">
-        <span style="color:#1A5FA8;">Radwege</span><span style="color:#2D8C28;">melder</span>
-      </div>
-      <div style="font-size:11px; color:#8A9BA4; font-weight:500; margin-top:3px; letter-spacing:0.3px;">by 2Rat · Planungsbüro für Radverkehr</div>
+  <nav>
+    <div class="nav__inner">
+      <img src="data:image/png;base64,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" alt="2RAT" class="nav__logo">
+      <ul class="nav__links">
+        <li><a href="#leistungen">Leistungen</a></li>
+        <li><a href="#produkte">Produkte</a></li>
+        <li><a href="#kontakt">Kontakt</a></li>
+        <li><a href="mailto:fahr2rat@gmail.com" class="nav__cta">Anfrage senden</a></li>
+      </ul>
     </div>
-    <!-- Karte -->
-    <div class="map-container">
-      <div id="map-container"></div>
+  </nav>
 
-      <!-- GPS-Status (Overlay auf Karte) -->
-      <!-- Status-Leiste über der Karte -->
-      <div style="position:absolute; top:8px; left:8px; right:8px; z-index:1000; display:flex; align-items:center; gap:6px;">
-        <div id="gps-status" class="gps-status">
-          <span class="gps-dot"></span> GPS wird gesucht…
-        </div>
-        <div id="sync-status" class="sync-status sync-status--offline">
-          <span class="sync-dot"></span> <span id="sync-text">Offline</span>
-        </div>
-        <div style="margin-left:auto;">
-          <button id="btn-my-reports" class="report-badge__btn">
-            📋 <span id="report-badge" style="display:none;">0</span> Meldungen ansehen
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Unterer Bereich: Kategorien -->
-    <div class="home-bottom">
-      <h2 class="home-bottom__title">Was möchtest du melden?</h2>
-      <p class="home-bottom__subtitle">Wähle eine Kategorie für deine Meldung.</p>
-
-      <!-- Problem -->
-      <button class="cat-btn cat-btn--problems" data-category="problems">
-        <div class="cat-btn__icon">⚠️</div>
-        <div>
-          <div class="cat-btn__label">Problem melden</div>
-          <div class="cat-btn__count">12 Unterkategorien</div>
-        </div>
-        <div class="cat-btn__arrow">›</div>
-      </button>
-
-      <!-- Wunsch -->
-      <button class="cat-btn cat-btn--wishes" data-category="wishes">
-        <div class="cat-btn__icon">💬</div>
-        <div>
-          <div class="cat-btn__label">Wunsch äußern</div>
-          <div class="cat-btn__count">6 Unterkategorien</div>
-        </div>
-        <div class="cat-btn__arrow">›</div>
-      </button>
-
-      <!-- Positiv -->
-      <button class="cat-btn cat-btn--positive" data-category="positive">
-        <div class="cat-btn__icon">👍</div>
-        <div>
-          <div class="cat-btn__label">Lob aussprechen</div>
-          <div class="cat-btn__count">4 Unterkategorien</div>
-        </div>
-        <div class="cat-btn__arrow">›</div>
-      </button>
-
-      <!-- Öffentliche Karte Button -->
-      <div style="text-align:center; margin-top:18px;">
-        <a href="./karte.html" style="display:inline-flex; align-items:center; gap:8px; padding:10px 20px; background:#1A5FA8; color:white; border-radius:24px; text-decoration:none; font-size:13px; font-weight:600; box-shadow:0 2px 8px rgba(26,95,168,0.3);">
-          🗺️ Radwegecheck Saarland ansehen
-        </a>
-      </div>
-
-      <!-- Footer -->
-      <div style="text-align:center; margin-top:16px; padding-top:12px; border-top:1px solid #F0F2F4; font-size:11px; color:#8A9BA4;">
-        <a href="./datenschutz.html" style="color:#8A9BA4; text-decoration:none;">📋 Impressum & Datenschutz</a>
-        &nbsp;·&nbsp;
-        <a href="#settings" style="color:#8A9BA4; text-decoration:none;">⚙️ Einstellungen</a>
-        &nbsp;·&nbsp;
-        <span>v1.2</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- SCREEN: Unterkategorie wählen              -->
-  <!-- ═══════════════════════════════════════════ -->
-  <div data-screen="subcategory">
-    <div class="screen-header">
-      <button class="screen-header__back" data-back>←</button>
-      <div>
-        <h3 class="screen-header__title" id="subcategory-title"></h3>
-        <p class="screen-header__subtitle">Was genau möchtest du melden?</p>
-      </div>
-    </div>
-    <div class="screen-body" id="subcategory-list">
-      <!-- Wird dynamisch gefüllt -->
-    </div>
-  </div>
-
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- SCREEN: Details (Standort, Foto, Kommentar)-->
-  <!-- ═══════════════════════════════════════════ -->
-  <div data-screen="details">
-    <div class="screen-header">
-      <button class="screen-header__back" data-back>←</button>
-      <div>
-        <h3 class="screen-header__title" id="detail-title"></h3>
-        <p class="screen-header__subtitle" id="detail-description"></p>
-      </div>
-    </div>
-    <div class="screen-body">
-
-      <!-- Standort -->
-      <div class="detail-section">
-        <div class="detail-label">📍 Standort</div>
-        <div class="detail-map" id="detail-map"></div>
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-top:8px;">
-          <p class="detail-map-hint" id="detail-gps-info">Dein aktueller GPS-Standort wird verwendet</p>
-          <button onclick="centerOnPosition()" style="background:none; border:1px solid #1A5FA8; color:#1A5FA8; border-radius:8px; padding:4px 10px; font-size:11px; font-weight:600; cursor:pointer;">📍 Zentrieren</button>
-        </div>
-      </div>
-
-      <!-- Foto -->
-      <div class="detail-section">
-        <div class="detail-label">📷 Foto (optional)</div>
-        <div class="photo-grid" id="photo-preview">
-          <button id="btn-add-photo" class="photo-add">
-            <span>+</span>
-            <small>Foto</small>
-          </button>
-        </div>
-      </div>
-
-      <!-- Kommentar -->
-      <div class="detail-section">
-        <div class="detail-label">💬 Kommentar (optional)</div>
-        <textarea
-          id="comment-input"
-          class="comment-input"
-          placeholder="Beschreibe das Problem genauer…"
-          rows="3"
-        ></textarea>
-      </div>
-
-      <!-- Speichern -->
-      <div style="padding:8px 0 16px;">
-        <button id="btn-save-report" class="btn-primary">
-          ✓ Meldung speichern
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- SCREEN: Bestätigung                        -->
-  <!-- ═══════════════════════════════════════════ -->
-  <div data-screen="confirm">
-    <div class="confirm-screen">
-      <div class="confirm-icon">✓</div>
-      <h2 class="confirm-title">Danke für deine Meldung!</h2>
-      <p class="confirm-text">
-        Deine Meldung wurde gespeichert.<br>
-        <span id="confirm-sync-info">Wird automatisch synchronisiert, sobald eine Verbindung besteht.</span>
-      </p>
-      <button id="btn-new-report" class="btn-primary" style="margin-bottom:12px;">
-        + Weitere Meldung erstellen
-      </button>
-      <button class="btn-secondary" onclick="window.location.hash='list'" style="margin-bottom:8px;">
-        📋 Meine Meldungen ansehen
-      </button>
-      <button class="btn-secondary" onclick="window.location.hash='home'" style="border-color:#8A9BA4; color:#8A9BA4;">
-        🗺️ Zurück zur Karte
-      </button>
-    </div>
-  </div>
-
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- SCREEN: Meine Meldungen                    -->
-  <!-- ═══════════════════════════════════════════ -->
-  <div data-screen="list">
-    <div class="screen-header">
-      <button class="screen-header__back" data-back>←</button>
-      <h3 class="screen-header__title" style="flex:1;">Meine Meldungen</h3>
-      <div style="display:flex; gap:6px;">
-        <button id="btn-export-geojson" class="export-btn">📥 GeoJSON</button>
-        <button id="btn-export-csv" class="export-btn">📥 CSV</button>
-        <button id="btn-export-qgis" class="export-btn" style="background:#E0F2DE; color:#2D8C28;">🎨 QGIS</button>
-      </div>
-    </div>
-    <div class="screen-body" id="report-list">
-      <!-- Wird dynamisch gefüllt -->
-    </div>
-  </div>
-
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- SCREEN: Einstellungen                       -->
-  <!-- ═══════════════════════════════════════════ -->
-  <div data-screen="settings">
-    <div class="screen-header">
-      <button class="screen-header__back" data-back>←</button>
-      <h3 class="screen-header__title">Einstellungen</h3>
-    </div>
-    <div class="screen-body">
-
-      <!-- Sync-Modus -->
-      <div class="detail-section">
-        <div class="detail-label">📡 Datenübertragung</div>
-        <p style="font-size:12px; color:#8A9BA4; margin-bottom:12px;">Wann sollen deine Meldungen an den Server übertragen werden?</p>
-
-        <label class="setting-option" id="opt-sync-auto">
-          <input type="radio" name="syncMode" value="auto">
-          <div class="setting-option__text">
-            <div class="setting-option__label">🔄 Automatisch</div>
-            <div class="setting-option__desc">Sofort übertragen (Mobile Daten + WLAN)</div>
+  <!-- â•â•â• HERO â•â•â• -->
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero__grid">
+        <div class="hero__left">
+          <div class="hero__sub">BÃ¼ro fÃ¼r Radverkehrsplanung</div>
+          <h1 class="hero__title">
+            <span class="gr">Gemeinsam fÃ¼r eine</span><br>
+            <span class="bl">fahrradfreundliche Zukunft</span>
+          </h1>
+          <p class="hero__text">Individuelle, praxisnahe Beratung fÃ¼r Kommunen. Von der Idee bis zur Umsetzung â€“ fÃ¼r sichere und attraktive Radinfrastruktur.</p>
+          <div class="hero__btns">
+            <a href="mailto:fahr2rat@gmail.com" class="btn btn--g">âœ‰ï¸ Kontakt aufnehmen</a>
+            <a href="#produkte" class="btn btn--b-o">Unsere Produkte</a>
           </div>
-        </label>
-
-        <label class="setting-option" id="opt-sync-wifi">
-          <input type="radio" name="syncMode" value="wifi" checked>
-          <div class="setting-option__text">
-            <div class="setting-option__label">📶 Nur WLAN</div>
-            <div class="setting-option__desc">Übertragung nur im WLAN – spart Datenvolumen</div>
-          </div>
-        </label>
-
-        <label class="setting-option" id="opt-sync-manual">
-          <input type="radio" name="syncMode" value="manual">
-          <div class="setting-option__text">
-            <div class="setting-option__label">👆 Manuell</div>
-            <div class="setting-option__desc">Du entscheidest selbst, wann synchronisiert wird</div>
-          </div>
-        </label>
-      </div>
-
-      <!-- Manueller Sync-Button -->
-      <div class="detail-section" id="manual-sync-section" style="display:none;">
-        <button id="btn-manual-sync" class="btn-primary" style="background:linear-gradient(135deg, #1A5FA8, #4A90D9);">
-          📡 Jetzt synchronisieren
-        </button>
-        <p id="pending-count" style="font-size:12px; color:#8A9BA4; text-align:center; margin-top:8px;"></p>
-      </div>
-
-      <!-- Info -->
-      <div class="detail-section" style="background:#F0F7FF; border-radius:12px; padding:14px;">
-        <p style="font-size:12px; color:#5A6A72; line-height:1.5;">
-          <strong>ℹ️ Hinweis:</strong> Meldungen werden immer zuerst lokal auf deinem Gerät gespeichert. 
-          Die Übertragung an den Server ist optional – du kannst deine Daten auch jederzeit als GeoJSON oder CSV exportieren.
-        </p>
-      </div>
-
-    </div>
-  </div>
-
-</div>
-
-<!-- App JS (als Module) -->
-
-
-
-<script>
-// ═══ categories.js ═══
-// ─── 2Rat Radmelder – Kategorien-System ───
-
-const CATEGORIES = {
-  // ─── ROT: Probleme / Mängel ───
-  problems: {
-    id: 'problems',
-    label: 'Problem melden',
-    emoji: '⚠️',
-    color: '#E00000',
-    bgColor: '#FF9999',
-    items: [
-      {
-        id: 'surface',
-        icon: '🕳️',
-        label: 'Oberfläche',
-        description: 'Schlaglöcher, Wurzelaufbrüche, Rillen, Kopfsteinpflaster',
-        tags: ['schlagloch', 'wurzel', 'rille', 'pflaster', 'belag'],
-      },
-      {
-        id: 'narrow',
-        icon: '↔️',
-        label: 'Engstelle',
-        description: 'Zu schmaler Radweg, Hindernisse, Poller',
-        tags: ['eng', 'schmal', 'hindernis', 'poller', 'breite'],
-      },
-      {
-        id: 'crossing',
-        icon: '🔀',
-        label: 'Kreuzung / Knoten',
-        description: 'Gefährliche Führung, schlechte Sicht, fehlende Signalisierung',
-        tags: ['kreuzung', 'knoten', 'sicht', 'signal', 'ampel'],
-      },
-      {
-        id: 'traverse',
-        icon: '🚶',
-        label: 'Querung',
-        description: 'Fehlende Querungshilfe, Umwege, Barrieren',
-        tags: ['querung', 'umweg', 'barriere', 'überweg'],
-      },
-      {
-        id: 'conflict',
-        icon: '💥',
-        label: 'Konflikte',
-        description: 'Dooring-Gefahr, Fußgängerkonflikte, Kfz-Konflikte',
-        tags: ['dooring', 'fussgänger', 'auto', 'konflikt', 'gefahr'],
-      },
-      {
-        id: 'parking',
-        icon: '🅿️',
-        label: 'Parken',
-        description: 'Zugeparkte Radwege, Falschparker, fehlende Kontrolle',
-        tags: ['parken', 'zugeparkt', 'falschparker', 'zweite-reihe'],
-      },
-      {
-        id: 'signage',
-        icon: '🪧',
-        label: 'Wegweisung',
-        description: 'Fehlend, beschädigt, verwirrend',
-        tags: ['schild', 'wegweisung', 'beschilderung', 'markierung'],
-      },
-      {
-        id: 'lighting',
-        icon: '💡',
-        label: 'Beleuchtung',
-        description: 'Fehlend, defekt, unzureichend',
-        tags: ['licht', 'dunkel', 'laterne', 'beleuchtung'],
-      },
-      {
-        id: 'winter',
-        icon: '❄️',
-        label: 'Winterdienst / Reinigung',
-        description: 'Nicht geräumt, Laub, Scherben, Verschmutzung',
-        tags: ['winter', 'schnee', 'eis', 'laub', 'glas', 'dreck'],
-      },
-      {
-        id: 'barrier_free',
-        icon: '♿',
-        label: 'Barrierefreiheit',
-        description: 'Hohe Bordsteine, fehlende Absenkung, Umlaufsperren',
-        tags: ['bordstein', 'absenkung', 'rampe', 'umlaufsperre', 'barriere'],
-      },
-      {
-        id: 'detour',
-        icon: '🔄',
-        label: 'Umleitung fehlt',
-        description: 'Keine Umleitung ausgeschildert, fehlende Umleitungsbeschilderung',
-        tags: ['umleitung', 'beschilderung', 'baustelle', 'sperrung', 'gesperrt'],
-      },
-      {
-        id: 'other_problem',
-        icon: '❓',
-        label: 'Sonstiges',
-        description: 'Anderes Problem (Freitext)',
-        tags: ['sonstiges'],
-      },
-    ],
-  },
-
-  // ─── GELB: Wünsche ───
-  wishes: {
-    id: 'wishes',
-    label: 'Wunsch äußern',
-    emoji: '💬',
-    color: '#E5A700',
-    bgColor: '#FFD966',
-    items: [
-      {
-        id: 'new_path',
-        icon: '🛤️',
-        label: 'Radweg gewünscht',
-        description: 'Neue Verbindung, Lückenschluss',
-        tags: ['radweg', 'verbindung', 'lücke', 'neu'],
-      },
-      {
-        id: 'bike_parking',
-        icon: '🔒',
-        label: 'Abstellanlage',
-        description: 'Fahrradbügel, überdacht, Ladestation',
-        tags: ['abstellen', 'bügel', 'parkplatz', 'laden'],
-      },
-      {
-        id: 'tempo30',
-        icon: '🐌',
-        label: 'Tempo 30',
-        description: 'Geschwindigkeitsreduzierung gewünscht',
-        tags: ['tempo', 'geschwindigkeit', '30', 'zone'],
-      },
-      {
-        id: 'traffic_light',
-        icon: '🚦',
-        label: 'Ampelschaltung',
-        description: 'Grüne Welle, kürzere Wartezeit, Anforderungstaster',
-        tags: ['ampel', 'grün', 'welle', 'wartezeit', 'taster'],
-      },
-      {
-        id: 'bike_street',
-        icon: '🚲',
-        label: 'Fahrradstraße',
-        description: 'Umwidmung gewünscht',
-        tags: ['fahrradstrasse', 'fahrradzone', 'umwidmung'],
-      },
-      {
-        id: 'oneway',
-        icon: '↩️',
-        label: 'Einbahnstraße öffnen',
-        description: 'Freigabe für Radverkehr in Gegenrichtung',
-        tags: ['einbahnstrasse', 'gegenrichtung', 'freigabe', 'öffnen'],
-      },
-    ],
-  },
-
-  // ─── GRÜN: Positiv ───
-  positive: {
-    id: 'positive',
-    label: 'Lob aussprechen',
-    emoji: '👍',
-    color: '#00A836',
-    bgColor: '#8FD99F',
-    items: [
-      {
-        id: 'good_infra',
-        icon: '⭐',
-        label: 'Gute Infrastruktur',
-        description: 'Vorbildlicher Radweg, gute Lösung',
-        tags: ['gut', 'vorbild', 'radweg', 'lösung'],
-      },
-      {
-        id: 'safe_crossing',
-        icon: '✅',
-        label: 'Sichere Querung',
-        description: 'Gut gestaltete Kreuzung oder Überweg',
-        tags: ['sicher', 'kreuzung', 'querung', 'überweg'],
-      },
-      {
-        id: 'service',
-        icon: '🛠️',
-        label: 'Service',
-        description: 'Reparaturstation, Luftpumpe, Trinkwasser',
-        tags: ['reparatur', 'pumpe', 'service', 'wasser'],
-      },
-      {
-        id: 'bike_friendly',
-        icon: '🍺',
-        label: 'Fahrradfreundliche Einkehr',
-        description: 'Gaststätte, Café oder Biergarten mit Abstellmöglichkeit',
-        tags: ['gaststätte', 'café', 'biergarten', 'einkehr', 'essen', 'trinken'],
-      },
-    ],
-  },
-};
-
-/**
- * Kategorie nach ID finden
- */
-function getCategoryById(categoryId) {
-  return CATEGORIES[categoryId] || null;
-}
-
-/**
- * Unterkategorie nach IDs finden
- */
-function getSubcategoryById(categoryId, subcategoryId) {
-  const cat = CATEGORIES[categoryId];
-  if (!cat) return null;
-  return cat.items.find((item) => item.id === subcategoryId) || null;
-}
-
-/**
- * Alle Kategorien als flache Liste (für Export)
- */
-function getAllSubcategories() {
-  const result = [];
-  for (const [catId, cat] of Object.entries(CATEGORIES)) {
-    for (const item of cat.items) {
-      result.push({
-        categoryId: catId,
-        categoryLabel: cat.label,
-        ...item,
-      });
-    }
-  }
-  return result;
-}
-
-
-
-// ═══ db.js ═══
-// ─── 2Rat Radmelder – Datenbank (IndexedDB via Dexie.js) ───
-// Dexie wird per CDN in index.html geladen
-
-const DB_NAME = 'radmelder';
-const DB_VERSION = 1;
-
-let db;
-
-/**
- * Datenbank initialisieren
- */
-function initDB() {
-  db = new Dexie(DB_NAME);
-
-  db.version(DB_VERSION).stores({
-    // Haupttabelle für Meldungen
-    reports: '++localId, id, category, subcategory, timestamp, syncStatus',
-    // Fotos separat (wegen Größe)
-    photos: '++id, reportLocalId, data, timestamp',
-    // Einstellungen
-    settings: 'key',
-  });
-
-  console.log('[DB] Initialisiert');
-  return db;
-}
-
-// ─── REPORTS ───
-
-/**
- * Neue Meldung speichern
- * @param {Object} report - Meldungsdaten
- * @returns {number} localId
- */
-async function saveReport(report) {
-  const entry = {
-    id: crypto.randomUUID(),
-    latitude: report.latitude,
-    longitude: report.longitude,
-    accuracy: report.accuracy || null,
-    heading: report.heading || null,
-    timestamp: new Date().toISOString(),
-    category: report.category,
-    subcategory: report.subcategory,
-    comment: report.comment || '',
-    photoCount: report.photoCount || 0,
-    syncStatus: 'local', // local | queued | synced
-    serverId: null,
-  };
-
-  const localId = await db.reports.add(entry);
-  console.log(`[DB] Meldung gespeichert: ${localId}`);
-  return localId;
-}
-
-/**
- * Alle Meldungen laden
- * @returns {Array} Meldungen sortiert nach Zeitstempel (neueste zuerst)
- */
-async function getAllReports() {
-  return db.reports.orderBy('timestamp').reverse().toArray();
-}
-
-/**
- * Einzelne Meldung laden
- * @param {number} localId
- * @returns {Object} Meldung
- */
-async function getReport(localId) {
-  return db.reports.get(localId);
-}
-
-/**
- * Meldung löschen
- * @param {number} localId
- */
-async function deleteReport(localId) {
-  await db.photos.where('reportLocalId').equals(localId).delete();
-  await db.reports.delete(localId);
-  console.log(`[DB] Meldung gelöscht: ${localId}`);
-}
-
-/**
- * Anzahl der Meldungen
- * @returns {number}
- */
-async function getReportCount() {
-  return db.reports.count();
-}
-
-// ─── FOTOS ───
-
-/**
- * Foto zu Meldung hinzufügen
- * @param {number} reportLocalId
- * @param {string} dataUrl - Base64-kodiertes Foto
- */
-async function savePhoto(reportLocalId, dataUrl) {
-  await db.photos.add({
-    reportLocalId,
-    data: dataUrl,
-    timestamp: new Date().toISOString(),
-  });
-}
-
-/**
- * Alle Fotos einer Meldung laden
- * @param {number} reportLocalId
- * @returns {Array}
- */
-async function getPhotosForReport(reportLocalId) {
-  return db.photos.where('reportLocalId').equals(reportLocalId).toArray();
-}
-
-// ─── EINSTELLUNGEN ───
-
-/**
- * Einstellung speichern
- */
-async function setSetting(key, value) {
-  await db.settings.put({ key, value });
-}
-
-/**
- * Einstellung laden
- */
-async function getSetting(key, defaultValue = null) {
-  const entry = await db.settings.get(key);
-  return entry ? entry.value : defaultValue;
-}
-
-// ─── STATISTIKEN ───
-
-/**
- * Statistik-Übersicht
- */
-async function getStats() {
-  const all = await db.reports.toArray();
-  const stats = {
-    total: all.length,
-    problems: all.filter((r) => r.category === 'problems').length,
-    wishes: all.filter((r) => r.category === 'wishes').length,
-    positive: all.filter((r) => r.category === 'positive').length,
-    synced: all.filter((r) => r.syncStatus === 'synced').length,
-    local: all.filter((r) => r.syncStatus === 'local').length,
-  };
-  return stats;
-}
-
-
-
-
-// ═══ router.js ═══
-// ─── 2Rat Radmelder – Router (Screen-Navigation) ───
-
-/**
- * Einfacher Hash-basierter Router für Single-Page-Navigation.
- * Screens werden per CSS-Klasse ein-/ausgeblendet.
- *
- * Verwendung:
- *   initRouter({
- *     default: 'home',
- *     routes: {
- *       'home':        () => showHomeScreen(),
- *       'category':    (params) => showCategoryScreen(params),
- *       'details':     (params) => showDetailsScreen(params),
- *       'confirm':     () => showConfirmScreen(),
- *       'list':        () => showListScreen(),
- *     }
- *   });
- *
- *   navigate('category', { type: 'problems' });
- *   goBack();
- */
-
-let routerConfig = null;
-let history = [];
-
-/**
- * Router initialisieren
- */
-function initRouter(config) {
-  routerConfig = config;
-  history = [];
-
-  // Hash-Änderungen abfangen
-  window.addEventListener('hashchange', () => {
-    const screen = getScreenFromHash();
-    activateScreen(screen);
-  });
-
-  // Initiales Routing
-  const initial = getScreenFromHash() || config.default || 'home';
-  navigate(initial);
-}
-
-/**
- * Screen-Name aus Hash extrahieren
- */
-function getScreenFromHash() {
-  const hash = window.location.hash.replace('#', '');
-  return hash || null;
-}
-
-/**
- * Zu Screen navigieren
- * @param {string} screenId - Name des Screens
- * @param {Object} params - Optionale Parameter
- */
-function navigate(screenId, params = {}) {
-  // In History pushen
-  history.push({ screen: screenId, params });
-
-  // Hash aktualisieren (ohne hashchange auszulösen)
-  window.location.hash = screenId;
-
-  // Screen aktivieren
-  activateScreen(screenId, params);
-}
-
-/**
- * Zurück navigieren
- */
-function goBack() {
-  if (history.length > 1) {
-    history.pop(); // Aktuellen entfernen
-    const prev = history[history.length - 1];
-    window.location.hash = prev.screen;
-    activateScreen(prev.screen, prev.params);
-  } else {
-    navigate(routerConfig.default || 'home');
-  }
-}
-
-/**
- * Screen aktivieren (CSS-Klasse + Callback)
- */
-function activateScreen(screenId, params = {}) {
-  // Alle Screens ausblenden
-  document.querySelectorAll('[data-screen]').forEach((el) => {
-    el.classList.remove('screen--active');
-    el.setAttribute('aria-hidden', 'true');
-  });
-
-  // Ziel-Screen einblenden
-  const target = document.querySelector(`[data-screen="${screenId}"]`);
-  if (target) {
-    target.classList.add('screen--active');
-    target.setAttribute('aria-hidden', 'false');
-    target.scrollTop = 0; // Scroll zurücksetzen
-  }
-
-  // Route-Callback ausführen
-  if (routerConfig?.routes?.[screenId]) {
-    routerConfig.routes[screenId](params);
-  }
-}
-
-/**
- * Aktuellen Screen abfragen
- */
-function getCurrentScreen() {
-  return history.length > 0 ? history[history.length - 1] : null;
-}
-
-/**
- * Hardware-Zurück-Button abfangen (Android)
- */
-function enableBackButton() {
-  window.addEventListener('popstate', (e) => {
-    if (history.length > 1) {
-      e.preventDefault();
-      goBack();
-    }
-  });
-}
-
-
-
-// ═══ camera.js ═══
-// ─── 2Rat Radmelder – Kamera-Modul ───
-
-/**
- * Foto aufnehmen via HTML5 Input (zuverlässigste Methode auf Mobile)
- * Gibt ein Promise zurück mit Base64-Daten und Thumbnail
- *
- * @param {Object} options
- * @param {number} options.maxWidth - Max Breite in Pixel (default: 1280)
- * @param {number} options.quality - JPEG-Qualität 0-1 (default: 0.8)
- * @returns {Promise<{dataUrl: string, thumbnail: string, width: number, height: number}>}
- */
-function capturePhoto(options = {}) {
-  const maxWidth = options.maxWidth || 1280;
-  const quality = options.quality || 0.8;
-
-  return new Promise((resolve, reject) => {
-    // Verstecktes File-Input erstellen
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.capture = 'environment'; // Rückkamera bevorzugen
-
-    input.addEventListener('change', (event) => {
-      const file = event.target.files[0];
-      if (!file) {
-        reject(new Error('Keine Datei ausgewählt'));
-        return;
-      }
-
-      processImage(file, maxWidth, quality)
-        .then(resolve)
-        .catch(reject);
-    });
-
-    input.addEventListener('cancel', () => {
-      reject(new Error('Abgebrochen'));
-    });
-
-    // Dialog öffnen
-    input.click();
-  });
-}
-
-/**
- * Bild verarbeiten: Resize + Komprimierung
- */
-function processImage(file, maxWidth, quality) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        // Resize wenn nötig
-        let width = img.width;
-        let height = img.height;
-
-        if (width > maxWidth) {
-          height = Math.round(height * (maxWidth / width));
-          width = maxWidth;
-        }
-
-        // Canvas für Komprimierung
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
-
-        const dataUrl = canvas.toDataURL('image/jpeg', quality);
-
-        // Thumbnail erstellen (200px breit)
-        const thumbWidth = 200;
-        const thumbHeight = Math.round(height * (thumbWidth / width));
-        canvas.width = thumbWidth;
-        canvas.height = thumbHeight;
-        ctx.drawImage(img, 0, 0, thumbWidth, thumbHeight);
-        const thumbnail = canvas.toDataURL('image/jpeg', 0.6);
-
-        resolve({
-          dataUrl,
-          thumbnail,
-          width,
-          height,
-          originalName: file.name,
-          size: dataUrl.length,
-        });
-      };
-
-      img.onerror = () => reject(new Error('Bild konnte nicht geladen werden'));
-      img.src = e.target.result;
-    };
-
-    reader.onerror = () => reject(new Error('Datei konnte nicht gelesen werden'));
-    reader.readAsDataURL(file);
-  });
-}
-
-/**
- * Prüfen ob Kamera verfügbar ist
- */
-function isCameraAvailable() {
-  return 'mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices;
-}
-
-
-
-// ═══ map.js ═══
-// ─── 2Rat Radmelder – Kartenmodul (Leaflet + GPS) ───
-
-let map = null;
-let userMarker = null;
-let reportMarkers = [];
-let currentPosition = null;
-let watchId = null;
-
-// Marker-Farben passend zu Kategorien (Ampel)
-const MARKER_COLORS = {
-  problems: '#E00000',
-  wishes: '#E5A700',
-  positive: '#00A836',
-};
-
-/**
- * Karte initialisieren
- * @param {string} containerId - ID des HTML-Containers
- * @param {Object} options - Optionen
- */
-function initMap(containerId, options = {}) {
-  const defaultCenter = [49.41, 6.78]; // Lebach, Saarland (2Rat Standort)
-  const defaultZoom = 14;
-
-  map = L.map(containerId, {
-    center: options.center || defaultCenter,
-    zoom: options.zoom || defaultZoom,
-    zoomControl: false, // Eigene Position stattdessen
-    attributionControl: true,
-  });
-
-  // OpenStreetMap Tiles
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>',
-    maxZoom: 19,
-  }).addTo(map);
-
-  // Zoom-Control rechts unten
-  L.control.zoom({ position: 'bottomright' }).addTo(map);
-
-  // Karte nach kurzer Verzögerung aktualisieren (Fix für Container-Größe)
-  setTimeout(() => { map.invalidateSize(); }, 300);
-  setTimeout(() => { map.invalidateSize(); }, 1000);
-
-  console.log('[Map] Initialisiert');
-  return map;
-}
-
-/**
- * GPS-Tracking starten
- * @param {Function} onUpdate - Callback bei Positionsupdate
- * @param {Function} onError - Callback bei Fehler
- */
-function startGPS(onUpdate, onError) {
-  if (!navigator.geolocation) {
-    onError && onError('GPS nicht verfügbar');
-    return;
-  }
-
-  const gpsOptions = {
-    enableHighAccuracy: true,
-    timeout: 15000,
-    maximumAge: 5000,
-  };
-
-  // Einmalige Position holen
-  navigator.geolocation.getCurrentPosition(
-    (pos) => {
-      handlePosition(pos, onUpdate);
-    },
-    (err) => {
-      console.warn('[GPS] Fehler:', err.message);
-      onError && onError(err.message);
-    },
-    gpsOptions
-  );
-
-  // Kontinuierliches Tracking
-  watchId = navigator.geolocation.watchPosition(
-    (pos) => handlePosition(pos, onUpdate),
-    (err) => console.warn('[GPS] Watch-Fehler:', err.message),
-    gpsOptions
-  );
-}
-
-/**
- * GPS-Tracking stoppen
- */
-function stopGPS() {
-  if (watchId !== null) {
-    navigator.geolocation.clearWatch(watchId);
-    watchId = null;
-  }
-}
-
-/**
- * Position verarbeiten
- */
-function handlePosition(pos, callback) {
-  currentPosition = {
-    latitude: pos.coords.latitude,
-    longitude: pos.coords.longitude,
-    accuracy: Math.round(pos.coords.accuracy),
-    heading: pos.coords.heading,
-    timestamp: pos.timestamp,
-  };
-
-  // User-Marker aktualisieren
-  if (map) {
-    const latlng = [currentPosition.latitude, currentPosition.longitude];
-
-    if (userMarker) {
-      userMarker.setLatLng(latlng);
-    } else {
-      userMarker = L.circleMarker(latlng, {
-        radius: 8,
-        fillColor: '#1A5FA8',
-        fillOpacity: 1,
-        color: '#FFFFFF',
-        weight: 3,
-      }).addTo(map);
-
-      // Beim ersten Fix: Karte zentrieren
-      map.setView(latlng, 16);
-    }
-
-    // Genauigkeitskreis
-    if (userMarker._accuracyCircle) {
-      userMarker._accuracyCircle.setLatLng(latlng);
-      userMarker._accuracyCircle.setRadius(currentPosition.accuracy);
-    } else {
-      userMarker._accuracyCircle = L.circle(latlng, {
-        radius: currentPosition.accuracy,
-        fillColor: '#1A5FA8',
-        fillOpacity: 0.1,
-        color: '#1A5FA8',
-        weight: 1,
-        opacity: 0.3,
-      }).addTo(map);
-    }
-  }
-
-  callback && callback(currentPosition);
-}
-
-/**
- * Aktuelle GPS-Position holen
- * @returns {Object|null}
- */
-function getCurrentPosition() {
-  return currentPosition;
-}
-
-/**
- * Karte auf Position zentrieren
- */
-function centerOnPosition() {
-  if (map && currentPosition) {
-    map.setView([currentPosition.latitude, currentPosition.longitude], 17);
-  }
-}
-
-/**
- * Meldungs-Marker auf Karte setzen
- * @param {Array} reports - Array von Meldungen aus der DB
- */
-function displayReports(reports) {
-  // Alte Marker entfernen
-  reportMarkers.forEach((m) => map.removeLayer(m));
-  reportMarkers = [];
-
-  reports.forEach((report) => {
-    if (!report.latitude || !report.longitude) return;
-
-    const color = MARKER_COLORS[report.category] || '#5A6A72';
-
-    const marker = L.circleMarker([report.latitude, report.longitude], {
-      radius: 10,
-      fillColor: color,
-      fillOpacity: 0.85,
-      color: '#FFFFFF',
-      weight: 2,
-    }).addTo(map);
-
-    // Popup mit Infos
-    marker.bindPopup(`
-      <div style="font-family: sans-serif; min-width: 150px;">
-        <strong>${report.subcategory || report.category}</strong><br>
-        <small style="color: #888;">${new Date(report.timestamp).toLocaleString('de-DE')}</small>
-        ${report.comment ? `<p style="margin: 6px 0 0; font-size: 13px;">${report.comment}</p>` : ''}
-      </div>
-    `);
-
-    reportMarkers.push(marker);
-  });
-}
-
-/**
- * Karte auf alle Meldungen zoomen
- */
-function fitToReports() {
-  if (reportMarkers.length === 0) return;
-  const group = L.featureGroup(reportMarkers);
-  map.fitBounds(group.getBounds().pad(0.1));
-}
-
-
-
-
-// ═══ export.js ═══
-// ─── 2Rat Radmelder – Export-Modul ───
-
-
-/**
- * Alle Meldungen als GeoJSON exportieren
- * @returns {Object} GeoJSON FeatureCollection
- */
-async function exportGeoJSON() {
-  const reports = await getAllReports();
-
-  const features = reports.map((report) => {
-    const sub = getSubcategoryById(report.category, report.subcategory);
-
-    return {
-      type: 'Feature',
-      geometry: {
-        type: 'Point',
-        coordinates: [report.longitude, report.latitude],
-      },
-      properties: {
-        id: report.id,
-        category: report.category,
-        subcategory: report.subcategory,
-        categoryLabel: sub?.label || report.subcategory,
-        comment: report.comment || '',
-        timestamp: report.timestamp,
-        accuracy: report.accuracy,
-        heading: report.heading,
-        photoCount: report.photoCount || 0,
-        syncStatus: report.syncStatus,
-      },
-    };
-  });
-
-  const geojson = {
-    type: 'FeatureCollection',
-    name: '2Rat_Radmelder_Export',
-    crs: {
-      type: 'name',
-      properties: {
-        name: 'urn:ogc:def:crs:OGC:1.3:CRS84',
-      },
-    },
-    features,
-    metadata: {
-      exportDate: new Date().toISOString(),
-      app: '2Rat Radmelder',
-      version: '1.0.0',
-      totalReports: features.length,
-    },
-  };
-
-  return geojson;
-}
-
-/**
- * Alle Meldungen als CSV exportieren
- * @returns {string} CSV-String
- */
-async function exportCSV() {
-  const reports = await getAllReports();
-
-  const headers = [
-    'id',
-    'latitude',
-    'longitude',
-    'accuracy',
-    'timestamp',
-    'category',
-    'subcategory',
-    'comment',
-    'photoCount',
-    'syncStatus',
-  ];
-
-  const rows = reports.map((r) =>
-    headers.map((h) => {
-      const val = r[h] ?? '';
-      // CSV-Escaping: Anführungszeichen verdoppeln
-      const str = String(val).replace(/"/g, '""');
-      return str.includes(',') || str.includes('"') || str.includes('\n')
-        ? `"${str}"`
-        : str;
-    }).join(',')
-  );
-
-  // BOM für Excel-Kompatibilität mit Umlauten
-  return '\uFEFF' + headers.join(',') + '\n' + rows.join('\n');
-}
-
-/**
- * Datei zum Download anbieten
- * @param {string} content - Dateiinhalt
- * @param {string} filename - Dateiname
- * @param {string} mimeType - MIME-Type
- */
-function downloadFile(content, filename, mimeType) {
-  const blob = new Blob(
-    [typeof content === 'string' ? content : JSON.stringify(content, null, 2)],
-    { type: mimeType }
-  );
-
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = filename;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
-
-  console.log(`[Export] ${filename} heruntergeladen`);
-}
-
-/**
- * GeoJSON-Export starten
- */
-async function downloadGeoJSON() {
-  const geojson = await exportGeoJSON();
-  const date = new Date().toISOString().split('T')[0];
-  downloadFile(geojson, `radmelder_${date}.geojson`, 'application/geo+json');
-}
-
-/**
- * CSV-Export starten
- */
-async function downloadCSV() {
-  const csv = await exportCSV();
-  const date = new Date().toISOString().split('T')[0];
-  downloadFile(csv, `radmelder_${date}.csv`, 'text/csv;charset=utf-8');
-}
-
-/**
- * QGIS-Stildatei (.qml) generieren
- * Farbcodierung nach Ampel-Schema
- */
-function downloadQGISStyle() {
-  const qml = `<?xml version="1.0" encoding="UTF-8"?>
-<qgis version="3.28" styleCategories="Symbology">
-  <renderer-v2 type="categorizedSymbol" attr="category" symbollevels="0">
-    <categories>
-      <category symbol="0" value="problems" label="Probleme/Mängel"/>
-      <category symbol="1" value="wishes" label="Wünsche"/>
-      <category symbol="2" value="positive" label="Positiv"/>
-    </categories>
-    <symbols>
-      <symbol type="marker" name="0">
-        <layer class="SimpleMarker">
-          <Option type="Map">
-            <Option type="QString" value="circle" name="name"/>
-            <Option type="QString" value="224,0,0,220" name="color"/>
-            <Option type="QString" value="3.5" name="size"/>
-          </Option>
-        </layer>
-      </symbol>
-      <symbol type="marker" name="1">
-        <layer class="SimpleMarker">
-          <Option type="Map">
-            <Option type="QString" value="circle" name="name"/>
-            <Option type="QString" value="229,167,0,220" name="color"/>
-            <Option type="QString" value="3.5" name="size"/>
-          </Option>
-        </layer>
-      </symbol>
-      <symbol type="marker" name="2">
-        <layer class="SimpleMarker">
-          <Option type="Map">
-            <Option type="QString" value="circle" name="name"/>
-            <Option type="QString" value="0,168,54,220" name="color"/>
-            <Option type="QString" value="3.5" name="size"/>
-          </Option>
-        </layer>
-      </symbol>
-    </symbols>
-  </renderer-v2>
-</qgis>`;
-
-  downloadFile(qml, 'radmelder_stil.qml', 'application/xml');
-}
-
-
-
-
-// ═══ sync.js ═══
-// ─── 2Rat Radwegemelder – Supabase Sync (REST-API, kein JS-Client nötig) ───
-
-const SUPABASE_URL = 'https://vimsikjyoupihogmquul.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpbXNpa2p5b3VwaWhvZ21xdXVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0NTIyMjYsImV4cCI6MjA4NjAyODIyNn0._Foa5ZVr4nwoOlZ4T-ORX0U4sNUjgRJJRyBDHvHV2vo';
-
-let syncEnabled = false;
-let deviceId = null;
-let syncMode = 'wifi';
-
-const sbHeaders = {
-  'apikey': SUPABASE_ANON_KEY,
-  'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
-  'Content-Type': 'application/json',
-  'Prefer': 'return=representation',
-};
-
-async function initSync() {
-  syncMode = await getSetting('syncMode', 'wifi');
-
-  if (!SUPABASE_URL || SUPABASE_URL === 'DEINE_SUPABASE_URL') {
-    updateSyncUI('offline', 'Nur lokal');
-    return;
-  }
-
-  deviceId = localStorage.getItem('radmelder_device_id');
-  if (!deviceId) {
-    deviceId = crypto.randomUUID();
-    localStorage.setItem('radmelder_device_id', deviceId);
-  }
-
-  try {
-    const resp = await fetch(SUPABASE_URL + '/rest/v1/reports?select=id&limit=1', {
-      headers: { 'apikey': SUPABASE_ANON_KEY }
-    });
-    if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    syncEnabled = true;
-    console.log('[Sync] Verbunden (REST-API)');
-  } catch (err) {
-    console.warn('[Sync] Nicht erreichbar:', err.message);
-    updateSyncUI('offline', 'Nur lokal');
-    return;
-  }
-
-  window.addEventListener('online', onOnline);
-  window.addEventListener('offline', onOffline);
-
-  if (navigator.onLine) {
-    updateSyncUI('synced', 'Online');
-    attemptSync();
-  } else {
-    updateSyncUI('offline', 'Offline');
-  }
-}
-
-function shouldSync() {
-  if (!syncEnabled || !navigator.onLine) return false;
-  if (syncMode === 'manual') return false;
-  if (syncMode === 'wifi') return isOnWifi();
-  return true;
-}
-
-function isOnWifi() {
-  const c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-  if (c) return c.type === 'wifi' || c.type === 'ethernet';
-  return true;
-}
-
-function attemptSync() {
-  if (shouldSync()) {
-    syncPendingReports();
-  } else if (syncMode === 'wifi' && !isOnWifi()) {
-    updatePendingInfo();
-    updateSyncUI('pending', 'Wartet auf WLAN');
-  } else if (syncMode === 'manual') {
-    updatePendingInfo();
-    updateSyncUI('pending', 'Manuell');
-  }
-}
-
-function onOnline() {
-  updateSyncUI('synced', 'Online');
-  attemptSync();
-}
-
-function onOffline() {
-  updateSyncUI('offline', 'Offline');
-}
-
-async function setSyncMode(mode) {
-  syncMode = mode;
-  await setSetting('syncMode', mode);
-  const ms = document.getElementById('manual-sync-section');
-  if (ms) ms.style.display = mode === 'manual' ? 'block' : 'none';
-  if (navigator.onLine) attemptSync();
-}
-
-async function updatePendingInfo() {
-  const pending = await db.reports.where('syncStatus').equals('local').count();
-  const el = document.getElementById('pending-count');
-  if (el) {
-    el.textContent = pending > 0
-      ? `${pending} Meldung${pending > 1 ? 'en' : ''} warten auf Übertragung`
-      : 'Alle Meldungen synchronisiert ✓';
-  }
-  return pending;
-}
-
-async function syncReport(report) {
-  if (!syncEnabled) return false;
-  try {
-    const body = {
-      id: report.id,
-      latitude: report.latitude,
-      longitude: report.longitude,
-      accuracy: report.accuracy ? Math.round(report.accuracy) : null,
-      heading: report.heading || null,
-      timestamp: report.timestamp || new Date().toISOString(),
-      category: report.category,
-      subcategory: report.subcategory,
-      comment: report.comment || '',
-      photo_count: report.photoCount || 0,
-      device_id: deviceId,
-    };
-
-    // Sichere RPC-Funktion mit Rate Limiting & Validierung
-    const resp = await fetch(SUPABASE_URL + '/rest/v1/rpc/insert_report_safe', {
-      method: 'POST',
-      headers: sbHeaders,
-      body: JSON.stringify({
-        p_id: body.id,
-        p_latitude: body.latitude,
-        p_longitude: body.longitude,
-        p_accuracy: body.accuracy,
-        p_category: body.category,
-        p_subcategory: body.subcategory,
-        p_comment: body.comment || null,
-        p_heading: body.heading,
-        p_has_photo: (body.photo_count || 0) > 0,
-        p_timestamp: body.timestamp,
-        p_project: body.project || null,
-        p_source: body.device_id || null,
-      }),
-    });
-
-    if (!resp.ok) {
-      const errData = await resp.json().catch(() => ({}));
-      if (errData.code === '23505') {
-        await db.reports.update(report.localId, { syncStatus: 'synced' });
-        return true;
-      }
-      throw new Error(errData.message || 'HTTP ' + resp.status);
-    }
-
-    // RPC-Ergebnis prüfen (Rate Limit, Validierung)
-    const result = await resp.json();
-    if (result && result.error) {
-      throw new Error(result.message || result.error);
-    }
-
-    // Fotos hochladen
-    const photos = await getPhotosForReport(report.localId);
-    for (let i = 0; i < photos.length; i++) {
-      await syncPhoto(report.id, photos[i], i);
-    }
-
-    await db.reports.update(report.localId, { syncStatus: 'synced', serverId: report.id });
-    console.log('[Sync] ✓ ' + report.id);
-    return true;
-  } catch (err) {
-    console.error('[Sync] ✗', err.message);
-    return false;
-  }
-}
-
-async function syncPhoto(reportId, photo, index) {
-  try {
-    const base64Data = photo.data.split(',')[1];
-    const bytes = atob(base64Data);
-    const arr = new Uint8Array(bytes.length);
-    for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
-    const blob = new Blob([arr], { type: 'image/jpeg' });
-    const path = reportId + '/' + index + '.jpg';
-
-    await fetch(SUPABASE_URL + '/storage/v1/object/photos/' + path, {
-      method: 'POST',
-      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY },
-      body: blob,
-    });
-
-    await fetch(SUPABASE_URL + '/rest/v1/photos', {
-      method: 'POST',
-      headers: sbHeaders,
-      body: JSON.stringify({ report_id: reportId, storage_path: path }),
-    });
-  } catch (err) {
-    console.warn('[Sync] Foto-Fehler:', err.message);
-  }
-}
-
-async function syncPendingReports() {
-  if (!syncEnabled || !navigator.onLine) return;
-  updateSyncUI('pending', 'Synchronisiere…');
-
-  const pending = await db.reports.where('syncStatus').equals('local').toArray();
-  if (pending.length === 0) {
-    updateSyncUI('synced', 'Online');
-    updatePendingInfo();
-    return;
-  }
-
-  let synced = 0;
-  for (const r of pending) {
-    if (await syncReport(r)) synced++;
-  }
-
-  if (synced === pending.length) {
-    updateSyncUI('synced', 'Online');
-    showToast(synced + ' Meldung' + (synced > 1 ? 'en' : '') + ' synchronisiert ✓');
-  } else {
-    updateSyncUI('pending', (pending.length - synced) + ' ausstehend');
-  }
-  updatePendingInfo();
-}
-
-function updateSyncUI(status, text) {
-  const c = document.getElementById('sync-status');
-  if (!c) return;
-  c.className = 'sync-status sync-status--' + status;
-  const t = document.getElementById('sync-text');
-  if (t) t.textContent = text;
-}
-
-async function fetchAllPublicReports() {
-  if (!syncEnabled) return [];
-  try {
-    const resp = await fetch(SUPABASE_URL + '/rest/v1/reports?select=*&order=timestamp.desc&limit=1000', {
-      headers: { 'apikey': SUPABASE_ANON_KEY }
-    });
-    return resp.ok ? await resp.json() : [];
-  } catch (err) { return []; }
-}
-
-// ═══ app.js ═══
-// ─── 2Rat Radmelder – Haupt-App ───
-
-
-// ─── App-State ───
-const state = {
-  selectedCategory: null,   // 'problems' | 'wishes' | 'positive'
-  selectedSubcategory: null, // z.B. 'surface'
-  comment: '',
-  photos: [],               // Array von { dataUrl, thumbnail }
-  gpsPosition: null,
-  gpsAccuracy: null,
-};
-
-// ─── INITIALISIERUNG ───
-
-document.addEventListener('DOMContentLoaded', async () => {
-  console.log('[App] 2Rat Radmelder wird geladen...');
-
-  // 1. Datenbank
-  initDB();
-
-  // 2. Service Worker registrieren
-  registerSW();
-
-  // 3. Sync initialisieren
-  initSync();
-
-  // 4. Karte
-  initMap('map-container');
-
-  // 5. GPS starten
-  startGPS(
-    (pos) => {
-      state.gpsPosition = pos;
-      updateGPSDisplay(pos);
-    },
-    (err) => {
-      console.warn('[App] GPS-Fehler:', err);
-      showGPSError(err);
-    }
-  );
-
-  // 6. Router
-  initRouter({
-    default: 'home',
-    routes: {
-      home: onHomeScreen,
-      subcategory: onSubcategoryScreen,
-      details: onDetailsScreen,
-      confirm: onConfirmScreen,
-      list: onListScreen,
-      settings: onSettingsScreen,
-    },
-  });
-
-  // 7. Event-Listener
-  bindEvents();
-
-  // 8. Meldungsanzahl aktualisieren
-  updateReportBadge();
-
-  console.log('[App] ✓ Bereit');
-});
-
-// ─── SERVICE WORKER ───
-
-async function registerSW() {
-  if ('serviceWorker' in navigator) {
-    try {
-      const reg = await navigator.serviceWorker.register('./sw.js');
-      console.log('[SW] Registriert:', reg.scope);
-    } catch (err) {
-      console.warn('[SW] Registrierung fehlgeschlagen:', err);
-    }
-  }
-}
-
-// ─── SCREEN-CALLBACKS ───
-
-async function onHomeScreen() {
-  // Meldungen auf Karte anzeigen
-  const reports = await getAllReports();
-  displayReports(reports);
-  updateReportBadge();
-}
-
-function onSubcategoryScreen(params) {
-  if (params?.type) {
-    state.selectedCategory = params.type;
-  }
-  renderSubcategories();
-}
-
-function onDetailsScreen() {
-  renderDetailsForm();
-}
-
-function onConfirmScreen() {
-  // Nichts zu tun – statischer Screen
-}
-
-async function onListScreen() {
-  renderReportList();
-}
-
-async function onSettingsScreen() {
-  // Aktuellen Sync-Modus in Radio-Buttons setzen
-  const radio = document.querySelector(`input[name="syncMode"][value="${syncMode}"]`);
-  if (radio) radio.checked = true;
-
-  // Manuell-Section anzeigen/verstecken
-  const manualSection = document.getElementById('manual-sync-section');
-  if (manualSection) {
-    manualSection.style.display = (syncMode === 'manual') ? 'block' : 'none';
-  }
-
-  // Ausstehende Meldungen anzeigen
-  updatePendingInfo();
-}
-
-// ─── RENDERING ───
-
-function renderSubcategories() {
-  const cat = CATEGORIES[state.selectedCategory];
-  if (!cat) return;
-
-  const container = document.getElementById('subcategory-list');
-  const title = document.getElementById('subcategory-title');
-
-  title.textContent = cat.label;
-  title.style.color = cat.color;
-
-  container.innerHTML = cat.items
-    .map(
-      (item) => `
-    <button class="category-card" data-sub="${item.id}" style="--accent: ${cat.color}; --accent-bg: ${cat.bgColor}; --accent-border: ${cat.color}20">
-      <div class="category-card__icon" style="background:${cat.bgColor}; font-size:22px;">${item.icon}</div>
-      <div class="category-card__text">
-        <div class="category-card__label">${item.label}</div>
-        <div class="category-card__desc">${item.description}</div>
-      </div>
-      <div class="category-card__arrow">›</div>
-    </button>
-  `
-    )
-    .join('');
-
-  // Click-Handler
-  container.querySelectorAll('.category-card').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      state.selectedSubcategory = btn.dataset.sub;
-      navigate('details');
-    });
-  });
-}
-
-let detailMap = null;
-let detailMarker = null;
-
-function renderDetailsForm() {
-  const sub = getSubcategoryById(state.selectedCategory, state.selectedSubcategory);
-  if (!sub) return;
-
-  document.getElementById('detail-title').textContent = `${sub.icon} ${sub.label}`;
-  document.getElementById('detail-description').textContent = sub.description;
-  document.getElementById('comment-input').value = state.comment;
-
-  // Detail-Karte initialisieren
-  setTimeout(() => {
-    const container = document.getElementById('detail-map');
-    if (!container) return;
-    
-    // Alte Karte entfernen
-    if (detailMap) {
-      detailMap.remove();
-      detailMap = null;
-    }
-
-    const pos = getCurrentPosition();
-    const center = pos ? [pos.latitude, pos.longitude] : [49.41, 6.78];
-    const zoom = pos ? 17 : 14;
-
-    detailMap = L.map('detail-map', {
-      center: center,
-      zoom: zoom,
-      zoomControl: false,
-      dragging: true,
-      scrollWheelZoom: false,
-    });
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap',
-      maxZoom: 19,
-    }).addTo(detailMap);
-
-    // Marker für aktuelle Position
-    if (pos) {
-      detailMarker = L.marker(center, {
-        draggable: true,
-      }).addTo(detailMap);
-
-      // Wenn Marker verschoben wird, Position updaten
-      detailMarker.on('dragend', function(e) {
-        const latlng = e.target.getLatLng();
-        state.gpsPosition = {
-          ...state.gpsPosition,
-          latitude: latlng.lat,
-          longitude: latlng.lng,
-          accuracy: 0, // Manuell gesetzt
-        };
-        const gpsInfo = document.getElementById('detail-gps-info');
-        if (gpsInfo) {
-          gpsInfo.textContent = `📍 Manuell gesetzt · ${latlng.lat.toFixed(5)}, ${latlng.lng.toFixed(5)}`;
-        }
-      });
-    }
-
-    // Karte neu layouten (wichtig nach Screen-Wechsel)
-    setTimeout(() => detailMap.invalidateSize(), 100);
-  }, 150);
-
-  // GPS-Anzeige aktualisieren
-  if (state.gpsPosition) {
-    updateGPSDisplay(state.gpsPosition);
-    const gpsInfo = document.getElementById('detail-gps-info');
-    if (gpsInfo) {
-      gpsInfo.textContent = `GPS: ±${state.gpsPosition.accuracy}m · ${state.gpsPosition.latitude.toFixed(5)}, ${state.gpsPosition.longitude.toFixed(5)}`;
-    }
-  }
-
-  // Fotos anzeigen
-  renderPhotoPreview();
-}
-
-function renderPhotoPreview() {
-  const container = document.getElementById('photo-preview');
-  container.innerHTML =
-    state.photos
-      .map(
-        (p, i) => `
-    <div class="photo-thumb">
-      <img src="${p.thumbnail}" alt="Foto ${i + 1}">
-      <button class="photo-thumb__remove" data-index="${i}">×</button>
-    </div>
-  `
-      )
-      .join('') +
-    `<button id="btn-add-photo" class="photo-add">
-      <span>+</span>
-      <small>Foto</small>
-    </button>`;
-
-  // Event-Handler
-  document.getElementById('btn-add-photo')?.addEventListener('click', handleAddPhoto);
-  container.querySelectorAll('.photo-thumb__remove').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      state.photos.splice(parseInt(btn.dataset.index), 1);
-      renderPhotoPreview();
-    });
-  });
-}
-
-async function renderReportList() {
-  const reports = await getAllReports();
-  const container = document.getElementById('report-list');
-
-  if (reports.length === 0) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-state__icon">🗺️</div>
-        <p>Noch keine Meldungen vorhanden.</p>
-        <button onclick="window.location.hash='home'" style="margin-top:16px; background:linear-gradient(135deg,#1A5FA8,#2D8C28); color:#fff; border:none; border-radius:14px; padding:14px 28px; font-size:15px; font-weight:700; cursor:pointer; box-shadow:0 4px 16px rgba(26,95,168,0.3);">
-          + Erste Meldung erstellen
-        </button>
-      </div>`;
-    return;
-  }
-
-  container.innerHTML = reports
-    .map((r) => {
-      const cat = CATEGORIES[r.category];
-      const sub = getSubcategoryById(r.category, r.subcategory);
-      const date = new Date(r.timestamp).toLocaleString('de-DE');
-
-      return `
-      <div class="report-item" style="--cat-bg: ${cat?.bgColor || '#f0f0f0'}">
-        <div class="report-item__icon" style="background: ${cat?.bgColor}">${sub?.icon || '📍'}</div>
-        <div class="report-item__text">
-          <div class="report-item__label">${sub?.label || r.subcategory}</div>
-          <div class="report-item__meta">${date} · ${r.photoCount ? '📷 ' + r.photoCount : 'Kein Foto'}</div>
-          ${r.comment ? `<div class="report-item__comment">„${r.comment.substring(0, 60)}${r.comment.length > 60 ? '...' : ''}"</div>` : ''}
         </div>
-        <button class="report-item__delete" data-id="${r.localId}" title="Löschen">🗑️</button>
-      </div>`;
-    })
-    .join('');
+        <div class="hero__right">
+          <img src="data:image/png;base64,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" alt="2RAT" class="hero__logo">
+        </div>
+      </div>
+    </div>
+  </section>
 
-  // Löschen-Handler
-  container.querySelectorAll('.report-item__delete').forEach((btn) => {
-    btn.addEventListener('click', async () => {
-      if (confirm('Meldung wirklich löschen?')) {
-        await deleteReport(parseInt(btn.dataset.id));
-        renderReportList();
-        updateReportBadge();
-      }
-    });
-  });
-}
+  <!-- â•â•â• LEISTUNGEN â•â•â• -->
+  <section class="section section--white" id="leistungen">
+    <div class="wrap">
+      <div class="s-label">Leistungen</div>
+      <h2 class="s-title">Was wir fÃ¼r Ihre Kommune tun kÃ¶nnen</h2>
+      <p class="s-text">Von der Bestandsaufnahme Ã¼ber die FÃ¶rdermittelberatung bis zur fertigen MaÃŸnahme.</p>
+      <div class="cards">
+        <div class="card">
+          <div class="card__top"><span class="card__icon">ðŸ“‹</span><h3 class="card__title">Radverkehrskonzepte</h3></div>
+          <p class="card__text">Erstellung kommunaler Radverkehrskonzepte â€“ von der Analyse bis zum MaÃŸnahmenkatalog. Praxisnah und umsetzbar.</p>
+        </div>
+        <div class="card">
+          <div class="card__top"><span class="card__icon">ðŸ”</span><h3 class="card__title">Bestandsaufnahmen & Netzanalysen</h3></div>
+          <p class="card__text">Systematische Erfassung und Bewertung bestehender Radinfrastruktur. Vor Ort und digital.</p>
+        </div>
+        <div class="card">
+          <div class="card__top"><span class="card__icon">ðŸ“Š</span><h3 class="card__title">FÃ¶rdermittelberatung</h3></div>
+          <p class="card__text">Welche FÃ¶rderprogramme passen? UnterstÃ¼tzung bei Antragsstellung und Kostenplanung fÃ¼r Radverkehrsprojekte.</p>
+        </div>
+        <div class="card">
+          <div class="card__top"><span class="card__icon">ðŸ‘¥</span><h3 class="card__title">BÃ¼rgerbeteiligung & Workshops</h3></div>
+          <p class="card__text">BÃ¼rger einbinden, Akzeptanz schaffen. Beteiligungsformate von der Online-Umfrage bis zum Workshop vor Ort.</p>
+          <p class="card__text" style="margin-top:10px;">Mit unserem <strong>Radwegemelder</strong> erheben BÃ¼rger digital Daten â€“ zugeschnitten auf Ihre Kommune, inklusive Auswertung und Kartenansicht.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-// ─── EVENT-HANDLER ───
+  <!-- â•â•â• PRODUKTE â•â•â• -->
+  <section class="section section--beige" id="produkte">
+    <div class="wrap">
+      <div class="s-label">Digitale Werkzeuge</div>
+      <h2 class="s-title">Apps fÃ¼r BÃ¼rgerbeteiligung</h2>
+      <p class="s-text">Unsere digitalen Werkzeuge fÃ¼r die Praxis â€“ entwickelt aus der tÃ¤glichen Planungsarbeit.</p>
 
-function bindEvents() {
-  // Hauptkategorien
-  document.querySelectorAll('[data-category]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      state.selectedCategory = btn.dataset.category;
-      state.selectedSubcategory = null;
-      state.comment = '';
-      state.photos = [];
-      navigate('subcategory', { type: btn.dataset.category });
-    });
-  });
+      <!-- Radwegemelder -->
+      <div class="produkt">
+        <div class="produkt__info">
+          <h3><span class="gr">Radwegemelder</span> â€“<br><span class="bl">Digitale BÃ¼rgerbeteiligung fÃ¼r Ihr Radverkehrskonzept</span></h3>
+          <p>Die Radwegemelder-App wurde von uns entwickelt, um BÃ¼rger digital bei der Erstellung von Radverkehrskonzepten oder MaÃŸnahmen beteiligen zu kÃ¶nnen. Probleme, WÃ¼nsche und positive Erfahrungen zum Radverkehr kÃ¶nnen direkt vom Smartphone gemeldet werden â€“ anonym, ohne Installation, ohne Registrierung.</p>
+          <div class="feat-list">
+            <div class="feat"><div class="feat__dot" style="background:#1A5FA8;"></div><div><strong>Eigene Aktionskarte</strong><br><span>Zugeschnitten auf Ihr Gemeindegebiet, mit Aktionszeitraum. Ein Link fÃ¼r Flyer, Website und Social Media.</span></div></div>
+            <div class="feat"><div class="feat__dot" style="background:#2D8C28;"></div><div><strong>Professionelle Auswertung</strong><br><span>Wir analysieren die Meldungen, erstellen Karten und Berichte fÃ¼r Ihre Gremien und die weitere Planung.</span></div></div>
+            <div class="feat"><div class="feat__dot" style="background:#E5A700;"></div><div><strong>Einbettung ins Radverkehrskonzept</strong><br><span>Die BÃ¼rgerdaten flieÃŸen direkt in unsere Bestandsanalyse und MaÃŸnahmenempfehlungen ein.</span></div></div>
+          </div>
+          <p style="font-size:13px;color:var(--text-light);font-style:italic;margin-top:16px;">Die fachliche Auswertung und Einbindung in Ihre Planung ist Teil unserer Beratungsleistung.</p>
+          <div class="produkt__btns">
+            <a href="https://2rat.github.io/velomeld/" class="btn btn--sm" style="background:#1A5FA8;color:white;" target="_blank">ðŸ“± App Ã¶ffnen</a>
+            <a href="https://2rat.github.io/velomeld/karte.html" class="btn btn--sm" style="background:transparent;color:#2D8C28;border:2px solid #2D8C28;" target="_blank">ðŸ—ºï¸ Karte ansehen</a>
+            <a href="https://2rat.github.io/velomeld/film.html" class="btn btn--sm" style="background:#FFD93D;color:#333;" target="_blank">🛸 Meldi-Film</a>
+          </div>
+        </div>
+        <div class="produkt__preview rm-preview">
+          <div class="rm-header">
+            <div class="rm-title"><span class="t-b">RADWEGE</span><span class="t-g">MELDER</span></div>
+            <div class="rm-sub">by 2Rat Â· PlanungsbÃ¼ro fÃ¼r Radverkehr</div>
+          </div>
+          <div class="rm-items">
+            <div class="rm-item rm-item--r"><span>âš ï¸</span> Problem melden</div>
+            <div class="rm-item rm-item--y"><span>ðŸ’¬</span> Wunsch Ã¤uÃŸern</div>
+            <div class="rm-item rm-item--g"><span>ðŸ‘</span> Lob aussprechen</div>
+          </div>
+        </div>
+      </div>
 
-  // Zurück-Buttons
-  document.querySelectorAll('[data-back]').forEach((btn) => {
-    btn.addEventListener('click', goBack);
-  });
+      <!-- Schulweg-Detektive -->
+      <div class="produkt">
+        <div class="produkt__info">
+          <h3><span class="bl">Schulweg-Detektive</span> â€“<br><span class="gr">Sichere Schulwege planen</span></h3>
+          <p>Kinder erfassen auf ihrem Schulweg gefÃ¤hrliche und sichere Stellen. Die Ergebnisse helfen Schulen und Kommunen bei der Schulwegplanung.</p>
+          <div class="feat-list">
+            <div class="feat"><div class="feat__dot" style="background:#FF9800;"></div><div><strong>Gefahren</strong><br><span>Schnelle Autos, fehlende Gehwege, schlechte Sicht</span></div></div>
+            <div class="feat"><div class="feat__dot" style="background:#4CAF50;"></div><div><strong>Positiv</strong><br><span>Zebrastreifen, SchÃ¼lerlotsen, verkehrsberuhigte Zonen</span></div></div>
+            <div class="feat"><div class="feat__dot" style="background:#2196F3;"></div><div><strong>QR-Code</strong><br><span>Ergebnisse per QR-Code an den Lehrer senden</span></div></div>
+          </div>
+          <div class="produkt__btns">
+            <a href="https://009aj.github.io/schulweg-check/" class="btn btn--sm" style="background:#FF9800;color:white;" target="_blank">ðŸ” App Ã¶ffnen</a>
+          </div>
+        </div>
+        <div class="produkt__preview sw-preview">
+          <div class="sw-header">
+            <div class="sw-title">ðŸ” Schulweg-Detektive</div>
+            <div class="sw-sub">Schulwegsicherheit mit Kinderaugen</div>
+          </div>
+          <div class="sw-items">
+            <div class="sw-item sw-item--r"><span>ðŸš—</span> Zu schnelle Autos</div>
+            <div class="sw-item sw-item--r"><span>ðŸŒ™</span> Zu dunkel</div>
+            <div class="sw-item sw-item--g"><span>ðŸš¦</span> Gute Ampel</div>
+            <div class="sw-item sw-item--g"><span>ðŸŒ</span> Tempo 30</div>
+          </div>
+        </div>
+      </div>
 
-  // Meldung speichern
-  document.getElementById('btn-save-report')?.addEventListener('click', handleSaveReport);
+    </div>
+  </section>
 
-  // Meine Meldungen
-  document.getElementById('btn-my-reports')?.addEventListener('click', () => navigate('list'));
+  <!-- â•â•â• KONTAKT â•â•â• -->
+  <section class="section section--white" id="kontakt">
+    <div class="wrap">
+      <div class="s-label">Kontakt</div>
+      <h2 class="s-title">Sprechen Sie mich an</h2>
+      <div class="kontakt__grid">
+        <div class="kontakt__text">
+          <p>Als Radverkehrsplaner unterstÃ¼tze ich Kommunen bei der Entwicklung fahrradfreundlicher Infrastruktur. Mein Fokus liegt auf praxisnahen LÃ¶sungen, die zum jeweiligen Ort passen.</p>
+          <p>Mit dem Radwegemelder und den Schulweg-Detektiven biete ich digitale Werkzeuge fÃ¼r echte BÃ¼rgerbeteiligung â€“ von der Datenerhebung bis zur Auswertung fÃ¼r die Planung.</p>
+          <p>Sprechen Sie mich an â€“ auch fÃ¼r eine kostenlose Erstberatung.</p>
+        </div>
+        <div class="kontakt__card">
+          <div class="kontakt__name">Armin Jung</div>
+          <div class="kontakt__role">Radverkehrsplaner EIPOS</div>
+          <ul class="kontakt__items">
+            <li>ðŸ“ Ritter von Hagen Str. 13, 66822 Lebach</li>
+            <li>ðŸ“ž <a href="tel:+4915129443794">+49 151 29443794</a></li>
+            <li>âœ‰ï¸ <a href="mailto:fahr2rat@gmail.com">fahr2rat@gmail.com</a></li>
+            <li>ðŸŒ <a href="https://www.2rat.org">www.2rat.org</a></li>
+          </ul>
+          <div class="kontakt__cta" style="display:flex;gap:10px;">
+            <a href="mailto:fahr2rat@gmail.com" class="btn btn--g" style="flex:1;text-align:center;">Anfrage senden</a>
+            <a href="Flyer2Rat.pdf" class="btn btn--b-o" download style="flex:1;text-align:center;">ðŸ“„ Flyer</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  // GPS zentrieren
-  document.getElementById('btn-center-gps')?.addEventListener('click', centerOnPosition);
+  <!-- â•â•â• FOOTER â•â•â• -->
+  <footer>
+    <div class="wrap">
+      <div class="footer__inner">
+        <span>Â© 2026 2RAT â€“ BÃ¼ro fÃ¼r Radverkehrsplanung</span>
+        <div class="footer__links">
+          <a href="https://2rat.github.io/velomeld/datenschutz.html">Impressum & Datenschutz</a>
+          <a href="Flyer2Rat.pdf">Flyer</a>
+        </div>
+      </div>
+    </div>
+  </footer>
 
-  // Neue Meldung (nach Bestätigung)
-  document.getElementById('btn-new-report')?.addEventListener('click', () => navigate('home'));
-
-  // Export-Buttons
-  document.getElementById('btn-export-geojson')?.addEventListener('click', downloadGeoJSON);
-  document.getElementById('btn-export-csv')?.addEventListener('click', downloadCSV);
-  document.getElementById('btn-export-qgis')?.addEventListener('click', downloadQGISStyle);
-
-  // Kommentar speichern bei Eingabe
-  document.getElementById('comment-input')?.addEventListener('input', (e) => {
-    state.comment = e.target.value;
-  });
-
-  // Sync-Modus wählen
-  document.querySelectorAll('input[name="syncMode"]').forEach((radio) => {
-    radio.addEventListener('change', (e) => {
-      setSyncMode(e.target.value);
-    });
-  });
-
-  // Manueller Sync-Button
-  document.getElementById('btn-manual-sync')?.addEventListener('click', async () => {
-    if (!navigator.onLine) {
-      showToast('⚠️ Keine Internetverbindung');
-      return;
-    }
-    showToast('📡 Synchronisiere…');
-    await syncPendingReports();
-    updatePendingInfo();
-  });
-}
-
-// ─── AKTIONEN ───
-
-async function handleAddPhoto() {
-  if (state.photos.length >= 3) {
-    showToast('Maximal 3 Fotos');
-    return;
-  }
-
-  try {
-    const photo = await capturePhoto({ maxWidth: 1280, quality: 0.8 });
-    state.photos.push(photo);
-    renderPhotoPreview();
-    showToast('📷 Foto hinzugefügt');
-  } catch (err) {
-    if (err.message !== 'Abgebrochen') {
-      showToast('Foto konnte nicht aufgenommen werden');
-    }
-  }
-}
-
-async function handleSaveReport() {
-  const pos = getCurrentPosition();
-
-  if (!pos) {
-    showToast('⚠️ Kein GPS-Signal – bitte warten');
-    return;
-  }
-
-  // Meldung speichern
-  const localId = await saveReport({
-    latitude: pos.latitude,
-    longitude: pos.longitude,
-    accuracy: pos.accuracy,
-    heading: pos.heading,
-    category: state.selectedCategory,
-    subcategory: state.selectedSubcategory,
-    comment: state.comment,
-    photoCount: state.photos.length,
-  });
-
-  // Fotos speichern
-  for (const photo of state.photos) {
-    await savePhoto(localId, photo.dataUrl);
-  }
-
-  // Sync versuchen (im Hintergrund, respektiert Sync-Modus)
-  if (syncEnabled && navigator.onLine && shouldSync()) {
-    const report = await getReport(localId);
-    syncReport(report).catch(err => console.warn('[Sync] Hintergrund-Sync fehlgeschlagen:', err));
-  }
-
-  // State zurücksetzen
-  state.selectedCategory = null;
-  state.selectedSubcategory = null;
-  state.comment = '';
-  state.photos = [];
-
-  navigate('confirm');
-}
-
-// ─── UI-HELPER ───
-
-function updateGPSDisplay(pos) {
-  const el = document.getElementById('gps-status');
-  if (el) {
-    el.innerHTML = `<span class="gps-dot"></span> GPS ±${pos.accuracy}m`;
-    el.classList.toggle('gps-status--good', pos.accuracy <= 10);
-    el.classList.toggle('gps-status--ok', pos.accuracy > 10 && pos.accuracy <= 30);
-    el.classList.toggle('gps-status--poor', pos.accuracy > 30);
-  }
-}
-
-function showGPSError(msg) {
-  const el = document.getElementById('gps-status');
-  if (el) {
-    el.innerHTML = `<span class="gps-dot gps-dot--error"></span> Kein GPS`;
-  }
-}
-
-async function updateReportBadge() {
-  const count = await getReportCount();
-  const badge = document.getElementById('report-badge');
-  if (badge) {
-    badge.textContent = count;
-    badge.style.display = count > 0 ? 'flex' : 'none';
-  }
-}
-
-let toastTimeout;
-function showToast(message) {
-  let toast = document.getElementById('toast');
-  if (!toast) {
-    toast = document.createElement('div');
-    toast.id = 'toast';
-    toast.className = 'toast';
-    document.body.appendChild(toast);
-  }
-
-  toast.textContent = message;
-  toast.classList.add('toast--visible');
-
-  clearTimeout(toastTimeout);
-  toastTimeout = setTimeout(() => {
-    toast.classList.remove('toast--visible');
-  }, 2500);
-}
-
-</script>
-  <script src="whitelabel.js"></script>
 </body>
 </html>
