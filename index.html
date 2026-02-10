@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2RAT â€“ BÃ¼ro fÃ¼r Radverkehrsplanung</title>
+  <link rel="icon" type="image/png" href="Logo_2Rat_clean.png">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --green: #689246;
+      --green-dark: #567A3A;
+      --blue: #1678A9;
+      --blue-dark: #0F5C84;
+      --beige: #F5E6C8;
+      --beige-light: #FAEFD8;
+      --white: #FFFFFF;
+      --text: #3D3D3D;
+      --text-light: #6B6B6B;
+      --font: 'Outfit', -apple-system, sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font); color: var(--text); background: var(--beige); line-height: 1.65; }
+
+    .wrap { max-width: 1060px; margin: 0 auto; padding: 0 28px; }
+
+    /* â”€â”€â”€ Nav â”€â”€â”€ */
+    nav {
+      position: fixed; top: 0; width: 100%; z-index: 100;
+      background: rgba(245,230,200,0.92); backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      height: 60px; display: flex; align-items: center; justify-content: center;
+    }
+    .nav__inner { display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 1060px; padding: 0 28px; }
+    .nav__logo { height: 34px; }
+    .nav__links { display: flex; align-items: center; gap: 24px; list-style: none; }
+    .nav__links a { text-decoration: none; color: var(--text-light); font-size: 14px; font-weight: 500; transition: color 0.2s; }
+    .nav__links a:hover { color: var(--green); }
+    .nav__cta { background: var(--green) !important; color: white !important; padding: 8px 18px !important; border-radius: 8px !important; font-weight: 600 !important; }
+    .nav__cta:hover { background: var(--green-dark) !important; }
+
+    /* â”€â”€â”€ Hero â”€â”€â”€ */
+    .hero { padding: 130px 0 80px; }
+    .hero__grid { display: grid; grid-template-columns: 61.8fr 38.2fr; gap: 40px; align-items: center; }
+    .hero__left {}
+    .hero__right { display: flex; justify-content: center; align-items: center; }
+    .hero__logo { width: 200px; }
+    .hero__sub { font-size: 18px; font-weight: 600; color: var(--blue); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 16px; }
+    .hero__title { font-size: clamp(26px, 3.5vw, 38px); font-weight: 800; line-height: 1.15; margin-bottom: 18px; color: var(--text); }
+    .hero__title .gr { color: var(--green); }
+    .hero__title .bl { color: var(--blue); }
+    .hero__text { font-size: 16px; color: var(--text-light); max-width: 500px; margin: 0 0 28px; line-height: 1.7; }
+    .hero__btns { display: flex; gap: 12px; flex-wrap: wrap; }
+
+    .btn { display: inline-flex; align-items: center; gap: 7px; padding: 12px 24px; border-radius: 10px; font-family: var(--font); font-size: 15px; font-weight: 600; text-decoration: none; transition: all 0.2s; border: none; cursor: pointer; }
+    .btn--g { background: var(--green); color: white; }
+    .btn--g:hover { background: var(--green-dark); transform: translateY(-1px); }
+    .btn--b-o { background: transparent; color: var(--blue); border: 2px solid var(--blue); }
+    .btn--b-o:hover { background: var(--blue); color: white; transform: translateY(-1px); }
+
+    /* â”€â”€â”€ Sections â”€â”€â”€ */
+    .section { padding: 70px 0; }
+    .section--white { background: var(--beige-light); }
+    .section--beige { background: var(--beige); }
+    .s-label { font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--blue); margin-bottom: 8px; }
+    .s-title { font-size: clamp(24px, 3vw, 34px); font-weight: 800; line-height: 1.2; margin-bottom: 14px; color: var(--green); }
+    .s-text { font-size: 15px; color: var(--text-light); line-height: 1.7; max-width: 520px; margin-bottom: 36px; }
+
+    /* â”€â”€â”€ Leistungen â”€â”€â”€ */
+    .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .card { background: var(--white); border-radius: 14px; padding: 24px 20px; border: 1px solid rgba(0,0,0,0.04); transition: transform 0.2s, box-shadow 0.2s; }
+    .card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,0.06); }
+    .card__top { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .card__icon { font-size: 24px; }
+    .card__title { font-size: 16px; font-weight: 700; }
+    .card__text { font-size: 13px; color: var(--text-light); line-height: 1.6; }
+
+    /* â”€â”€â”€ Produkte (Radmelder + Schulweg) â”€â”€â”€ */
+    .produkt { display: flex; flex-direction: column; gap: 24px; margin-bottom: 56px; }
+    .produkt:last-child { margin-bottom: 0; }
+    .produkt--flip { direction: ltr; }
+
+    .produkt__preview { border-radius: 16px; padding: 28px 22px; position: relative; overflow: hidden; max-width: 400px; }
+    .produkt__preview::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+
+    /* Radmelder Preview */
+    .rm-preview { background: #FFFFFF; border: 1px solid #E5E7EB; box-shadow: 0 4px 20px rgba(0,0,0,0.05); font-family: 'DM Sans', sans-serif; }
+    .rm-preview::before { background: linear-gradient(90deg, #1A5FA8, #2D8C28); }
+    .rm-header { text-align: center; margin-bottom: 18px; }
+    .rm-title { font-size: 17px; font-weight: 800; letter-spacing: 3px; font-family: 'DM Sans', sans-serif; }
+    .rm-title .t-b { color: #1A5FA8; }
+    .rm-title .t-g { color: #2D8C28; }
+    .rm-sub { font-size: 10px; color: #8A9BA4; margin-top: 2px; }
+    .rm-items { display: flex; flex-direction: column; gap: 8px; }
+    .rm-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; font-size: 13px; font-weight: 600; color: #3D4F58; font-family: 'DM Sans', sans-serif; }
+    .rm-item--r { background: #FFF0F0; border-left: 3px solid #E00000; }
+    .rm-item--y { background: #FFF8E0; border-left: 3px solid #E5A700; }
+    .rm-item--g { background: #EEFBF0; border-left: 3px solid #00A836; }
+
+    /* Schulweg Preview */
+    .sw-preview { background: #F0F7FF; border: 1px solid #D8E8F8; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+    .sw-preview::before { background: linear-gradient(90deg, #FF9800, #4CAF50); }
+    .sw-header { text-align: center; margin-bottom: 18px; }
+    .sw-title { font-size: 17px; font-weight: 800; }
+    .sw-sub { font-size: 10px; color: #8A9BA4; margin-top: 2px; }
+    .sw-items { display: flex; flex-direction: column; gap: 8px; }
+    .sw-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; font-size: 13px; font-weight: 600; color: #3D4F58; }
+    .sw-item--r { background: #FFF3E0; border-left: 3px solid #FF9800; }
+    .sw-item--g { background: #E8F5E9; border-left: 3px solid #4CAF50; }
+
+    .produkt__info h3 { font-size: clamp(20px, 2.5vw, 28px); font-weight: 800; line-height: 1.2; margin-bottom: 12px; }
+    .produkt__info h3 .bl { color: var(--blue); }
+    .produkt__info h3 .gr { color: var(--green); }
+    .produkt__info p { font-size: 14px; color: var(--text-light); line-height: 1.7; margin-bottom: 16px; }
+    .feat-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
+    .feat { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; line-height: 1.5; }
+    .feat__dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+    .feat strong { white-space: nowrap; margin-right: 4px; }
+    .feat span { color: var(--text-light); }
+    .produkt__btns { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn--sm { padding: 10px 18px; font-size: 13px; border-radius: 8px; }
+
+    /* â”€â”€â”€ Kontakt â”€â”€â”€ */
+    .kontakt__grid { display: grid; grid-template-columns: 7fr 5fr; gap: 40px; margin-top: 28px; align-items: start; }
+    .kontakt__text { font-size: 15px; color: var(--text-light); line-height: 1.8; }
+    .kontakt__text p + p { margin-top: 12px; }
+    .kontakt__card { background: var(--white); border-radius: 16px; padding: 28px; border: 1px solid rgba(0,0,0,0.04); }
+    .kontakt__name { font-size: 18px; font-weight: 800; margin-bottom: 2px; }
+    .kontakt__role { font-size: 13px; color: var(--green); font-weight: 600; margin-bottom: 18px; }
+    .kontakt__items { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .kontakt__items li { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+    .kontakt__items a { color: var(--text); text-decoration: none; }
+    .kontakt__items a:hover { color: var(--blue); }
+    .kontakt__cta { margin-top: 20px; }
+    .kontakt__cta .btn { width: 100%; justify-content: center; }
+
+    /* â”€â”€â”€ Footer â”€â”€â”€ */
+    footer { background: var(--blue-dark); padding: 24px 0; font-size: 12px; }
+    .footer__inner { display: flex; justify-content: space-between; align-items: center; }
+    .footer__links { display: flex; gap: 18px; }
+    footer a { color: rgba(255,255,255,0.6); text-decoration: none; }
+    footer a:hover { color: white; }
+    footer span { color: rgba(255,255,255,0.4); }
+
+    /* â”€â”€â”€ Mobile â”€â”€â”€ */
+    @media (max-width: 768px) {
+      .nav__links { display: none; }
+      .hero { padding: 100px 0 50px; }
+      .hero__grid { grid-template-columns: 1fr; text-align: center; }
+      .hero__right { order: -1; margin-bottom: 20px; }
+      .hero__logo { width: 120px; }
+      .hero__btns { justify-content: center; }
+      .hero__text { margin: 0 auto 28px; }
+      .cards { grid-template-columns: 1fr; }
+      .produkt, .produkt--flip { flex-direction: column; }
+      .produkt__preview { max-width: 100%; }
+      .produkt__preview { margin-bottom: 0; }
+      .kontakt__grid { grid-template-columns: 1fr; }
+      .footer__inner { flex-direction: column; gap: 8px; text-align: center; }
+      .s-title { font-size: 24px; }
+      .produkt__info h3 { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav__inner">
+      <img src="data:image/png;base64,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" alt="2RAT" class="nav__logo">
+      <ul class="nav__links">
+        <li><a href="#leistungen">Leistungen</a></li>
+        <li><a href="#produkte">Produkte</a></li>
+        <li><a href="#kontakt">Kontakt</a></li>
+        <li><a href="mailto:fahr2rat@gmail.com" class="nav__cta">Anfrage senden</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- â•â•â• HERO â•â•â• -->
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero__grid">
+        <div class="hero__left">
+          <div class="hero__sub">BÃ¼ro fÃ¼r Radverkehrsplanung</div>
+          <h1 class="hero__title">
+            <span class="gr">Gemeinsam fÃ¼r eine</span><br>
+            <span class="bl">fahrradfreundliche Zukunft</span>
+          </h1>
+          <p class="hero__text">Individuelle, praxisnahe Beratung fÃ¼r Kommunen. Von der Idee bis zur Umsetzung â€“ fÃ¼r sichere und attraktive Radinfrastruktur.</p>
+          <div class="hero__btns">
+            <a href="mailto:fahr2rat@gmail.com" class="btn btn--g">âœ‰ï¸ Kontakt aufnehmen</a>
+            <a href="#produkte" class="btn btn--b-o">Unsere Produkte</a>
+          </div>
+        </div>
+        <div class="hero__right">
+          <img src="data:image/png;base64,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" alt="2RAT" class="hero__logo">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- â•â•â• LEISTUNGEN â•â•â• -->
+  <section class="section section--white" id="leistungen">
+    <div class="wrap">
+      <div class="s-label">Leistungen</div>
+      <h2 class="s-title">Was wir fÃ¼r Ihre Kommune tun kÃ¶nnen</h2>
+      <p class="s-text">Von der Bestandsaufnahme Ã¼ber die FÃ¶rdermittelberatung bis zur fertigen MaÃŸnahme.</p>
+      <div class="cards">
+        <div class="card">
+          <div class="card__top"><span class="card__icon">ðŸ“‹</span><h3 class="card__title">Radverkehrskonzepte</h3></div>
+          <p class="card__text">Erstellung kommunaler Radverkehrskonzepte â€“ von der Analyse bis zum MaÃŸnahmenkatalog. Praxisnah und umsetzbar.</p>
+        </div>
+        <div class="card">
+          <div class="card__top"><span class="card__icon">ðŸ”</span><h3 class="card__title">Bestandsaufnahmen & Netzanalysen</h3></div>
+          <p class="card__text">Systematische Erfassung und Bewertung bestehender Radinfrastruktur. Vor Ort und digital.</p>
+        </div>
+        <div class="card">
+          <div class="card__top"><span class="card__icon">ðŸ“Š</span><h3 class="card__title">FÃ¶rdermittelberatung</h3></div>
+          <p class="card__text">Welche FÃ¶rderprogramme passen? UnterstÃ¼tzung bei Antragsstellung und Kostenplanung fÃ¼r Radverkehrsprojekte.</p>
+        </div>
+        <div class="card">
+          <div class="card__top"><span class="card__icon">ðŸ‘¥</span><h3 class="card__title">BÃ¼rgerbeteiligung & Workshops</h3></div>
+          <p class="card__text">BÃ¼rger einbinden, Akzeptanz schaffen. Beteiligungsformate von der Online-Umfrage bis zum Workshop vor Ort.</p>
+          <p class="card__text" style="margin-top:10px;">Mit unserem <strong>Radwegemelder</strong> erheben BÃ¼rger digital Daten â€“ zugeschnitten auf Ihre Kommune, inklusive Auswertung und Kartenansicht.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- â•â•â• PRODUKTE â•â•â• -->
+  <section class="section section--beige" id="produkte">
+    <div class="wrap">
+      <div class="s-label">Digitale Werkzeuge</div>
+      <h2 class="s-title">Apps fÃ¼r BÃ¼rgerbeteiligung</h2>
+      <p class="s-text">Unsere digitalen Werkzeuge fÃ¼r die Praxis â€“ entwickelt aus der tÃ¤glichen Planungsarbeit.</p>
+
+      <!-- Radwegemelder -->
+      <div class="produkt">
+        <div class="produkt__info">
+          <h3><span class="gr">Radwegemelder</span> â€“<br><span class="bl">Digitale BÃ¼rgerbeteiligung fÃ¼r Ihr Radverkehrskonzept</span></h3>
+          <p>Die Radwegemelder-App wurde von uns entwickelt, um BÃ¼rger digital bei der Erstellung von Radverkehrskonzepten oder MaÃŸnahmen beteiligen zu kÃ¶nnen. Probleme, WÃ¼nsche und positive Erfahrungen zum Radverkehr kÃ¶nnen direkt vom Smartphone gemeldet werden â€“ anonym, ohne Installation, ohne Registrierung.</p>
+          <div class="feat-list">
+            <div class="feat"><div class="feat__dot" style="background:#1A5FA8;"></div><div><strong>Eigene Aktionskarte</strong><br><span>Zugeschnitten auf Ihr Gemeindegebiet, mit Aktionszeitraum. Ein Link fÃ¼r Flyer, Website und Social Media.</span></div></div>
+            <div class="feat"><div class="feat__dot" style="background:#2D8C28;"></div><div><strong>Professionelle Auswertung</strong><br><span>Wir analysieren die Meldungen, erstellen Karten und Berichte fÃ¼r Ihre Gremien und die weitere Planung.</span></div></div>
+            <div class="feat"><div class="feat__dot" style="background:#E5A700;"></div><div><strong>Einbettung ins Radverkehrskonzept</strong><br><span>Die BÃ¼rgerdaten flieÃŸen direkt in unsere Bestandsanalyse und MaÃŸnahmenempfehlungen ein.</span></div></div>
+          </div>
+          <p style="font-size:13px;color:var(--text-light);font-style:italic;margin-top:16px;">Die fachliche Auswertung und Einbindung in Ihre Planung ist Teil unserer Beratungsleistung.</p>
+          <div class="produkt__btns">
+            <a href="https://2rat.github.io/velomeld/" class="btn btn--sm" style="background:#1A5FA8;color:white;" target="_blank">ðŸ“± App Ã¶ffnen</a>
+            <a href="https://2rat.github.io/velomeld/karte.html" class="btn btn--sm" style="background:transparent;color:#2D8C28;border:2px solid #2D8C28;" target="_blank">ðŸ—ºï¸ Karte ansehen</a>
+            <a href="https://2rat.github.io/velomeld/film.html" class="btn btn--sm" style="background:#FFD93D;color:#333;" target="_blank">🛸 Meldi-Film</a>
+          </div>
+        </div>
+        <div class="produkt__preview rm-preview">
+          <div class="rm-header">
+            <div class="rm-title"><span class="t-b">RADWEGE</span><span class="t-g">MELDER</span></div>
+            <div class="rm-sub">by 2Rat Â· PlanungsbÃ¼ro fÃ¼r Radverkehr</div>
+          </div>
+          <div class="rm-items">
+            <div class="rm-item rm-item--r"><span>âš ï¸</span> Problem melden</div>
+            <div class="rm-item rm-item--y"><span>ðŸ’¬</span> Wunsch Ã¤uÃŸern</div>
+            <div class="rm-item rm-item--g"><span>ðŸ‘</span> Lob aussprechen</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Schulweg-Detektive -->
+      <div class="produkt">
+        <div class="produkt__info">
+          <h3><span class="bl">Schulweg-Detektive</span> â€“<br><span class="gr">Sichere Schulwege planen</span></h3>
+          <p>Kinder erfassen auf ihrem Schulweg gefÃ¤hrliche und sichere Stellen. Die Ergebnisse helfen Schulen und Kommunen bei der Schulwegplanung.</p>
+          <div class="feat-list">
+            <div class="feat"><div class="feat__dot" style="background:#FF9800;"></div><div><strong>Gefahren</strong><br><span>Schnelle Autos, fehlende Gehwege, schlechte Sicht</span></div></div>
+            <div class="feat"><div class="feat__dot" style="background:#4CAF50;"></div><div><strong>Positiv</strong><br><span>Zebrastreifen, SchÃ¼lerlotsen, verkehrsberuhigte Zonen</span></div></div>
+            <div class="feat"><div class="feat__dot" style="background:#2196F3;"></div><div><strong>QR-Code</strong><br><span>Ergebnisse per QR-Code an den Lehrer senden</span></div></div>
+          </div>
+          <div class="produkt__btns">
+            <a href="https://009aj.github.io/schulweg-check/" class="btn btn--sm" style="background:#FF9800;color:white;" target="_blank">ðŸ” App Ã¶ffnen</a>
+          </div>
+        </div>
+        <div class="produkt__preview sw-preview">
+          <div class="sw-header">
+            <div class="sw-title">ðŸ” Schulweg-Detektive</div>
+            <div class="sw-sub">Schulwegsicherheit mit Kinderaugen</div>
+          </div>
+          <div class="sw-items">
+            <div class="sw-item sw-item--r"><span>ðŸš—</span> Zu schnelle Autos</div>
+            <div class="sw-item sw-item--r"><span>ðŸŒ™</span> Zu dunkel</div>
+            <div class="sw-item sw-item--g"><span>ðŸš¦</span> Gute Ampel</div>
+            <div class="sw-item sw-item--g"><span>ðŸŒ</span> Tempo 30</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- â•â•â• KONTAKT â•â•â• -->
+  <section class="section section--white" id="kontakt">
+    <div class="wrap">
+      <div class="s-label">Kontakt</div>
+      <h2 class="s-title">Sprechen Sie mich an</h2>
+      <div class="kontakt__grid">
+        <div class="kontakt__text">
+          <p>Als Radverkehrsplaner unterstÃ¼tze ich Kommunen bei der Entwicklung fahrradfreundlicher Infrastruktur. Mein Fokus liegt auf praxisnahen LÃ¶sungen, die zum jeweiligen Ort passen.</p>
+          <p>Mit dem Radwegemelder und den Schulweg-Detektiven biete ich digitale Werkzeuge fÃ¼r echte BÃ¼rgerbeteiligung â€“ von der Datenerhebung bis zur Auswertung fÃ¼r die Planung.</p>
+          <p>Sprechen Sie mich an â€“ auch fÃ¼r eine kostenlose Erstberatung.</p>
+        </div>
+        <div class="kontakt__card">
+          <div class="kontakt__name">Armin Jung</div>
+          <div class="kontakt__role">Radverkehrsplaner EIPOS</div>
+          <ul class="kontakt__items">
+            <li>ðŸ“ Ritter von Hagen Str. 13, 66822 Lebach</li>
+            <li>ðŸ“ž <a href="tel:+4915129443794">+49 151 29443794</a></li>
+            <li>âœ‰ï¸ <a href="mailto:fahr2rat@gmail.com">fahr2rat@gmail.com</a></li>
+            <li>ðŸŒ <a href="https://www.2rat.org">www.2rat.org</a></li>
+          </ul>
+          <div class="kontakt__cta" style="display:flex;gap:10px;">
+            <a href="mailto:fahr2rat@gmail.com" class="btn btn--g" style="flex:1;text-align:center;">Anfrage senden</a>
+            <a href="Flyer2Rat.pdf" class="btn btn--b-o" download style="flex:1;text-align:center;">ðŸ“„ Flyer</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- â•â•â• FOOTER â•â•â• -->
+  <footer>
+    <div class="wrap">
+      <div class="footer__inner">
+        <span>Â© 2026 2RAT â€“ BÃ¼ro fÃ¼r Radverkehrsplanung</span>
+        <div class="footer__links">
+          <a href="https://2rat.github.io/velomeld/datenschutz.html">Impressum & Datenschutz</a>
+          <a href="Flyer2Rat.pdf">Flyer</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
