@@ -2155,10 +2155,24 @@ async function syncReport(report) {
       device_id: deviceId,
     };
 
-    const resp = await fetch(SUPABASE_URL + '/rest/v1/reports', {
+    // Sichere RPC-Funktion mit Rate Limiting & Validierung
+    const resp = await fetch(SUPABASE_URL + '/rest/v1/rpc/insert_report_safe', {
       method: 'POST',
       headers: sbHeaders,
-      body: JSON.stringify(body),
+      body: JSON.stringify({
+        p_id: body.id,
+        p_latitude: body.latitude,
+        p_longitude: body.longitude,
+        p_accuracy: body.accuracy,
+        p_category: body.category,
+        p_subcategory: body.subcategory,
+        p_comment: body.comment || null,
+        p_heading: body.heading,
+        p_has_photo: (body.photo_count || 0) > 0,
+        p_timestamp: body.timestamp,
+        p_project: body.project || null,
+        p_source: body.device_id || null,
+      }),
     });
 
     if (!resp.ok) {
@@ -2168,6 +2182,12 @@ async function syncReport(report) {
         return true;
       }
       throw new Error(errData.message || 'HTTP ' + resp.status);
+    }
+
+    // RPC-Ergebnis prüfen (Rate Limit, Validierung)
+    const result = await resp.json();
+    if (result && result.error) {
+      throw new Error(result.message || result.error);
     }
 
     // Fotos hochladen
