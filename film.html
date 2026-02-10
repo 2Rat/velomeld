@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meldi & der Radwegemelder – Ein außerirdisch guter Film</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--green:#689246;--blue:#1678A9;--beige:#FAEFD8;--red:#E04040;--yellow:#E5A700;--purple:#8B5CF6;--text:#3D3D3D;--comic:'Bangers',cursive;--body:'DM Sans',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--body);background:#0a0a1a;display:flex;align-items:center;justify-content:center;height:100vh;overflow:hidden}
+
+.cinema{width:min(96vw,840px);aspect-ratio:16/9;background:#000;border-radius:14px;overflow:hidden;position:relative;box-shadow:0 20px 80px rgba(0,0,0,.6)}
+
+/* ─── Scenes ─── */
+.scene{position:absolute;inset:0;opacity:0;transition:opacity .6s ease;display:flex;align-items:center;justify-content:center;pointer-events:none;overflow:hidden;will-change:opacity;transform:translateZ(0)}
+.scene.active{opacity:1;pointer-events:auto}
+
+/* ─── Subtitle ─── */
+.sub{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.88));padding:28px 24px 46px;z-index:50}
+.sub__text{color:#fff;font-size:clamp(12px,2vw,17px);font-weight:600;line-height:1.5;text-align:center;opacity:0;transform:translateY(10px);transition:opacity .5s ease .3s,transform .5s ease .3s;text-shadow:0 2px 8px rgba(0,0,0,.5)}
+.scene.active .sub__text{opacity:1;transform:translateY(0)}
+
+/* ─── Speech Bubble ─── */
+.speech{
+  position:absolute;z-index:40;
+  background:#fff;border:2.5px solid var(--text);border-radius:18px;
+  padding:clamp(8px,1.5vw,14px) clamp(12px,2vw,18px);
+  font-size:clamp(10px,1.6vw,14px);font-weight:700;line-height:1.4;
+  max-width:clamp(140px,30vw,260px);
+  opacity:0;transform:scale(.7);
+  transition:opacity .4s ease,transform .4s ease;
+  box-shadow:3px 3px 0 rgba(0,0,0,.1);
+}
+.scene.active .speech{opacity:1;transform:scale(1)}
+.speech::after{
+  content:'';position:absolute;bottom:-10px;left:25px;
+  width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-top:10px solid var(--text);
+}
+.speech::before{
+  content:'';position:absolute;bottom:-7px;left:27px;
+  width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-top:8px solid #fff;z-index:1;
+}
+.speech--alien{background:#E8F0FF;border-color:var(--purple)}
+.speech--alien::after{border-top-color:var(--purple)}
+.speech--alien::before{border-top-color:#E8F0FF}
+.speech--red{background:#FFF0F0;border-color:var(--red)}
+.speech--red::after{border-top-color:var(--red)}
+.speech--red::before{border-top-color:#FFF0F0}
+.speech--green{background:#EEFBF0;border-color:var(--green)}
+.speech--green::after{border-top-color:var(--green)}
+.speech--green::before{border-top-color:#EEFBF0}
+
+.speech--top::after{bottom:auto;top:-10px;border-top:none;border-bottom:10px solid var(--text)}
+.speech--top::before{bottom:auto;top:-7px;border-top:none;border-bottom:8px solid #fff}
+.speech--alien.speech--top::after{border-bottom-color:var(--purple)}
+.speech--alien.speech--top::before{border-bottom-color:#E8F0FF}
+
+/* delay classes */
+.d1{transition-delay:.5s!important}
+.d2{transition-delay:.9s!important}
+.d3{transition-delay:1.3s!important}
+.d4{transition-delay:1.7s!important}
+.d5{transition-delay:2.1s!important}
+
+/* ═══ MELDI CHARACTER ═══ */
+.alien{position:relative;display:inline-block;transform:translateZ(0)}
+/* Head - round, separate from body */
+.alien__head{
+  width:clamp(32px,6.5vw,54px);height:clamp(30px,6vw,50px);
+  background:linear-gradient(180deg,#7CDB7C,#4CAF50);
+  border-radius:50%;position:absolute;
+  top:0;left:50%;transform:translateX(-50%);
+  z-index:2;border:2px solid #3a9a3a;
+}
+/* Body - smaller torso with T-shirt */
+.alien__body{
+  width:clamp(28px,5.5vw,46px);height:clamp(26px,5vw,42px);
+  background:linear-gradient(180deg,var(--blue),#0F5C84);
+  border-radius:8px 8px 6px 6px;position:relative;
+  margin-top:clamp(26px,5.2vw,44px);
+  margin-left:auto;margin-right:auto;
+  border:1.5px solid #0a4a6e;
+}
+/* Veloxaner-Wappen on shirt */
+.alien__body::after{
+  content:'';position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);
+  width:clamp(10px,2vw,16px);height:clamp(10px,2vw,16px);
+  background:radial-gradient(circle at 40% 35%,#2E7D32,#1B5E20);
+  border-radius:50% 50% 50% 50% / 40% 40% 60% 60%;
+  border:1px solid rgba(255,255,255,.35);
+  box-shadow:0 0 4px rgba(76,175,80,.3);
+}
+/* Gold star on the crest */
+.alien__body::before{
+  content:'★';position:absolute;top:34%;left:50%;transform:translate(-50%,-50%);
+  font-size:clamp(5px,1vw,7px);color:#FFD93D;z-index:1;
+  text-shadow:0 0 3px rgba(255,217,61,.5);line-height:1;
+}
+/* Big expressive eyes */
+.alien__eye{
+  position:absolute;top:25%;width:clamp(11px,2.2vw,18px);height:clamp(13px,2.6vw,22px);
+  background:#fff;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  border:1.5px solid #2a7a2a;
+}
+.alien__eye--l{left:12%}.alien__eye--r{right:12%}
+.alien__pupil{
+  width:50%;height:50%;background:#222;border-radius:50%;
+  position:relative;
+  animation:look 3s ease-in-out infinite;
+}
+/* Pupil highlight */
+.alien__pupil::after{
+  content:'';position:absolute;top:1px;right:1px;
+  width:35%;height:35%;background:#fff;border-radius:50%;
+}
+@keyframes look{0%,100%{transform:translateX(0)}30%{transform:translateX(2px)}70%{transform:translateX(-2px)}}
+/* Happy smile */
+.alien__mouth{
+  position:absolute;bottom:18%;left:50%;transform:translateX(-50%);
+  width:clamp(12px,2.4vw,20px);height:clamp(6px,1.2vw,10px);
+  border-bottom:clamp(2px,.4vw,3px) solid #2E7D32;
+  border-radius:0 0 50% 50%;
+  background:transparent;
+}
+/* Antenna with glowing tip */
+.alien__antenna{
+  position:absolute;top:calc(-1 * clamp(14px,2.8vw,24px));left:50%;transform:translateX(-50%);
+  width:2px;height:clamp(12px,2.4vw,20px);background:#4CAF50;
+  z-index:3;
+}
+.alien__antenna::after{
+  content:'';position:absolute;top:calc(-1 * clamp(5px,1vw,8px));left:50%;transform:translateX(-50%);
+  width:clamp(7px,1.4vw,12px);height:clamp(7px,1.4vw,12px);
+  background:#FFD93D;border-radius:50%;
+  animation:glow 1.5s ease-in-out infinite;
+}
+@keyframes glow{0%,100%{box-shadow:0 0 4px #FFD93D}50%{box-shadow:0 0 14px #FFD93D,0 0 24px rgba(255,217,61,.4)}}
+/* Arms - longer, more expressive */
+.alien__arm{
+  position:absolute;top:clamp(30px,6vw,50px);
+  width:clamp(14px,2.8vw,24px);height:clamp(5px,1vw,8px);
+  background:#4CAF50;border-radius:4px;border:1px solid #3a9a3a;
+}
+.alien__arm--l{left:calc(-1 * clamp(12px,2.4vw,20px));transform:rotate(-20deg);transform-origin:right center}
+.alien__arm--r{right:calc(-1 * clamp(12px,2.4vw,20px));transform:rotate(20deg);transform-origin:left center}
+/* 3-finger hands */
+.alien__hand{
+  position:absolute;top:clamp(28px,5.6vw,47px);
+  width:clamp(8px,1.6vw,14px);height:clamp(8px,1.6vw,14px);
+  background:#7CDB7C;border-radius:50%;border:1px solid #3a9a3a;
+}
+.alien__hand--l{left:calc(-1 * clamp(16px,3.2vw,28px))}
+.alien__hand--r{right:calc(-1 * clamp(16px,3.2vw,28px))}
+/* Legs with sneakers */
+.alien__leg{
+  position:absolute;bottom:calc(-1 * clamp(14px,2.8vw,24px));
+  width:clamp(7px,1.4vw,12px);height:clamp(12px,2.4vw,20px);
+  background:#4CAF50;border-radius:0 0 3px 3px;border:1px solid #3a9a3a;
+}
+.alien__leg--l{left:18%}.alien__leg--r{right:18%}
+.alien__shoe{
+  position:absolute;bottom:calc(-1 * clamp(20px,4vw,34px));
+  width:clamp(11px,2.2vw,18px);height:clamp(6px,1.2vw,10px);
+  background:#FF5252;border-radius:3px 6px 3px 3px;border:1px solid #c33;
+}
+.alien__shoe--l{left:14%}.alien__shoe--r{right:14%}
+
+/* ── Meldi on bike ── */
+.alien-bike{position:relative;display:inline-block}
+.alien-bike .alien{position:absolute;bottom:clamp(22px,4.4vw,38px);left:50%;transform:translateX(-50%)}
+.alien-bike__wheels{display:flex;gap:clamp(20px,4vw,34px)}
+.alien-bike__wh{
+  width:clamp(22px,4.4vw,36px);height:clamp(22px,4.4vw,36px);
+  border:clamp(2px,.4vw,3px) solid #444;border-radius:50%;
+  animation:spin .6s linear infinite;position:relative;
+  background:rgba(255,255,255,.1);
+}
+.alien-bike__wh::after{content:'';position:absolute;inset:30%;background:#444;border-radius:50%}
+/* Spokes */
+.alien-bike__wh::before{
+  content:'';position:absolute;top:50%;left:50%;
+  width:1px;height:80%;background:#666;transform:translate(-50%,-50%);
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.alien-bike__frame{
+  position:absolute;bottom:clamp(14px,2.8vw,24px);left:50%;transform:translateX(-50%);
+  width:clamp(26px,5.2vw,44px);height:clamp(3px,.6vw,4px);background:var(--green);
+  border-radius:2px;
+}
+/* Handlebars */
+.alien-bike__bar{
+  position:absolute;bottom:clamp(20px,4vw,34px);right:-3px;
+  width:clamp(3px,.6vw,5px);height:clamp(10px,2vw,18px);
+  background:#888;border-radius:2px;
+}
+
+/* ── Meldi states ── */
+.alien--excited{animation:bounce .5s ease-in-out infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+/* Shocked - big O mouth, wide eyes */
+.alien--shocked .alien__mouth{
+  width:clamp(10px,2vw,16px)!important;height:clamp(10px,2vw,16px)!important;
+  border:none!important;background:#2E7D32;border-radius:50%!important;
+  bottom:15%!important;
+}
+.alien--shocked .alien__eye{transform:scale(1.2)}
+/* Happy - wave arm, big smile */
+.alien--happy .alien__arm--r{animation:wave .4s ease-in-out infinite}
+.alien--happy .alien__hand--r{animation:wave .4s ease-in-out infinite}
+@keyframes wave{0%,100%{transform:rotate(20deg)}50%{transform:rotate(-50deg)}}
+
+/* ═══ UFO (Fahrrad-Raumschiff) ═══ */
+.ufo{
+  position:relative;display:inline-block;
+  width:clamp(80px,16vw,130px);height:clamp(50px,10vw,85px);
+}
+/* ── Main saucer body ── */
+.ufo__disc{
+  position:absolute;bottom:20%;left:50%;transform:translateX(-50%);
+  width:100%;height:clamp(18px,3.6vw,30px);
+  background:linear-gradient(180deg,#CFD8DC,#90A4AE 40%,#78909C);
+  border-radius:50%;
+  border-top:1px solid rgba(255,255,255,.4);
+  box-shadow:
+    0 4px 12px rgba(0,0,0,.2),
+    0 0 20px rgba(100,200,255,.15),
+    inset 0 2px 4px rgba(255,255,255,.3);
+}
+/* Top dome - glass cockpit */
+.ufo__dome{
+  position:absolute;bottom:42%;left:50%;transform:translateX(-50%);
+  width:clamp(30px,6vw,50px);height:clamp(20px,4vw,34px);
+  background:linear-gradient(180deg,rgba(130,210,255,.55),rgba(100,200,255,.15));
+  border-radius:50% 50% 30% 30%;
+  border:1.5px solid rgba(255,255,255,.35);
+  box-shadow:0 0 14px rgba(100,200,255,.25);
+  z-index:3;
+}
+/* Bike on dome removed – replaced by Veloxaner crest */
+/* Saucer body (structural) */
+.ufo__body{
+  position:absolute;inset:0;
+}
+/* Ring of lights around disc edge */
+.ufo__dots{
+  position:absolute;bottom:22%;left:50%;transform:translateX(-50%);
+  display:flex;gap:clamp(8px,1.6vw,14px);z-index:3;
+}
+.ufo__dot{
+  width:clamp(5px,1vw,8px);height:clamp(5px,1vw,8px);border-radius:50%;
+  animation:ufo-blink .8s ease-in-out infinite alternate;
+  box-shadow:0 0 4px currentColor;
+}
+.ufo__dot:nth-child(1){background:#FF5252;color:#FF5252;animation-delay:0s}
+.ufo__dot:nth-child(2){background:#FFD93D;color:#FFD93D;animation-delay:.2s}
+.ufo__dot:nth-child(3){background:#4CAF50;color:#4CAF50;animation-delay:.4s}
+.ufo__dot:nth-child(4){background:#42A5F5;color:#42A5F5;animation-delay:.6s}
+@keyframes ufo-blink{0%{opacity:.3;transform:scale(.8)}100%{opacity:1;transform:scale(1)}}
+/* Engine glow underneath */
+.ufo__light{
+  position:absolute;bottom:0;left:50%;transform:translateX(-50%);
+  width:60%;height:clamp(6px,1.2vw,10px);
+  background:radial-gradient(ellipse,rgba(100,200,255,.35),transparent 70%);
+  border-radius:50%;
+  animation:thruster 1s ease-in-out infinite alternate;
+}
+@keyframes thruster{0%{opacity:.3;transform:translateX(-50%) scaleX(.7)}100%{opacity:.9;transform:translateX(-50%) scaleX(1.2)}}
+/* Bottom rim accent */
+.ufo__rim{
+  position:absolute;bottom:18%;left:50%;transform:translateX(-50%);
+  width:85%;height:clamp(3px,.6vw,5px);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);
+  border-radius:50%;
+}
+/* ── Veloxaner-Wappen (Fahrrad-Emblem auf der Untertasse) ── */
+.ufo__crest{
+  position:absolute;bottom:24%;left:50%;transform:translateX(-50%);
+  width:clamp(22px,4.4vw,36px);height:clamp(22px,4.4vw,36px);
+  z-index:5;
+}
+/* Shield background */
+.ufo__crest-shield{
+  position:absolute;inset:0;
+  background:radial-gradient(circle at 40% 35%,#2E7D32,#1B5E20);
+  border-radius:50% 50% 50% 50% / 40% 40% 60% 60%;
+  border:1.5px solid rgba(255,255,255,.35);
+  box-shadow:0 0 8px rgba(76,175,80,.3),inset 0 1px 2px rgba(255,255,255,.2);
+}
+/* Bike wheel left */
+.ufo__crest-wh1{
+  position:absolute;bottom:22%;left:14%;
+  width:clamp(7px,1.4vw,11px);height:clamp(7px,1.4vw,11px);
+  border:1.5px solid #FFD93D;border-radius:50%;
+  box-shadow:0 0 3px rgba(255,217,61,.4);
+}
+.ufo__crest-wh1::after{
+  content:'';position:absolute;inset:25%;background:#FFD93D;border-radius:50%;
+}
+/* Bike wheel right */
+.ufo__crest-wh2{
+  position:absolute;bottom:22%;right:14%;
+  width:clamp(7px,1.4vw,11px);height:clamp(7px,1.4vw,11px);
+  border:1.5px solid #FFD93D;border-radius:50%;
+  box-shadow:0 0 3px rgba(255,217,61,.4);
+}
+.ufo__crest-wh2::after{
+  content:'';position:absolute;inset:25%;background:#FFD93D;border-radius:50%;
+}
+/* Bike frame triangle */
+.ufo__crest-frame{
+  position:absolute;bottom:32%;left:50%;transform:translateX(-50%);
+  width:0;height:0;
+  border-left:clamp(5px,1vw,8px) solid transparent;
+  border-right:clamp(5px,1vw,8px) solid transparent;
+  border-bottom:clamp(6px,1.2vw,10px) solid #FFD93D;
+  filter:drop-shadow(0 0 2px rgba(255,217,61,.4));
+}
+/* Star above bike (Veloxaner symbol) */
+.ufo__crest-star{
+  position:absolute;top:12%;left:50%;transform:translateX(-50%);
+  font-size:clamp(5px,1vw,8px);
+  color:#FFD93D;
+  text-shadow:0 0 4px rgba(255,217,61,.5);
+  line-height:1;
+}
+/* Anhängerkupplung (clean, below saucer) */
+.ufo__hitch{
+  position:absolute;right:8%;bottom:16%;z-index:3;
+}
+.ufo__hitch-bar{
+  width:clamp(8px,1.6vw,12px);height:clamp(2px,.4vw,3px);
+  background:linear-gradient(90deg,#90A4AE,#B0BEC5);
+  border-radius:1px;
+}
+.ufo__hitch-ball{
+  position:absolute;right:calc(-1 * clamp(3px,.6vw,5px));top:50%;
+  transform:translateY(-50%);
+  width:clamp(5px,1vw,7px);height:clamp(5px,1vw,7px);
+  background:radial-gradient(circle at 35% 35%,#E0E0E0,#78909C);
+  border-radius:50%;border:1px solid rgba(0,0,0,.12);
+  box-shadow:0 0 3px rgba(100,200,255,.2);
+}
+
+/* ═══════════════════════════════════════
+   SCENE 0: Title - Space
+   ═══════════════════════════════════════ */
+.s0-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,#0a0a2e 0%,#050510 100%)}
+.s0-stars{position:absolute;inset:0}
+.star{position:absolute;background:#fff;border-radius:50%;animation:twinkle 2s ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:.2;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
+
+.s0-content{text-align:center;z-index:2;position:relative}
+.s0-logbook{
+  font-family:var(--body);font-size:clamp(9px,1.5vw,13px);
+  color:rgba(100,200,255,.6);letter-spacing:1.5px;text-transform:uppercase;
+  margin-bottom:10px;
+  opacity:0;transform:translateY(-8px);transition:opacity .5s ease .1s,transform .5s ease .1s;
+  text-shadow:0 0 8px rgba(100,200,255,.3);
+}
+.scene.active .s0-logbook{opacity:1;transform:translateY(0)}
+.s0-logo{
+  font-family:var(--comic);font-size:clamp(28px,5.5vw,48px);
+  letter-spacing:2px;margin-bottom:2px;
+  opacity:0;transform:scale(.7);transition:opacity .6s ease .3s,transform .6s ease .3s;
+}
+.scene.active .s0-logo{opacity:1;transform:scale(1)}
+.s0-logo .gr{color:var(--green)}.s0-logo .bl{color:#5BB8F0}
+.s0-tagline{
+  font-family:var(--comic);font-size:clamp(14px,2.8vw,24px);
+  color:var(--purple);letter-spacing:1px;
+  opacity:0;transition:opacity .5s ease .7s;
+}
+.scene.active .s0-tagline{opacity:1}
+.s0-subtitle{
+  color:rgba(255,255,255,.4);font-size:clamp(10px,1.6vw,14px);
+  margin-top:8px;opacity:0;transition:opacity .5s ease 1s;
+}
+.scene.active .s0-subtitle{opacity:1}
+
+.s0-ufo{
+  position:absolute;top:20%;right:10%;
+  opacity:0;transform:translate(60px,-30px);
+  transition:opacity .6s ease .5s,transform 1s ease .5s;
+}
+.scene.active .s0-ufo{opacity:1;transform:translate(0,0)}
+.s0-ufo .ufo{animation:hover 3s ease-in-out infinite}
+@keyframes hover{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-10px) rotate(2deg)}}
+
+/* ═══════════════════════════════════════
+   SCENE 1: Landing in Saarland
+   ═══════════════════════════════════════ */
+.s1-bg{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,#0d0d2b 0%,#1a1a4e 25%,#2a3a5e 42%,#4a7a3a 52%,#3d6e30 60%,#3a6a2e 100%);
+}
+/* Stars in night sky */
+.s1-stars{position:absolute;inset:0;overflow:hidden}
+.s1-star{
+  position:absolute;background:#fff;border-radius:50%;
+  animation:twinkle 2s ease-in-out infinite alternate;
+}
+@keyframes twinkle{0%{opacity:.3}100%{opacity:1}}
+.s1-moon{
+  position:absolute;top:6%;right:14%;
+  width:clamp(24px,5vw,42px);height:clamp(24px,5vw,42px);
+  background:linear-gradient(135deg,#FFF8E1,#FFE082);border-radius:50%;
+  box-shadow:0 0 30px rgba(255,224,130,.5),0 0 60px rgba(255,224,130,.2);
+}
+/* Rolling hills silhouette */
+.s1-hills{
+  position:absolute;bottom:0;left:0;right:0;height:55%;
+  background:
+    radial-gradient(ellipse 70% 40% at 20% 80%, #3d6e30 70%, transparent 70%),
+    radial-gradient(ellipse 60% 35% at 55% 85%, #4a7a3a 70%, transparent 70%),
+    radial-gradient(ellipse 80% 45% at 85% 78%, #3a6a2e 70%, transparent 70%);
+}
+/* Simple tree silhouettes */
+.s1-tree{position:absolute;bottom:38%}
+.s1-tree::before{
+  content:'';display:block;
+  width:0;height:0;
+  border-left:clamp(8px,1.6vw,14px) solid transparent;
+  border-right:clamp(8px,1.6vw,14px) solid transparent;
+  border-bottom:clamp(18px,3.6vw,32px) solid #2d5a22;
+}
+.s1-tree::after{
+  content:'';display:block;
+  width:clamp(3px,.6vw,5px);height:clamp(6px,1.2vw,10px);
+  background:#4a3520;margin:0 auto;
+}
+.s1-tree--1{left:8%}.s1-tree--2{left:18%;bottom:40%}.s1-tree--3{right:22%;bottom:36%}
+.s1-tree--4{right:6%;bottom:42%}.s1-tree--5{left:72%;bottom:39%}
+
+.s1-ufo{
+  position:absolute;top:12%;left:38%;
+  opacity:0;
+  animation:land 2.2s ease-in-out .3s forwards;
+}
+@keyframes land{
+  0%{transform:translate(-80px,-50px) scale(.4);opacity:0}
+  35%{opacity:1}
+  100%{transform:translate(0,0) scale(1);opacity:1}
+}
+.s1-ufo .ufo{animation:hover 2s ease-in-out infinite}
+/* Brighter, wider beam */
+.s1-beam{
+  position:absolute;top:38%;left:42%;
+  width:0;height:0;
+  border-left:clamp(24px,5vw,42px) solid transparent;
+  border-right:clamp(24px,5vw,42px) solid transparent;
+  border-top:clamp(60px,12vw,100px) solid rgba(255,255,100,.12);
+  filter:blur(2px);
+  opacity:0;transition:opacity .5s ease .8s;
+}
+.scene.active .s1-beam{opacity:1}
+/* Beam glow ring on ground */
+.s1-beamring{
+  position:absolute;bottom:30%;left:39%;
+  width:clamp(40px,8vw,70px);height:clamp(10px,2vw,18px);
+  border-radius:50%;
+  background:radial-gradient(ellipse,rgba(255,255,100,.2),transparent 70%);
+  opacity:0;transition:opacity .4s ease 1.2s;
+}
+.scene.active .s1-beamring{opacity:1}
+
+.s1-alien{
+  position:absolute;bottom:26%;left:44%;
+  opacity:0;transform:translateY(-30px);
+  transition:opacity .3s ease 1.4s,transform .5s ease 1.4s;
+}
+.scene.active .s1-alien{opacity:1;transform:translateY(0)}
+
+/* Proper German road sign style */
+.s1-sign{
+  position:absolute;bottom:26%;right:10%;
+  opacity:0;transition:opacity .4s ease .5s;
+}
+.scene.active .s1-sign{opacity:1}
+.s1-sign__post{
+  width:clamp(3px,.5vw,4px);height:clamp(30px,6vw,50px);
+  background:#888;margin:0 auto;
+}
+.s1-sign__plate{
+  background:linear-gradient(135deg,#FFD700,#FFC107);
+  border:clamp(2px,.3vw,3px) solid #333;border-radius:3px;
+  padding:clamp(4px,.8vw,7px) clamp(8px,1.6vw,14px);
+  font-size:clamp(7px,1.3vw,11px);font-weight:800;color:#333;
+  text-align:center;white-space:nowrap;
+  box-shadow:0 2px 8px rgba(0,0,0,.2);
+  transform:rotate(-2deg);
+}
+
+/* ═══════════════════════════════════════
+   SCENE 2: Cycling chaos
+   ═══════════════════════════════════════ */
+.s2-bg{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,#6CB4EE 0%,#9DD1F5 32%,#78A856 32%,#6B9A4A 40%,#777 40%,#666 100%);
+}
+.s2-alien-bike{
+  position:absolute;bottom:34%;left:15%;
+  opacity:0;transform:translateX(-50px);
+  transition:opacity .5s ease .3s,transform .8s ease .3s;
+}
+.scene.active .s2-alien-bike{opacity:1;transform:translateX(0)}
+.s2-alien-bike .alien--shocked{animation:bike-shake .3s ease-in-out infinite}
+@keyframes bike-shake{0%,100%{transform:translateX(-50%) rotate(-3deg)}50%{transform:translateX(-50%) rotate(3deg)}}
+
+.s2-obstacles{position:absolute;inset:0}
+.s2-hole{
+  position:absolute;bottom:28%;
+  width:clamp(34px,7vw,58px);height:clamp(10px,2vw,16px);
+  background:#333;border-radius:50%;border:2px solid #222;
+  box-shadow:inset 0 2px 4px rgba(0,0,0,.5);
+}
+.s2-hole--1{left:42%}
+.s2-hole--2{left:68%}
+/* Big CSS car blocking the road */
+.s2-car{
+  position:absolute;bottom:29%;right:5%;
+  width:clamp(60px,12vw,100px);height:clamp(30px,6vw,50px);
+  background:linear-gradient(180deg,#c0392b,#a93226);
+  border-radius:8px 8px 4px 4px;
+  opacity:0;transition:opacity .4s ease .8s;
+  border:1.5px solid #8e2420;
+  transform:translateZ(0);
+}
+.scene.active .s2-car{opacity:1}
+.s2-car::before{
+  content:'';position:absolute;top:-35%;left:15%;right:15%;height:50%;
+  background:linear-gradient(180deg,#85c1e9,#aed6f1);
+  border-radius:6px 6px 0 0;border:1.5px solid #7fb3d3;
+}
+.s2-car::after{
+  content:'';position:absolute;bottom:-20%;left:12%;
+  width:clamp(10px,2vw,16px);height:clamp(10px,2vw,16px);
+  background:#333;border-radius:50%;border:2px solid #555;
+  box-shadow:clamp(28px,5.6vw,48px) 0 0 0 #333;
+}
+/* Parked car on bike lane */
+.s2-parkcar{
+  position:absolute;bottom:31%;right:28%;
+  width:clamp(50px,10vw,84px);height:clamp(26px,5.2vw,44px);
+  background:linear-gradient(180deg,#5b5b5b,#444);
+  border-radius:6px 6px 3px 3px;
+  opacity:0;transition:opacity .4s ease 1s;
+  border:1.5px solid #333;
+}
+.scene.active .s2-parkcar{opacity:1}
+.s2-parkcar::before{
+  content:'';position:absolute;top:-30%;left:18%;right:18%;height:45%;
+  background:linear-gradient(180deg,#85c1e9,#aed6f1);
+  border-radius:5px 5px 0 0;border:1px solid #7fb3d3;
+}
+.s2-parkcar::after{
+  content:'';position:absolute;bottom:-18%;left:10%;
+  width:clamp(8px,1.6vw,14px);height:clamp(8px,1.6vw,14px);
+  background:#333;border-radius:50%;border:1.5px solid #555;
+  box-shadow:clamp(22px,4.4vw,38px) 0 0 0 #333;
+}
+/* P-sign on parked car */
+.s2-psign{
+  position:absolute;bottom:42%;right:30%;
+  background:var(--blue);color:#fff;
+  width:clamp(14px,2.8vw,22px);height:clamp(14px,2.8vw,22px);
+  border-radius:3px;display:flex;align-items:center;justify-content:center;
+  font-size:clamp(8px,1.6vw,14px);font-weight:800;
+  opacity:0;transition:opacity .3s ease 1.2s;z-index:5;
+}
+.scene.active .s2-psign{opacity:1}
+.s2-crack{
+  position:absolute;bottom:30%;left:46%;
+  font-size:clamp(18px,3.6vw,32px);
+  animation:shake .3s ease-in-out infinite;
+  opacity:0;transition:opacity .3s ease .6s;
+}
+.scene.active .s2-crack{opacity:1}
+@keyframes shake{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
+
+.s2-effects{position:absolute;top:10%;right:5%;display:flex;flex-direction:column;gap:8px}
+.s2-fx{
+  font-family:var(--comic);font-size:clamp(14px,2.8vw,24px);
+  color:var(--red);
+  opacity:0;transition:opacity .3s ease;
+}
+.scene.active .s2-fx:nth-child(1){opacity:1;transition-delay:.7s}
+.scene.active .s2-fx:nth-child(2){opacity:1;transition-delay:1.1s}
+.scene.active .s2-fx:nth-child(3){opacity:1;transition-delay:1.5s}
+
+/* ═══════════════════════════════════════
+   SCENE 3: Discovers app
+   ═══════════════════════════════════════ */
+.s3-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 40% 50%,#1a3a2a,#0a2018)}
+.s3-alien{
+  position:absolute;left:12%;bottom:20%;
+  opacity:0;transition:opacity .4s ease .2s;
+}
+.scene.active .s3-alien{opacity:1}
+.s3-phone{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:clamp(90px,16vw,140px);height:clamp(170px,30vw,260px);
+  background:#111;border-radius:clamp(10px,2vw,18px);padding:clamp(4px,.7vw,6px);
+  box-shadow:0 0 40px rgba(104,146,70,.3),0 10px 40px rgba(0,0,0,.4);
+  opacity:0;transform:translate(-50%,-50%) scale(.7);
+  transition:opacity .5s ease .4s,transform .6s ease .4s;
+}
+.scene.active .s3-phone{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.s3-screen{width:100%;height:100%;background:#fff;border-radius:clamp(7px,1.4vw,14px);overflow:hidden;display:flex;flex-direction:column}
+.s3-hdr{background:var(--blue);color:#fff;padding:clamp(3px,.6vw,6px);text-align:center;font-size:clamp(6px,1.1vw,9px);font-weight:800;letter-spacing:1px}
+.s3-hdr span{color:#7BC67E}
+.s3-items{padding:clamp(3px,.6vw,6px);display:flex;flex-direction:column;gap:clamp(2px,.4vw,4px)}
+.s3-item{
+  display:flex;align-items:center;gap:clamp(2px,.4vw,4px);
+  padding:clamp(3px,.6vw,6px) clamp(4px,.8vw,8px);
+  border-radius:clamp(3px,.6vw,6px);
+  font-size:clamp(5px,1vw,8px);font-weight:700;
+  opacity:0;transform:translateX(-8px);transition:opacity .3s ease,transform .3s ease;
+}
+.scene.active .s3-item:nth-child(1){opacity:1;transform:translateX(0);transition-delay:.7s}
+.scene.active .s3-item:nth-child(2){opacity:1;transform:translateX(0);transition-delay:.9s}
+.scene.active .s3-item:nth-child(3){opacity:1;transform:translateX(0);transition-delay:1.1s}
+.s3-item--r{background:#FFF0F0;border-left:2px solid var(--red);color:var(--red)}
+.s3-item--y{background:#FFF8E0;border-left:2px solid var(--yellow);color:#B8860B}
+.s3-item--g{background:#EEFBF0;border-left:2px solid var(--green);color:var(--green)}
+.s3-map{flex:1;background:#E8F0E8;margin:clamp(2px,.4vw,4px);border-radius:clamp(2px,.4vw,4px);position:relative}
+.s3-pin{position:absolute;top:35%;left:40%;font-size:clamp(8px,1.6vw,12px);opacity:0;transition:opacity .3s ease 1.3s}
+.scene.active .s3-pin{opacity:1}
+.s3-ring{position:absolute;top:42%;left:45%;width:clamp(10px,2vw,16px);height:clamp(10px,2vw,16px);border:1.5px solid var(--blue);border-radius:50%;opacity:0;transition:opacity .2s ease 1.4s;animation:gps 1.5s ease-in-out infinite}
+.scene.active .s3-ring{opacity:1}
+@keyframes gps{0%{transform:translate(-50%,-50%) scale(.5);opacity:1}100%{transform:translate(-50%,-50%) scale(2.5);opacity:0}}
+
+.s3-lightbulb{
+  position:absolute;top:10%;left:20%;
+  font-size:clamp(24px,5vw,44px);
+  opacity:0;transition:opacity .3s ease 1.5s;
+  animation:idea-pop 1s ease-in-out infinite;
+}
+.scene.active .s3-lightbulb{opacity:1}
+@keyframes idea-pop{0%,100%{transform:scale(1) rotate(-5deg)}50%{transform:scale(1.15) rotate(5deg)}}
+
+/* ═══════════════════════════════════════
+   SCENE 4: Reporting frenzy
+   ═══════════════════════════════════════ */
+.s4-bg{position:absolute;inset:0;background:linear-gradient(180deg,#87CEEB 0%,#B8E0F0 35%,#78A856 35%,#6B9A4A 42%,#777 42%,#666 100%)}
+.s4-alien{
+  position:absolute;bottom:36%;left:22%;
+  opacity:0;transition:opacity .3s ease .2s;
+}
+.scene.active .s4-alien{opacity:1}
+
+.s4-pings{position:absolute;inset:0}
+.s4-ping{
+  position:absolute;font-size:clamp(14px,2.8vw,24px);
+  opacity:0;transform:scale(0);
+  transition:opacity .3s ease,transform .4s cubic-bezier(.17,.67,.28,1.5);
+}
+.scene.active .s4-ping:nth-child(1){opacity:1;transform:scale(1);transition-delay:.6s}
+.scene.active .s4-ping:nth-child(2){opacity:1;transform:scale(1);transition-delay:1s}
+.scene.active .s4-ping:nth-child(3){opacity:1;transform:scale(1);transition-delay:1.4s}
+.scene.active .s4-ping:nth-child(4){opacity:1;transform:scale(1);transition-delay:1.8s}
+.scene.active .s4-ping:nth-child(5){opacity:1;transform:scale(1);transition-delay:2.2s}
+
+.s4-counter{
+  position:absolute;top:8%;right:8%;
+  background:var(--red);color:#fff;
+  width:clamp(36px,7vw,60px);height:clamp(36px,7vw,60px);
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-family:var(--comic);font-size:clamp(16px,3.2vw,28px);
+  box-shadow:0 4px 15px rgba(224,64,64,.4);
+}
+.s4-counter__num{animation:count-up .3s ease}
+@keyframes count-up{from{transform:scale(1.4)}to{transform:scale(1)}}
+
+/* ═══════════════════════════════════════
+   SCENE 5: Municipality dashboard
+   ═══════════════════════════════════════ */
+.s5-bg{position:absolute;inset:0;background:linear-gradient(135deg,#1a2a3a,#0a1a2a)}
+.s5-dash{
+  width:clamp(200px,40vw,340px);background:#fff;border-radius:10px;
+  box-shadow:0 8px 40px rgba(0,0,0,.3);overflow:hidden;z-index:2;
+  opacity:0;transform:translateY(20px);transition:opacity .5s ease .2s,transform .6s ease .2s;
+}
+.scene.active .s5-dash{opacity:1;transform:translateY(0)}
+.s5-dhdr{background:var(--blue);color:#fff;padding:clamp(5px,1vw,8px) clamp(8px,1.4vw,12px);display:flex;justify-content:space-between;font-size:clamp(7px,1.3vw,11px);font-weight:700}
+.s5-stats{display:flex;padding:clamp(5px,1vw,8px);gap:clamp(3px,.6vw,5px)}
+.s5-stat{flex:1;text-align:center;padding:clamp(3px,.6vw,5px);background:#F8FAFC;border-radius:5px}
+.s5-stat__n{font-size:clamp(12px,2.4vw,20px);font-weight:800}
+.s5-stat__l{font-size:clamp(5px,.9vw,7px);color:#999;text-transform:uppercase}
+.s5-map{height:clamp(40px,8vw,70px);background:#E8F0E8;margin:0 clamp(5px,1vw,8px) clamp(5px,1vw,8px);border-radius:4px;position:relative}
+.s5-pin{position:absolute;font-size:clamp(6px,1.2vw,10px);opacity:0;transition:opacity .3s ease}
+.scene.active .s5-pin:nth-child(1){opacity:1;transition-delay:.6s}
+.scene.active .s5-pin:nth-child(2){opacity:1;transition-delay:.8s}
+.scene.active .s5-pin:nth-child(3){opacity:1;transition-delay:1s}
+.scene.active .s5-pin:nth-child(4){opacity:1;transition-delay:1.2s}
+.scene.active .s5-pin:nth-child(5){opacity:1;transition-delay:1.4s}
+.scene.active .s5-pin:nth-child(6){opacity:1;transition-delay:1.6s}
+
+.s5-people{
+  position:absolute;bottom:clamp(20px,5vw,50px);right:clamp(15px,4vw,40px);
+  font-size:clamp(18px,3.6vw,32px);z-index:1;
+  opacity:0;transition:opacity .4s ease 1.2s;
+}
+.scene.active .s5-people{opacity:.7}
+
+/* ═══════════════════════════════════════
+   SCENE 6: Happy ending
+   ═══════════════════════════════════════ */
+.s6-bg{position:absolute;inset:0;background:linear-gradient(180deg,#6CB4EE 0%,#9DD1F5 30%,#78A856 30%,#6B9A4A 40%,#999 40%,#888 100%)}
+.s6-sun{position:absolute;top:4%;left:6%;width:clamp(28px,5.5vw,48px);height:clamp(28px,5.5vw,48px);background:#FFD93D;border-radius:50%;box-shadow:0 0 40px rgba(255,217,61,.5)}
+.s6-path{
+  position:absolute;bottom:30%;left:8%;right:8%;height:clamp(8px,1.6vw,14px);
+  background:var(--green);border-radius:10px;
+  transform:scaleX(0);transition:transform .8s ease .3s;transform-origin:left;
+}
+.scene.active .s6-path{transform:scaleX(1)}
+.s6-path__label{
+  position:absolute;top:calc(-1 * clamp(16px,3vw,26px));left:50%;transform:translateX(-50%);
+  background:var(--green);color:#fff;padding:clamp(2px,.3vw,3px) clamp(6px,1vw,10px);
+  border-radius:8px;font-size:clamp(6px,1.1vw,10px);font-weight:700;white-space:nowrap;
+}
+.s6-alien-bike{
+  position:absolute;bottom:34%;
+  opacity:0;animation:ride-across 2s ease .8s forwards;
+}
+@keyframes ride-across{0%{left:-10%;opacity:0}20%{opacity:1}100%{left:60%;opacity:1}}
+.s6-confetti{position:absolute;font-size:clamp(12px,2.2vw,18px);animation:confetti 2.5s ease-in-out infinite}
+@keyframes confetti{0%{transform:translateY(0) rotate(0);opacity:1}100%{transform:translateY(80px) rotate(360deg);opacity:0}}
+.s6-confetti:nth-child(1){top:3%;left:10%;animation-delay:0s}
+.s6-confetti:nth-child(2){top:7%;left:30%;animation-delay:.3s}
+.s6-confetti:nth-child(3){top:2%;left:50%;animation-delay:.6s}
+.s6-confetti:nth-child(4){top:9%;left:70%;animation-delay:.2s}
+.s6-confetti:nth-child(5){top:5%;left:88%;animation-delay:.5s}
+
+.s6-ufo{
+  position:absolute;top:10%;right:10%;
+  opacity:0;transition:opacity .4s ease 2s;
+}
+.scene.active .s6-ufo{opacity:.7}
+.s6-ufo .ufo{animation:hover 2s ease-in-out infinite;transform:scale(.6)}
+
+/* ═══════════════════════════════════════
+   SCENE 7: CTA
+   ═══════════════════════════════════════ */
+.s7-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,#0a0a2e,#050510)}
+.s7-content{text-align:center;z-index:2;position:relative;padding:20px}
+.s7-title{
+  font-family:var(--comic);font-size:clamp(20px,4vw,36px);color:var(--green);
+  margin-bottom:clamp(4px,.8vw,8px);
+  opacity:0;transform:translateY(12px);transition:opacity .5s ease .3s,transform .5s ease .3s;
+}
+.scene.active .s7-title{opacity:1;transform:translateY(0)}
+.s7-text{
+  color:rgba(255,255,255,.6);font-size:clamp(10px,1.6vw,14px);
+  margin-bottom:clamp(10px,2vw,20px);line-height:1.6;
+  opacity:0;transition:opacity .5s ease .6s;
+}
+.scene.active .s7-text{opacity:1}
+.s7-btns{display:flex;gap:clamp(6px,1.2vw,12px);justify-content:center;flex-wrap:wrap;opacity:0;transition:opacity .5s ease .9s}
+.scene.active .s7-btns{opacity:1}
+.s7-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:clamp(8px,1.4vw,12px) clamp(14px,2.8vw,24px);
+  border-radius:10px;font-family:var(--body);font-size:clamp(10px,1.6vw,14px);
+  font-weight:700;text-decoration:none;border:none;cursor:pointer;transition:transform .2s;
+}
+.s7-btn:hover{transform:translateY(-2px)}
+.s7-btn--g{background:var(--green);color:#fff}
+.s7-btn--b{background:var(--blue);color:#fff}
+.s7-credit{margin-top:clamp(10px,2vw,20px);color:rgba(255,255,255,.3);font-size:clamp(8px,1.2vw,11px)}
+.s7-credit a{color:rgba(255,255,255,.45);text-decoration:none}
+.s7-alien{
+  position:absolute;bottom:clamp(10px,3vw,30px);right:clamp(10px,3vw,30px);
+  opacity:0;transition:opacity .3s ease 1.2s;
+}
+.scene.active .s7-alien{opacity:.5}
+
+/* End-scene Veloxaner crest */
+.s7-crest{
+  width:clamp(40px,8vw,64px);height:clamp(40px,8vw,64px);
+  margin:0 auto clamp(6px,1.2vw,12px);position:relative;
+  cursor:pointer;transition:transform .3s;
+  opacity:0;transform:scale(.5);transition:opacity .4s ease .1s,transform .4s ease .1s;
+}
+.scene.active .s7-crest{opacity:1;transform:scale(1)}
+.s7-crest:hover{transform:scale(1.15) rotate(5deg)!important;filter:drop-shadow(0 0 12px rgba(76,175,80,.5))}
+.s7-crest__shield{
+  position:absolute;inset:0;
+  background:radial-gradient(circle at 40% 30%,#2E7D32,#1B5E20);
+  border-radius:50% 50% 50% 50% / 40% 40% 60% 60%;
+  border:2px solid rgba(255,255,255,.3);
+  box-shadow:0 0 16px rgba(76,175,80,.3),inset 0 2px 4px rgba(255,255,255,.15);
+}
+.s7-crest__star{
+  position:absolute;top:14%;left:50%;transform:translateX(-50%);
+  font-size:clamp(8px,1.6vw,14px);color:#FFD93D;
+  text-shadow:0 0 6px rgba(255,217,61,.5);line-height:1;
+}
+.s7-crest__wh1,.s7-crest__wh2{
+  position:absolute;bottom:22%;
+  width:clamp(10px,2vw,16px);height:clamp(10px,2vw,16px);
+  border:2px solid #FFD93D;border-radius:50%;
+  box-shadow:0 0 4px rgba(255,217,61,.3);
+}
+.s7-crest__wh1::after,.s7-crest__wh2::after{
+  content:'';position:absolute;inset:28%;background:#FFD93D;border-radius:50%;
+}
+.s7-crest__wh1{left:16%}
+.s7-crest__wh2{right:16%}
+/* Mission rating */
+.s7-mission{
+  font-size:clamp(9px,1.4vw,12px);color:rgba(100,200,255,.6);
+  letter-spacing:1px;text-transform:uppercase;margin-bottom:clamp(6px,1.2vw,10px);
+  opacity:0;transition:opacity .5s ease .2s;
+}
+.scene.active .s7-mission{opacity:1}
+
+/* ── Easter Egg: Veloxaner-Akte ── */
+.dossier{
+  display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  z-index:200;width:clamp(260px,60vw,380px);
+  background:linear-gradient(135deg,#0a1628,#0d2240);
+  border:1px solid rgba(100,200,255,.2);
+  border-radius:14px;padding:clamp(14px,2.8vw,24px);
+  box-shadow:0 0 40px rgba(100,200,255,.15),0 20px 60px rgba(0,0,0,.5);
+  color:#fff;font-family:var(--body);
+}
+.dossier.open{display:block;animation:dossier-in .3s ease}
+@keyframes dossier-in{from{opacity:0;transform:translate(-50%,-50%) scale(.8)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+.dossier__close{
+  position:absolute;top:8px;right:12px;
+  background:none;border:none;color:rgba(255,255,255,.4);
+  font-size:16px;cursor:pointer;
+}
+.dossier__close:hover{color:#fff}
+.dossier__title{
+  font-size:clamp(13px,2.2vw,18px);font-weight:800;
+  color:rgba(100,200,255,.8);letter-spacing:2px;text-align:center;
+  margin-bottom:clamp(10px,2vw,16px);
+  text-shadow:0 0 8px rgba(100,200,255,.3);
+}
+.dossier__line{
+  display:flex;justify-content:space-between;
+  padding:clamp(4px,.8vw,7px) 0;
+  border-bottom:1px solid rgba(100,200,255,.08);
+  font-size:clamp(10px,1.6vw,13px);
+}
+.dossier__label{color:rgba(100,200,255,.5);font-weight:600;min-width:40%}
+.dossier__stamp{
+  text-align:center;margin-top:clamp(10px,2vw,16px);
+  font-size:clamp(14px,2.4vw,20px);font-weight:800;
+  color:rgba(76,175,80,.6);letter-spacing:3px;
+  transform:rotate(-5deg);
+  text-shadow:0 0 6px rgba(76,175,80,.2);
+}
+
+/* ─── Controls ─── */
+.controls{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);z-index:100;display:flex;align-items:center;gap:10px}
+.ctrl{background:rgba(255,255,255,.12);backdrop-filter:blur(6px);border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:14px;cursor:pointer;transition:background .2s;display:flex;align-items:center;justify-content:center}
+.ctrl:hover{background:rgba(255,255,255,.25)}
+.prog{width:clamp(100px,26vw,260px);height:3px;background:rgba(255,255,255,.15);border-radius:2px;overflow:hidden}
+.prog__bar{height:100%;background:var(--green);border-radius:2px;width:0;transition:width .3s linear}
+.sc-num{color:rgba(255,255,255,.4);font-size:10px;font-weight:600;min-width:32px;text-align:center}
+.replay{
+  position:absolute;top:10px;right:10px;z-index:100;
+  background:rgba(255,255,255,.1);backdrop-filter:blur(6px);border:none;
+  color:rgba(255,255,255,.5);padding:5px 12px;border-radius:16px;
+  font-family:var(--body);font-size:10px;font-weight:600;cursor:pointer;
+  opacity:0;transition:opacity .3s;
+}
+.replay.show{opacity:1}.replay:hover{background:rgba(255,255,255,.2);color:#fff}
+</style>
+</head>
+<body>
+
+<div class="cinema">
+
+  <!-- SCENE 0: Title -->
+  <div class="scene active" data-duration="3500">
+    <div class="s0-bg"><div class="s0-stars" id="stars"></div></div>
+    <div class="s0-ufo"><div class="ufo"><div class="ufo__body"><div class="ufo__disc"></div><div class="ufo__dome"></div><div class="ufo__dots"><div class="ufo__dot"></div><div class="ufo__dot"></div><div class="ufo__dot"></div><div class="ufo__dot"></div></div><div class="ufo__rim"></div></div><div class="ufo__crest"><div class="ufo__crest-shield"></div><div class="ufo__crest-wh1"></div><div class="ufo__crest-wh2"></div><div class="ufo__crest-frame"></div><div class="ufo__crest-star">★</div></div><div class="ufo__hitch"><div class="ufo__hitch-bar"></div><div class="ufo__hitch-ball"></div></div><div class="ufo__light"></div></div></div>
+    <div class="s0-content">
+      <div class="s0-logbook">📡 Logbuch der Veloxflotte · Eintrag 247</div>
+      <div class="s0-logo"><span class="gr">Radwege</span><span class="bl">melder</span></div>
+      <div class="s0-tagline">🛸 Meldi besucht die "Fahrradnation"</div>
+      <div class="s0-subtitle">Ein außerirdisch guter Kurzfilm</div>
+    </div>
+  </div>
+
+  <!-- SCENE 1: Landing -->
+  <div class="scene" data-duration="5500">
+    <div class="s1-bg"></div>
+    <div class="s1-stars" id="stars2s1"></div>
+    <div class="s1-moon"></div>
+    <div class="s1-hills"></div>
+    <div class="s1-tree s1-tree--1"></div>
+    <div class="s1-tree s1-tree--2"></div>
+    <div class="s1-tree s1-tree--3"></div>
+    <div class="s1-tree s1-tree--4"></div>
+    <div class="s1-tree s1-tree--5"></div>
+    <div class="s1-ufo"><div class="ufo"><div class="ufo__body"><div class="ufo__disc"></div><div class="ufo__dome"></div><div class="ufo__dots"><div class="ufo__dot"></div><div class="ufo__dot"></div><div class="ufo__dot"></div><div class="ufo__dot"></div></div><div class="ufo__rim"></div></div><div class="ufo__crest"><div class="ufo__crest-shield"></div><div class="ufo__crest-wh1"></div><div class="ufo__crest-wh2"></div><div class="ufo__crest-frame"></div><div class="ufo__crest-star">★</div></div><div class="ufo__hitch"><div class="ufo__hitch-bar"></div><div class="ufo__hitch-ball"></div></div><div class="ufo__light"></div></div></div>
+    <div class="s1-beam"></div>
+    <div class="s1-beamring"></div>
+    <div class="s1-alien"><div class="alien alien--excited"><div class="alien__antenna"></div><div class="alien__head"><div class="alien__eye alien__eye--l"><div class="alien__pupil"></div></div><div class="alien__eye alien__eye--r"><div class="alien__pupil"></div></div><div class="alien__mouth"></div></div><div class="alien__body"></div><div class="alien__arm alien__arm--l"></div><div class="alien__arm alien__arm--r"></div><div class="alien__hand alien__hand--l"></div><div class="alien__hand alien__hand--r"></div><div class="alien__leg alien__leg--l"></div><div class="alien__leg alien__leg--r"></div><div class="alien__shoe alien__shoe--l"></div><div class="alien__shoe alien__shoe--r"></div></div></div>
+    <div class="s1-sign"><div class="s1-sign__plate">Willkommen im Saarland</div><div class="s1-sign__post"></div></div>
+    <div class="speech speech--alien d2" style="top:18%;left:8%;max-width:220px">Endlich! Deutschland – die berühmte Fahrradnation! 🚲✨</div>
+    <div class="sub"><div class="sub__text">Meldi gehört zu den Veloxanern – einem Volk mit der Mission, allen Planeten Fahrradfreundlichkeit beizubringen.</div></div>
+  </div>
+
+  <!-- SCENE 2: Chaos -->
+  <div class="scene" data-duration="6000">
+    <div class="s2-bg"></div>
+    <div class="s2-alien-bike">
+      <div class="alien-bike">
+        <div class="alien alien--shocked"><div class="alien__antenna"></div><div class="alien__head"><div class="alien__eye alien__eye--l"><div class="alien__pupil"></div></div><div class="alien__eye alien__eye--r"><div class="alien__pupil"></div></div><div class="alien__mouth"></div></div><div class="alien__body"></div><div class="alien__arm alien__arm--l"></div><div class="alien__arm alien__arm--r"></div><div class="alien__hand alien__hand--l"></div><div class="alien__hand alien__hand--r"></div></div>
+        <div class="alien-bike__frame"></div>
+        <div class="alien-bike__wheels"><div class="alien-bike__wh"></div><div class="alien-bike__wh"></div></div>
+      </div>
+    </div>
+    <div class="s2-obstacles">
+      <div class="s2-hole s2-hole--1"></div>
+      <div class="s2-hole s2-hole--2"></div>
+      <div class="s2-crack">💥</div>
+      <div class="s2-car"></div>
+      <div class="s2-parkcar"></div>
+      <div class="s2-psign">P</div>
+    </div>
+    <div class="s2-effects">
+      <div class="s2-fx">KRACH!</div>
+      <div class="s2-fx">WUMM!</div>
+      <div class="s2-fx">AUTSCH!</div>
+    </div>
+    <div class="speech speech--red d2" style="top:12%;left:5%;max-width:240px">Fahrradnation?! Schlaglöcher! Zugeparkt! Wo bin ich hier gelandet?! 😱</div>
+    <div class="sub"><div class="sub__text">Die Realität trifft Meldi wie ein Bordstein. Schlaglöcher, Falschparker, Engstellen überall.</div></div>
+  </div>
+
+  <!-- SCENE 3: Discovers app -->
+  <div class="scene" data-duration="5500">
+    <div class="s3-bg"></div>
+    <div class="s3-alien"><div class="alien"><div class="alien__antenna"></div><div class="alien__head"><div class="alien__eye alien__eye--l"><div class="alien__pupil"></div></div><div class="alien__eye alien__eye--r"><div class="alien__pupil"></div></div><div class="alien__mouth"></div></div><div class="alien__body"></div><div class="alien__arm alien__arm--l"></div><div class="alien__arm alien__arm--r"></div><div class="alien__hand alien__hand--l"></div><div class="alien__hand alien__hand--r"></div><div class="alien__leg alien__leg--l"></div><div class="alien__leg alien__leg--r"></div><div class="alien__shoe alien__shoe--l"></div><div class="alien__shoe alien__shoe--r"></div></div></div>
+    <div class="s3-phone">
+      <div class="s3-screen">
+        <div class="s3-hdr">RADWEGE<span>MELDER</span></div>
+        <div class="s3-items">
+          <div class="s3-item s3-item--r">⚠️ Problem</div>
+          <div class="s3-item s3-item--y">💬 Wunsch</div>
+          <div class="s3-item s3-item--g">👍 Positiv</div>
+        </div>
+        <div class="s3-map"><div class="s3-pin">📍</div><div class="s3-ring"></div></div>
+      </div>
+    </div>
+    <div class="s3-lightbulb">💡</div>
+    <div class="speech speech--alien d3" style="top:8%;right:5%;max-width:230px">Oh! Die Erdlinge haben eine App dafür! Einfach melden – selbst mit 3 Fingern! 👽📱</div>
+    <div class="sub"><div class="sub__text">Meldi entdeckt den Radwegemelder. Keine Installation, kein Account – einfach melden!</div></div>
+  </div>
+
+  <!-- SCENE 4: Reporting frenzy -->
+  <div class="scene" data-duration="6000">
+    <div class="s4-bg"></div>
+    <div class="s4-alien"><div class="alien alien--happy"><div class="alien__antenna"></div><div class="alien__head"><div class="alien__eye alien__eye--l"><div class="alien__pupil"></div></div><div class="alien__eye alien__eye--r"><div class="alien__pupil"></div></div><div class="alien__mouth"></div></div><div class="alien__body"></div><div class="alien__arm alien__arm--l"></div><div class="alien__arm alien__arm--r"></div><div class="alien__hand alien__hand--l"></div><div class="alien__hand alien__hand--r"></div><div class="alien__leg alien__leg--l"></div><div class="alien__leg alien__leg--r"></div><div class="alien__shoe alien__shoe--l"></div><div class="alien__shoe alien__shoe--r"></div></div></div>
+    <div class="s4-pings">
+      <div class="s4-ping" style="top:25%;left:38%">📍🔴</div>
+      <div class="s4-ping" style="top:35%;left:55%">📍🔴</div>
+      <div class="s4-ping" style="top:20%;left:70%">📍🟡</div>
+      <div class="s4-ping" style="top:45%;left:60%">📍🔴</div>
+      <div class="s4-ping" style="top:30%;left:82%">📍🟢</div>
+    </div>
+    <div class="s4-counter" id="counter"><span class="s4-counter__num" id="counterNum">0</span></div>
+    <div class="speech speech--alien d1" style="bottom:55%;left:5%;max-width:230px">Ich hab sogar eine fahrradfreundliche Einkehr auf der Karte gefunden! 🍺🚲 Man kann auch gute Sachen melden!</div>
+    <div class="sub"><div class="sub__text">Meldi meldet alles – Schlaglöcher, Wünsche, und sogar eine fahrradfreundliche Einkehr! Die Saarländer lieben das.</div></div>
+  </div>
+
+  <!-- SCENE 5: Municipality sees data -->
+  <div class="scene" data-duration="5500">
+    <div class="s5-bg"></div>
+    <div class="s5-dash">
+      <div class="s5-dhdr"><span>📊 Dashboard</span><span>Lebach</span></div>
+      <div class="s5-stats">
+        <div class="s5-stat"><div class="s5-stat__n" style="color:#E00000">47</div><div class="s5-stat__l">Probleme</div></div>
+        <div class="s5-stat"><div class="s5-stat__n" style="color:#E5A700">18</div><div class="s5-stat__l">Wünsche</div></div>
+        <div class="s5-stat"><div class="s5-stat__n" style="color:#00A836">12</div><div class="s5-stat__l">Positiv</div></div>
+      </div>
+      <div class="s5-map">
+        <div class="s5-pin" style="top:20%;left:20%">🔴</div>
+        <div class="s5-pin" style="top:50%;left:45%">🔴</div>
+        <div class="s5-pin" style="top:30%;left:65%">🟡</div>
+        <div class="s5-pin" style="top:60%;left:25%">🔴</div>
+        <div class="s5-pin" style="top:40%;left:80%">🟢</div>
+        <div class="s5-pin" style="top:70%;left:55%">🔴</div>
+      </div>
+    </div>
+    <div class="s5-people">👩‍💼👨‍💻</div>
+    <div class="speech speech--green d2" style="top:8%;right:5%;max-width:240px">77 Meldungen! Die Bürger zeigen uns genau, wo es hakt. Das sind echte Daten! 📊</div>
+    <div class="sub"><div class="sub__text">Die Kommune sieht alle Meldungen auf der Karte – professionell aufbereitet für Gremien.</div></div>
+  </div>
+
+  <!-- SCENE 6: Happy ending -->
+  <div class="scene" data-duration="5500">
+    <div class="s6-bg"></div>
+    <div class="s6-sun"></div>
+    <div class="s6-confetti">🎉</div><div class="s6-confetti">⭐</div><div class="s6-confetti">🎊</div><div class="s6-confetti">✨</div><div class="s6-confetti">🛸</div>
+    <div class="s6-path"><div class="s6-path__label">✨ Bessere & neue Radwege</div></div>
+    <div class="s6-alien-bike">
+      <div class="alien-bike">
+        <div class="alien alien--happy"><div class="alien__antenna"></div><div class="alien__head"><div class="alien__eye alien__eye--l"><div class="alien__pupil"></div></div><div class="alien__eye alien__eye--r"><div class="alien__pupil"></div></div><div class="alien__mouth"></div></div><div class="alien__body"></div><div class="alien__arm alien__arm--l"></div><div class="alien__arm alien__arm--r"></div><div class="alien__hand alien__hand--l"></div><div class="alien__hand alien__hand--r"></div></div>
+        <div class="alien-bike__frame"></div>
+        <div class="alien-bike__wheels"><div class="alien-bike__wh"></div><div class="alien-bike__wh"></div></div>
+      </div>
+    </div>
+    <div class="s6-ufo"><div class="ufo"><div class="ufo__body"><div class="ufo__disc"></div><div class="ufo__dome"></div><div class="ufo__dots"><div class="ufo__dot"></div><div class="ufo__dot"></div><div class="ufo__dot"></div><div class="ufo__dot"></div></div><div class="ufo__rim"></div></div><div class="ufo__crest"><div class="ufo__crest-shield"></div><div class="ufo__crest-wh1"></div><div class="ufo__crest-wh2"></div><div class="ufo__crest-frame"></div><div class="ufo__crest-star">★</div></div><div class="ufo__hitch"><div class="ufo__hitch-bar"></div><div class="ufo__hitch-ball"></div></div><div class="ufo__light"></div></div></div>
+    <div class="speech speech--alien speech--top d3" style="top:5%;left:10%;max-width:260px">Ich erzähl allen Veloxanern von euch – Mission Saarland: fast geschafft! 🛸🚲💚</div>
+    <div class="sub"><div class="sub__text">Mission erfüllt! Meldi hat gezeigt: Bürgerdaten werden zu besseren Radwegen.</div></div>
+  </div>
+
+  <!-- SCENE 7: CTA -->
+  <div class="scene" data-duration="0">
+    <div class="s7-bg"><div class="s0-stars" id="stars2"></div></div>
+    <div class="s7-content">
+      <div class="s7-crest" id="easterEggCrest" title="🥚 Klick mich!">
+        <div class="s7-crest__shield"></div>
+        <div class="s7-crest__star">★</div>
+        <div class="s7-crest__wh1"></div>
+        <div class="s7-crest__wh2"></div>
+      </div>
+      <div class="s7-mission">Mission Saarland · Status: ⭐⭐⭐ von 5 – ausbaufähig!</div>
+      <div class="s7-title">🚲 Machen Sie Ihre Kommune fahrradfreundlich!</div>
+      <div class="s7-text">Machen Sie es wie Meldi – nutzen Sie den Radwegemelder!<br>Kostenlos · Anonym · Keine Installation nötig</div>
+      <div class="s7-btns">
+        <a href="https://2rat.github.io/velomeld/" class="s7-btn s7-btn--g" target="_blank">📱 Jetzt ausprobieren</a>
+        <a href="/cdn-cgi/l/email-protection#a4c2c5ccd696d6c5d0e4c3c9c5cdc88ac7cbc9" class="s7-btn s7-btn--b">✉️ Beratung anfragen</a>
+      </div>
+      <div class="s7-credit"><a href="https://www.2rat.org">2Rat – Büro für Radverkehrsplanung</a> · Armin Jung · <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="fd9b9c958fcf8f9c89bd9a909c9491d39e9290">[email&#160;protected]</a></div>
+    </div>
+    <!-- Easter Egg Dossier -->
+    <div class="dossier" id="dossier">
+      <div class="dossier__close" onclick="closeDossier()">✕</div>
+      <div class="dossier__title">🛸 VELOXANER-AKTE</div>
+      <div class="dossier__line"><span class="dossier__label">Spezies</span><span>Veloxaner</span></div>
+      <div class="dossier__line"><span class="dossier__label">Heimatplanet</span><span>Velox (Galaxie M87)</span></div>
+      <div class="dossier__line"><span class="dossier__label">Agent</span><span>Meldi · Klasse V</span></div>
+      <div class="dossier__line"><span class="dossier__label">Raumschiff</span><span>VX-247 "Speiche"</span></div>
+      <div class="dossier__line"><span class="dossier__label">Mission</span><span>Fahrradfreundlichkeit auf allen Planeten</span></div>
+      <div class="dossier__line"><span class="dossier__label">Aktueller Einsatz</span><span>Saarland, Planet Erde</span></div>
+      <div class="dossier__line"><span class="dossier__label">Status</span><span>⭐⭐⭐ – ausbaufähig, aber die melden jetzt!</span></div>
+      <div class="dossier__line"><span class="dossier__label">Spezialausrüstung</span><span>Radwegemelder-App 📱</span></div>
+      <div class="dossier__line"><span class="dossier__label">Lieblingsgericht</span><span>Schwenker mit Radler 🥩🍺</span></div>
+      <div class="dossier__stamp">GENEHMIGT ✓</div>
+    </div>
+    <div class="s7-alien"><div class="alien"><div class="alien__antenna"></div><div class="alien__head"><div class="alien__eye alien__eye--l"><div class="alien__pupil"></div></div><div class="alien__eye alien__eye--r"><div class="alien__pupil"></div></div><div class="alien__mouth"></div></div><div class="alien__body"></div><div class="alien__arm alien__arm--l"></div><div class="alien__arm alien__arm--r"></div><div class="alien__hand alien__hand--l"></div><div class="alien__hand alien__hand--r"></div><div class="alien__leg alien__leg--l"></div><div class="alien__leg alien__leg--r"></div><div class="alien__shoe alien__shoe--l"></div><div class="alien__shoe alien__shoe--r"></div></div></div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <button class="ctrl" id="playBtn" onclick="togglePlay()">⏸</button>
+    <div class="prog"><div class="prog__bar" id="progBar"></div></div>
+    <div class="sc-num" id="scNum">1/8</div>
+    <button class="ctrl" onclick="prevScene()">⏮</button>
+    <button class="ctrl" onclick="nextScene()">⏭</button>
+  </div>
+  <button class="replay" id="replayBtn" onclick="replay()">↻ Nochmal</button>
+</div>
+
+<script>
+// Stars
+function makeStars(id){const c=document.getElementById(id);if(!c)return;for(let i=0;i<40;i++){const s=document.createElement('div');s.className='star';const sz=Math.random()*2.5+.5;s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;animation-delay:${Math.random()*3}s;animation-duration:${Math.random()*2+1.5}s`;c.appendChild(s)}}
+makeStars('stars');makeStars('stars2');
+
+// Easter Egg: Veloxaner-Akte
+document.getElementById('easterEggCrest').addEventListener('click',function(){
+  document.getElementById('dossier').classList.add('open');
+});
+function closeDossier(){document.getElementById('dossier').classList.remove('open');}
+// Close dossier on outside click
+document.getElementById('dossier').addEventListener('click',function(e){
+  if(e.target===this)closeDossier();
+});
+// Scene 1 stars
+(function(){const c=document.getElementById('stars2s1');if(!c)return;for(let i=0;i<30;i++){const s=document.createElement('div');s.className='s1-star';const sz=Math.random()*2+.5;s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*45}%;left:${Math.random()*100}%;animation-delay:${Math.random()*3}s`;c.appendChild(s)}})();
+
+const scenes=document.querySelectorAll('.scene');
+const total=scenes.length;
+let cur=0,playing=true,timer=null;
+
+// Counter animation for scene 4
+let counterInterval=null;
+function startCounter(){
+  let n=0;const el=document.getElementById('counterNum');
+  if(counterInterval)clearInterval(counterInterval);
+  el.textContent='0';
+  counterInterval=setInterval(()=>{n++;el.textContent=n;if(n>=47)clearInterval(counterInterval)},90);
+}
+function stopCounter(){if(counterInterval){clearInterval(counterInterval);counterInterval=null}}
+
+function goTo(idx){
+  stopCounter();
+  scenes.forEach(s=>s.classList.remove('active'));
+  cur=idx;
+  // Small delay to let previous scene fully fade before activating new one
+  requestAnimationFrame(()=>{
+    scenes[cur].classList.add('active');
+    if(cur===4)setTimeout(startCounter,600);
+    updateUI();scheduleNext();
+  });
+}
+function scheduleNext(){
+  clearTimeout(timer);if(!playing)return;
+  const dur=parseInt(scenes[cur].dataset.duration);
+  if(dur>0){timer=setTimeout(()=>{if(cur<total-1)goTo(cur+1);else{playing=false;updateUI()}},dur)}
+  else{playing=false;updateUI()}
+}
+function togglePlay(){playing=!playing;updateUI();if(playing){if(cur>=total-1)goTo(0);else scheduleNext()}else clearTimeout(timer)}
+function nextScene(){if(cur<total-1)goTo(cur+1)}
+function prevScene(){if(cur>0)goTo(cur-1)}
+function replay(){playing=true;goTo(0)}
+function updateUI(){
+  document.getElementById('playBtn').textContent=playing?'⏸':'▶';
+  document.getElementById('scNum').textContent=(cur+1)+'/'+total;
+  document.getElementById('progBar').style.width=((cur+1)/total*100)+'%';
+  document.getElementById('replayBtn').classList.toggle('show',cur>=total-1&&!playing);
+}
+goTo(0);
+
+// === MELDI SOUNDTRACK: Pixar-Entdecker ===
+// Leicht, beschwingt, neugierig. Wie WALL-E oder Ratatouille.
+// Sanft aber mit Schwung! Leises Pizzicato-Groove, pfeifende Melodie.
+(function(){
+var ax=null,mg=null,mp=false,lt=null;
+function ini(){
+  if(ax&&ax.state!=='closed')return;
+  ax=new(window.AudioContext||window.webkitAudioContext)();
+  mg=ax.createGain();mg.gain.value=0;mg.connect(ax.destination);
+}
+
+// Pizzicato (zupfender Puls - das Herzstueck)
+function pizz(freq,t,vol){
+  var o=ax.createOscillator(),g=ax.createGain(),fl=ax.createBiquadFilter();
+  o.type='triangle';o.frequency.setValueAtTime(freq,t);
+  fl.type='lowpass';fl.frequency.setValueAtTime(freq*5,t);
+  fl.frequency.exponentialRampToValueAtTime(freq*1.5,t+0.15);
+  g.gain.setValueAtTime(vol*0.05,t);
+  g.gain.exponentialRampToValueAtTime(0.0001,t+0.35);
+  o.connect(fl);fl.connect(g);g.connect(mg);o.start(t);o.stop(t+0.4);
+}
+
+// Pfeifen/Floete (froeliche Melodie)
+function whist(freq,t,d,vol){
+  var o=ax.createOscillator(),g=ax.createGain(),fl=ax.createBiquadFilter();
+  o.type='sine';o.frequency.setValueAtTime(freq,t);
+  fl.type='lowpass';fl.frequency.setValueAtTime(freq*3,t);fl.Q.setValueAtTime(0.5,t);
+  var v=vol*0.03;
+  g.gain.setValueAtTime(0.0001,t);
+  g.gain.linearRampToValueAtTime(v,t+0.06);
+  g.gain.setValueAtTime(v*0.9,t+d-0.08);
+  g.gain.linearRampToValueAtTime(0.0001,t+d);
+  o.connect(fl);fl.connect(g);g.connect(mg);o.start(t);o.stop(t+d+.1);
+  // Hauch dazu
+  var o2=ax.createOscillator(),g2=ax.createGain();
+  o2.type='triangle';o2.frequency.setValueAtTime(freq*2,t);
+  g2.gain.setValueAtTime(0.0001,t);g2.gain.linearRampToValueAtTime(v*0.15,t+0.06);
+  g2.gain.linearRampToValueAtTime(0.0001,t+d);
+  o2.connect(g2);g2.connect(mg);o2.start(t);o2.stop(t+d+.1);
+}
+
+// Glockenspiel (Sternchen)
+function glock(freq,t,vol){
+  [1,2.5,4].forEach(function(h,i){
+    var o=ax.createOscillator(),g=ax.createGain();
+    o.type='sine';o.frequency.setValueAtTime(freq*h,t);
+    g.gain.setValueAtTime(vol*0.012/(i+1),t);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+2);
+    o.connect(g);g.connect(mg);o.start(t);o.stop(t+2.5);
+  });
+}
+
+// Sanfter Bass (warm, nicht schwer)
+function bass(freq,t,d,vol){
+  var o=ax.createOscillator(),g=ax.createGain();
+  o.type='sine';o.frequency.setValueAtTime(freq,t);
+  var v=vol*0.025;
+  g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(v,t+0.05);
+  g.gain.setValueAtTime(v*0.7,t+d-0.05);g.gain.linearRampToValueAtTime(0.0001,t+d);
+  o.connect(g);g.connect(mg);o.start(t);o.stop(t+d+.1);
+}
+
+// Leichter Brush/Besen (ganz zart)
+function brush(t,vol){
+  var d=0.08;
+  var buf=ax.createBuffer(1,ax.sampleRate*d,ax.sampleRate);
+  var dat=buf.getChannelData(0);for(var i=0;i<dat.length;i++)dat[i]=Math.random()*2-1;
+  var s=ax.createBufferSource(),g=ax.createGain(),fl=ax.createBiquadFilter();
+  s.buffer=buf;fl.type='highpass';fl.frequency.setValueAtTime(4000,t);
+  g.gain.setValueAtTime(vol*0.015,t);g.gain.linearRampToValueAtTime(0.0001,t+d);
+  s.connect(fl);fl.connect(g);g.connect(mg);s.start(t);s.stop(t+d+.01);
+}
+
+// Noten
+var C3=130.81,D3=146.83,E3=164.81,F3=174.61,G3=196,A3=220,B3=246.94;
+var C4=261.63,D4=293.66,E4=329.63,F4=349.23,G4=392,A4=440,B4=493.88;
+var C5=523.25,D5=587.33,E5=659.25,F5=698.46,G5=783.99,A5=880;
+var C2=65.41,D2=73.42,E2=82.41,F2=87.31,G2=98,A2=110,B2=123.47;
+
+var BPM=108;
+var BT=60/BPM; // ~0.556s pro Beat
+var BAR=BT*4;
+var DUR=BAR*8; // 8 Takte, ~17.8s
+
+function sched(){
+  if(!ax||!mg)return DUR;
+  var t0=ax.currentTime+0.1;
+
+  // === PIZZICATO-GROOVE: Das Herzstueck! Beschwingt. ===
+  // Durchgehend, leicht, wie Schritte auf Entdeckungstour
+  var pzPat=[
+    // Bar 1-2: C -> Am
+    [C3,0],[E3,1],[G3,2],[E3,3],
+    [A3,4],[C3,5],[E3,6],[A3,7],
+    // Bar 3-4: F -> G
+    [F3,8],[A3,9],[C4,10],[A3,11],
+    [G3,12],[B3,13],[D4,14],[G3,15],
+    // Bar 5-6: C -> Em
+    [C3,16],[G3,17],[E3,18],[C4,19],
+    [E3,20],[G3,21],[B3,22],[E3,23],
+    // Bar 7-8: F -> G -> C
+    [F3,24],[A3,25],[F3,26],[C4,27],
+    [G3,28],[D4,29],[G3,30],[C3,31],
+  ];
+  pzPat.forEach(function(x){pizz(x[0],t0+x[1]*BT,0.5);});
+
+  // === BASS: Grundtoene, rund und warm ===
+  var bl=[[C2,0],[A2,4],[F2,8],[G2,12],[C2,16],[E2,20],[F2,24],[G2,28]];
+  bl.forEach(function(x){bass(x[0],t0+x[1]*BT,BAR*0.9,0.6);});
+
+  // === BESEN-BRUSH: Ganz zartes Tik-Tik ===
+  for(var i=0;i<32;i++){
+    if(i%2===0)brush(t0+i*BT,0.3);
+    if(i%4===2)brush(t0+i*BT+BT*0.5,0.2); // Offbeat
+  }
+
+  // === MELODIE: Pfeifend, beschwingt, neugierig ===
+  // Phrase 1: "Oh! Was ist das?" (aufwaerts, staunend)
+  whist(E5,t0+1*BT,BT*0.8,0.5);
+  whist(G5,t0+2*BT,BT*0.6,0.5);
+  whist(A5,t0+3*BT,BT*1.5,0.55);
+  // Pause... dann:
+  whist(G5,t0+5*BT,BT*0.6,0.5);
+  whist(E5,t0+6*BT,BT*0.8,0.5);
+  whist(D5,t0+7*BT,BT*1.2,0.5);
+
+  // Phrase 2: "Hmm, interessant!" (spielerisch)
+  whist(C5,t0+9*BT,BT*0.5,0.5);
+  whist(D5,t0+9.5*BT,BT*0.5,0.5);
+  whist(E5,t0+10*BT,BT*0.5,0.5);
+  whist(G5,t0+11*BT,BT*1.8,0.55);
+  // Echo runter
+  whist(E5,t0+13*BT,BT*0.6,0.45);
+  whist(C5,t0+14*BT,BT*1.5,0.5);
+
+  // Phrase 3: "Aha!" (Entdeckung)
+  whist(G5,t0+17*BT,BT*0.4,0.5);
+  whist(A5,t0+17.5*BT,BT*0.4,0.55);
+  whist(G5,t0+18*BT,BT*1.2,0.5);
+  whist(E5,t0+19.5*BT,BT*0.8,0.5);
+  whist(F5,t0+20.5*BT,BT*0.6,0.5);
+  whist(E5,t0+21.5*BT,BT*2,0.55);
+
+  // Phrase 4: Zufriedenes Ende, "Schoen hier!"
+  whist(D5,t0+25*BT,BT*0.6,0.45);
+  whist(E5,t0+26*BT,BT*0.6,0.5);
+  whist(G5,t0+27*BT,BT*0.4,0.45);
+  whist(E5,t0+28*BT,BT*1.5,0.5);
+  whist(C5,t0+30*BT,BT*2,0.5);
+
+  // === GLOCKENSPIEL: Vereinzelte Sternchen ===
+  glock(C5*2,t0+2.5*BT,0.3);
+  glock(G5,t0+7.5*BT,0.3);
+  glock(E5*2,t0+12*BT,0.25);
+  glock(A5,t0+17.5*BT,0.3);
+  glock(D5*2,t0+22*BT,0.25);
+  glock(G5,t0+27.5*BT,0.3);
+  glock(C5*2,t0+31*BT,0.25);
+
+  return DUR;
+}
+
+function loop1(){if(!mp)return;var d=sched();lt=setTimeout(function(){if(mp)loop1();},(d-0.5)*1000);}
+function startM(){
+  ini();var go=function(){
+    mp=true;mg.gain.cancelScheduledValues(ax.currentTime);
+    mg.gain.setValueAtTime(0.0001,ax.currentTime);
+    mg.gain.linearRampToValueAtTime(0.55,ax.currentTime+2);
+    loop1();updMUI();
+  };
+  if(ax.state==='suspended')ax.resume().then(go);else go();
+}
+function stopM(){
+  mp=false;if(lt){clearTimeout(lt);lt=null;}
+  if(mg&&ax){try{mg.gain.cancelScheduledValues(ax.currentTime);mg.gain.setValueAtTime(mg.gain.value,ax.currentTime);mg.gain.linearRampToValueAtTime(0.0001,ax.currentTime+1.5);}catch(e){}}
+  updMUI();
+}
+window.toggleMusic=function(){if(mp)stopM();else startM();};
+function updMUI(){
+  var b=document.getElementById('musicBtn');if(!b)return;
+  if(mp){b.textContent='🔊';b.title='Musik aus';b.classList.add('mus-on');}
+  else{b.textContent='🎵';b.title='Musik an';b.classList.remove('mus-on');}
+}
+var ctrl=document.querySelector('.controls');
+if(ctrl){var b=document.createElement('button');b.id='musicBtn';b.className='ctrl mus-btn';b.textContent='🎵';b.title='Musik an';b.onclick=window.toggleMusic;ctrl.insertBefore(b,ctrl.firstChild);}
+var ms=document.createElement('style');
+ms.textContent='.mus-btn{transition:all .3s!important}.mus-btn.mus-on{background:rgba(126,224,160,.2)!important;box-shadow:0 0 12px rgba(126,224,160,.3)!important;animation:musPulse 3s ease-in-out infinite!important}@keyframes musPulse{0%,100%{box-shadow:0 0 8px rgba(126,224,160,.15)}50%{box-shadow:0 0 16px rgba(126,224,160,.35)}}';
+document.head.appendChild(ms);
+})();
+
+</script>
+</body>
+</html>
