@@ -1,26 +1,12 @@
-# Velomeld - Radwegecheck fuer Buerger
+# Velomeld Pro - Internes Repository
 
-Probleme, Wuensche und positive Erfahrungen zum Radverkehr melden - direkt vom Smartphone.
+Privates Repository fuer geschaeftskritische Komponenten.
 
-## Features
-- GPS-genaue Standorterfassung
-- Foto-Dokumentation
-- Offline-faehig
-- Export als GeoJSON, CSV, QGIS
-
-## Links
-- App: https://velomeld.2rat.org
-- Karte: https://velomeld.2rat.org/karte.html
-
-## Fuer Kommunen
-Kommunen koennen Velomeld als Beteiligungstool einsetzen.
-Kontakt: fahr2rat@gmail.com
-
-## Lizenz
-Proprietaer / Source Available - siehe LICENSE.
-Der Quellcode ist einsehbar, aber NICHT frei nutzbar.
-
-## Kontakt
-2RAT - Buero fuer Radverkehrsplanung
-Armin Jung, Radverkehrsplaner EIPOS
-https://www.2rat.org
+## Inhalt
+- dashboard.html - Admin-Dashboard
+- supabase-setup.sql - Datenbank-Schema
+- SUPABASE-SETUP.md - Setup-Dokumentation
+- outreach/ - Kommunen-Anschreiben
+- planer/ - RadPlan Pro
+- reports/ - PDF-Report-Templates
+- docs/ - Interne Dokumentation
