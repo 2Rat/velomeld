@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Radwegemelder â€“ Ã–ffentliche Karte</title>
+  <title>Radwegemelder â€“ Öffentliche Karte</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
@@ -128,7 +128,7 @@
   <div class="header">
     <div class="header__brand">
       <div class="header__title"><span>Radwege</span><span>melder</span></div>
-      <div class="header__subtitle" id="subtitle">Ã–ffentliche Meldungskarte Â· Saarland</div>
+      <div class="header__subtitle" id="subtitle">Öffentliche Meldungskarte · Saarland</div>
     </div>
     <div class="header__stats" id="stats"></div>
   </div>
@@ -143,7 +143,7 @@
       âš ï¸ Probleme <span class="filter-count" id="count-problems">0</span>
     </button>
     <button class="filter-btn filter-btn--wishes" data-filter="wishes" onclick="setFilter('wishes')">
-      ðŸ’¬ WÃ¼nsche <span class="filter-count" id="count-wishes">0</span>
+      ðŸ’¬ Wünsche <span class="filter-count" id="count-wishes">0</span>
     </button>
     <button class="filter-btn filter-btn--positive" data-filter="positive" onclick="setFilter('positive')">
       ðŸ‘ Positiv <span class="filter-count" id="count-positive">0</span>
@@ -152,11 +152,11 @@
 
   <div class="loading" id="loading">
     <div class="loading__spinner"></div>
-    Meldungen werden geladenâ€¦
+    Meldungen werden geladen…
   </div>
 
   <div class="info-box">
-    ðŸš² Mitmachen? <a href="https://2rat.github.io/velomeld/">Radwegemelder-App Ã¶ffnen</a>
+    ðŸš² Mitmachen? <a href="https://2rat.github.io/velomeld/">Radwegemelder-App öffnen</a>
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -166,14 +166,14 @@
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpbXNpa2p5b3VwaWhvZ21xdXVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0NTIyMjYsImV4cCI6MjA4NjAyODIyNn0._Foa5ZVr4nwoOlZ4T-ORX0U4sNUjgRJJRyBDHvHV2vo';
 
     const CATEGORIES = {
-      problems: { label: 'Problem', color: '#E00000', emoji: 'âš ï¸',
-        subs: { surface:{icon:'ðŸ•³ï¸',label:'OberflÃ¤che'}, narrow:{icon:'â†”ï¸',label:'Engstelle'}, crossing:{icon:'ðŸ”€',label:'Kreuzung / Knoten'}, traverse:{icon:'ðŸš¶',label:'Querung'}, conflict:{icon:'ðŸ’¥',label:'Konflikte'}, parking:{icon:'ðŸ…¿ï¸',label:'Parken'}, signage:{icon:'ðŸª§',label:'Wegweisung'}, lighting:{icon:'ðŸ’¡',label:'Beleuchtung'}, construction:{icon:'ðŸš§',label:'Baustelle'}, drainage:{icon:'ðŸ’§',label:'EntwÃ¤sserung'}, other:{icon:'ðŸ“',label:'Sonstiges'}, detour:{icon:'ðŸ”„',label:'Umleitung fehlt'}, barrier_free:{icon:'♿',label:'Barrierefreiheit'}, other_problem:{icon:'❗',label:'Sonstiges Problem'} }
+      problems: { label: 'Problem', color: '#E00000', emoji: '⚠️',
+        subs: { surface:{icon:'🕳️',label:'Oberfläche'}, narrow:{icon:'↔️',label:'Engstelle'}, crossing:{icon:'🔀',label:'Kreuzung / Knoten'}, traverse:{icon:'🚶',label:'Querung'}, conflict:{icon:'💥',label:'Konflikte'}, parking:{icon:'🅿️',label:'Parken'}, signage:{icon:'🪧',label:'Wegweisung'}, lighting:{icon:'💡',label:'Beleuchtung'}, construction:{icon:'🚧',label:'Baustelle'}, drainage:{icon:'💧',label:'Entwässerung'}, other:{icon:'📍',label:'Sonstiges'}, detour:{icon:'🔄',label:'Umleitung fehlt'}, barrier_free:{icon:'♿',label:'Barrierefreiheit'}, other_problem:{icon:'❗',label:'Sonstiges Problem'} }
       },
-      wishes: { label: 'Wunsch', color: '#E5A700', emoji: 'ðŸ’¬',
-        subs: { new_path:{icon:'ðŸ›¤ï¸',label:'Radweg gewÃ¼nscht'}, bike_parking:{icon:'ðŸ”’',label:'Abstellanlage'}, tempo30:{icon:'ðŸŒ',label:'Tempo 30'}, traffic_light:{icon:'ðŸš¦',label:'Ampelschaltung'}, bike_street:{icon:'ðŸš²',label:'FahrradstraÃŸe'}, oneway:{icon:'â†©ï¸',label:'EinbahnstraÃŸe Ã¶ffnen'} }
+      wishes: { label: 'Wunsch', color: '#E5A700', emoji: '💬',
+        subs: { new_path:{icon:'🛤️',label:'Radweg gewünscht'}, bike_parking:{icon:'🔒',label:'Abstellanlage'}, tempo30:{icon:'🐌',label:'Tempo 30'}, traffic_light:{icon:'🚦',label:'Ampelschaltung'}, bike_street:{icon:'🚲',label:'Fahrradstraße'}, oneway:{icon:'↩️',label:'Einbahnstraße öffnen'} }
       },
-      positive: { label: 'Positiv', color: '#00A836', emoji: 'ðŸ‘',
-        subs: { good_infra:{icon:'â­',label:'Gute Infrastruktur'}, safe_crossing:{icon:'âœ…',label:'Sichere Querung'}, service:{icon:'ðŸ› ï¸',label:'Service'}, bike_friendly_stop:{icon:'â˜•',label:'Fahrradfreundliche Einkehr'} }
+      positive: { label: 'Positiv', color: '#00A836', emoji: '👍',
+        subs: { good_infra:{icon:'⭐',label:'Gute Infrastruktur'}, safe_crossing:{icon:'✅',label:'Sichere Querung'}, service:{icon:'🛠️',label:'Service'}, bike_friendly_stop:{icon:'☕',label:'Fahrradfreundliche Einkehr'} }
       }
     };
 
@@ -207,7 +207,7 @@
     // â”€â”€â”€ Map Init â”€â”€â”€
     const map = L.map('map', { center: [49.35, 6.85], zoom: 10, zoomControl: true });
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: 'Â© <a href="https://openstreetmap.org">OpenStreetMap</a> Â· <a href="https://2rat.github.io/velomeld/">2Rat Radwegemelder</a>', maxZoom: 19
+      attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a> · <a href="https://2rat.github.io/velomeld/">2Rat Radwegemelder</a>', maxZoom: 19
     }).addTo(map);
 
     // â”€â”€â”€ Kommune-Geofence laden â”€â”€â”€
@@ -224,16 +224,16 @@
         // Banner anzeigen
         document.getElementById('kommuneBanner').classList.add('active');
         document.getElementById('kommuneName').textContent = kommuneName;
-        document.getElementById('subtitle').textContent = 'Meldungskarte Â· ' + kommuneName;
+        document.getElementById('subtitle').textContent = 'Meldungskarte · ' + kommuneName;
 
         // Zeitraum im Banner
         if (paramVon || paramBis) {
-          const vonStr = paramVon || 'â€¦';
-          const bisStr = paramBis || 'â€¦';
-          document.getElementById('kommuneInfo').textContent = 'Â· Aktionszeitraum: ' + vonStr + ' bis ' + bisStr;
+          const vonStr = paramVon || '…';
+          const bisStr = paramBis || '…';
+          document.getElementById('kommuneInfo').textContent = '· Aktionszeitraum: ' + vonStr + ' bis ' + bisStr;
         }
 
-        // Titel Ã¼berschreiben
+        // Titel überschreiben
         if (paramTitel) {
           document.getElementById('kommuneName').textContent = paramTitel;
           document.title = paramTitel + ' â€“ Radwegemelder';
