@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Radwegemelder â€“ Öffentliche Karte</title>
+  <title>Radwegemelder – Öffentliche Karte</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
@@ -121,7 +121,7 @@
 
   <!-- Kommune-Banner (nur bei ?kommune=...) -->
   <div class="kommune-banner" id="kommuneBanner">
-    ðŸ“ Radwegecheck <span class="kommune-banner__name" id="kommuneName"></span>
+    📍 Radwegecheck <span class="kommune-banner__name" id="kommuneName"></span>
     <span class="kommune-banner__info" id="kommuneInfo"></span>
   </div>
 
@@ -137,16 +137,16 @@
 
   <div class="filters">
     <button class="filter-btn filter-btn--all active" data-filter="all" onclick="setFilter('all')">
-      ðŸ“ Alle <span class="filter-count" id="count-all">0</span>
+      📍 Alle <span class="filter-count" id="count-all">0</span>
     </button>
     <button class="filter-btn filter-btn--problems" data-filter="problems" onclick="setFilter('problems')">
-      âš ï¸ Probleme <span class="filter-count" id="count-problems">0</span>
+      ⚠️ Probleme <span class="filter-count" id="count-problems">0</span>
     </button>
     <button class="filter-btn filter-btn--wishes" data-filter="wishes" onclick="setFilter('wishes')">
-      ðŸ’¬ Wünsche <span class="filter-count" id="count-wishes">0</span>
+      💬 Wünsche <span class="filter-count" id="count-wishes">0</span>
     </button>
     <button class="filter-btn filter-btn--positive" data-filter="positive" onclick="setFilter('positive')">
-      ðŸ‘ Positiv <span class="filter-count" id="count-positive">0</span>
+      👍 Positiv <span class="filter-count" id="count-positive">0</span>
     </button>
   </div>
 
@@ -156,7 +156,7 @@
   </div>
 
   <div class="info-box">
-    ðŸš² Mitmachen? <a href="https://2rat.github.io/velomeld/">Radwegemelder-App öffnen</a>
+    🚲 Mitmachen? <a href="https://2rat.github.io/velomeld/">Radwegemelder-App öffnen</a>
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -167,7 +167,7 @@
 
     const CATEGORIES = {
       problems: { label: 'Problem', color: '#E00000', emoji: '⚠️',
-        subs: { surface:{icon:'🕳️',label:'Oberfläche'}, narrow:{icon:'↔️',label:'Engstelle'}, crossing:{icon:'🔀',label:'Kreuzung / Knoten'}, traverse:{icon:'🚶',label:'Querung'}, conflict:{icon:'💥',label:'Konflikte'}, parking:{icon:'🅿️',label:'Parken'}, signage:{icon:'🪧',label:'Wegweisung'}, lighting:{icon:'💡',label:'Beleuchtung'}, construction:{icon:'🚧',label:'Baustelle'}, drainage:{icon:'💧',label:'Entwässerung'}, other:{icon:'📍',label:'Sonstiges'}, detour:{icon:'🔄',label:'Umleitung fehlt'}, barrier_free:{icon:'♿',label:'Barrierefreiheit'}, other_problem:{icon:'❗',label:'Sonstiges Problem'} }
+        subs: { surface:{icon:'🕳️',label:'Oberfläche'}, narrow:{icon:'↔️',label:'Engstelle'}, crossing:{icon:'🔀',label:'Kreuzung / Knoten'}, traverse:{icon:'🚶',label:'Querung'}, conflict:{icon:'💥',label:'Konflikte'}, parking:{icon:'🅿️',label:'Parken'}, signage:{icon:'🪧',label:'Wegweisung'}, lighting:{icon:'💡',label:'Beleuchtung'}, construction:{icon:'🚧',label:'Baustelle'}, drainage:{icon:'💧',label:'Entwässerung'}, other:{icon:'📝',label:'Sonstiges'}, detour:{icon:'🔄',label:'Umleitung fehlt'}, barrier_free:{icon:'♿',label:'Barrierefreiheit'}, other_problem:{icon:'❗',label:'Sonstiges Problem'} }
       },
       wishes: { label: 'Wunsch', color: '#E5A700', emoji: '💬',
         subs: { new_path:{icon:'🛤️',label:'Radweg gewünscht'}, bike_parking:{icon:'🔒',label:'Abstellanlage'}, tempo30:{icon:'🐌',label:'Tempo 30'}, traffic_light:{icon:'🚦',label:'Ampelschaltung'}, bike_street:{icon:'🚲',label:'Fahrradstraße'}, oneway:{icon:'↩️',label:'Einbahnstraße öffnen'} }
@@ -179,7 +179,7 @@
 
     function getSubInfo(cat, sub) {
       const c = CATEGORIES[cat];
-      if (!c) return { icon: 'ðŸ“', label: sub, color: '#888', catLabel: cat };
+      if (!c) return { icon: '📍', label: sub, color: '#888', catLabel: cat };
       const s = c.subs[sub];
       return { icon: s ? s.icon : c.emoji, label: s ? s.label : sub, color: c.color, catLabel: c.label };
     }
@@ -193,24 +193,24 @@
 
     const ICONS = { problems: createMarkerIcon('#E00000'), wishes: createMarkerIcon('#E5A700'), positive: createMarkerIcon('#00A836') };
 
-    // â”€â”€â”€ State â”€â”€â”€
+    // ─── State ───
     let allReports = [], filteredByGeo = [], currentFilter = 'all', clusterGroup;
     let kommuneMode = false, kommuneName = '', gfPoly = null;
 
-    // â”€â”€â”€ URL-Parameter lesen â”€â”€â”€
+    // ─── URL-Parameter lesen ───
     const params = new URLSearchParams(window.location.search);
     const paramKommune = params.get('kommune');
     const paramVon = params.get('von');
     const paramBis = params.get('bis');
     const paramTitel = params.get('titel');
 
-    // â”€â”€â”€ Map Init â”€â”€â”€
+    // ─── Map Init ───
     const map = L.map('map', { center: [49.35, 6.85], zoom: 10, zoomControl: true });
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a> · <a href="https://2rat.github.io/velomeld/">2Rat Radwegemelder</a>', maxZoom: 19
     }).addTo(map);
 
-    // â”€â”€â”€ Kommune-Geofence laden â”€â”€â”€
+    // ─── Kommune-Geofence laden ───
     async function loadKommuneGeofence(name) {
       try {
         const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(name + ', Deutschland')}&format=json&polygon_geojson=1&limit=1`, {
@@ -236,9 +236,9 @@
         // Titel überschreiben
         if (paramTitel) {
           document.getElementById('kommuneName').textContent = paramTitel;
-          document.title = paramTitel + ' â€“ Radwegemelder';
+          document.title = paramTitel + ' – Radwegemelder';
         } else {
-          document.title = 'Radwegecheck ' + kommuneName + ' â€“ Radwegemelder';
+          document.title = 'Radwegecheck ' + kommuneName + ' – Radwegemelder';
         }
 
         // Polygon zeichnen
@@ -256,7 +256,7 @@
       } catch (e) { console.error('Geofence-Fehler:', e); }
     }
 
-    // â”€â”€â”€ Point-in-Polygon â”€â”€â”€
+    // ─── Point-in-Polygon ───
     function inGeo(lat, lng) {
       if (!kommuneMode || !gfPoly) return true;
       if (gfPoly.getLayers) {
@@ -280,7 +280,7 @@
       return ins;
     }
 
-    // â”€â”€â”€ Daten laden â”€â”€â”€
+    // ─── Daten laden ───
     async function loadReports() {
       try {
         const resp = await fetch(SUPABASE_URL + '/rest/v1/reports?select=*&order=timestamp.desc&limit=5000', { headers: { 'apikey': SUPABASE_KEY } });
@@ -306,12 +306,12 @@
         }
       } catch (err) {
         console.error('Fehler:', err);
-        document.getElementById('loading').innerHTML = 'âŒ Meldungen konnten nicht geladen werden';
+        document.getElementById('loading').innerHTML = '❌ Meldungen konnten nicht geladen werden';
       }
       document.getElementById('loading').style.display = 'none';
     }
 
-    // â”€â”€â”€ Marker â”€â”€â”€
+    // ─── Marker ───
     function renderMarkers() {
       if (clusterGroup) map.removeLayer(clusterGroup);
       clusterGroup = L.markerClusterGroup({
@@ -338,7 +338,7 @@
         const marker = L.marker([r.latitude, r.longitude], { icon });
         marker._cat = r.category;
         const dateStr = new Date(r.timestamp).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-        marker.bindPopup(`<div class="popup"><div class="popup__header"><span class="popup__icon">${info.icon}</span><div><div class="popup__category">${info.label}</div><span class="popup__badge" style="background:${info.color}">${info.catLabel}</span></div></div>${r.comment ? '<div class="popup__comment">' + escapeHtml(r.comment) + '</div>' : ''}<div class="popup__meta">ðŸ“… ${dateStr}</div></div>`);
+        marker.bindPopup(`<div class="popup"><div class="popup__header"><span class="popup__icon">${info.icon}</span><div><div class="popup__category">${info.label}</div><span class="popup__badge" style="background:${info.color}">${info.catLabel}</span></div></div>${r.comment ? '<div class="popup__comment">' + escapeHtml(r.comment) + '</div>' : ''}<div class="popup__meta">📅 ${dateStr}</div></div>`);
         clusterGroup.addLayer(marker);
       });
       map.addLayer(clusterGroup);
@@ -362,9 +362,9 @@
 
     function escapeHtml(text) { const d = document.createElement('div'); d.textContent = text; return d.innerHTML; }
 
-    // â”€â”€â”€ Start â”€â”€â”€
+    // ─── Start ───
     async function init() {
-      // Wenn Kommune-Parameter da â†’ erst Geofence laden, dann Meldungen
+      // Wenn Kommune-Parameter da → erst Geofence laden, dann Meldungen
       if (paramKommune) {
         await loadKommuneGeofence(paramKommune);
       }
