@@ -9,10 +9,13 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root{--blue:#1A5FA8;--blue-dark:#14498A;--green:#2D8C28;--red:#E00000;--yellow:#E5A700;--green-pos:#00A836;--bg:#F4F6F9;--card:#FFF;--text:#2C3E50;--text-light:#7B8A9A;--border:#E2E8F0;--sidebar-w:400px;--header-h:56px}
-    *{margin:0;padding:0;box-sizing:border-box}body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden}
+    :root{--blue:#1A5FA8;--blue-dark:#14498A;--green:#2D8C28;--red:#E00000;--yellow:#E5A700;--green-pos:#00A836;--bg:#F4F6F9;--card:#FFF;--text:#2C3E50;--text-light:#7B8A9A;--border:#E2E8F0;--sidebar-w:400px;--header-h:56px;--tab-h:0px}
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden}
+
+    /* LOGIN */
     .login-overlay{position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#1A5FA8,#14498A);display:flex;align-items:center;justify-content:center}.login-overlay.hidden{display:none}
-    .login-box{background:#fff;border-radius:16px;padding:40px;width:380px;box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center}
+    .login-box{background:#fff;border-radius:16px;padding:40px;width:380px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center}
     .login-box__logo{font-size:22px;font-weight:800;color:var(--blue);margin-bottom:4px}.login-box__logo span{color:var(--green)}
     .login-box__sub{font-size:12px;color:var(--text-light);margin-bottom:28px}
     .login-box input{width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:14px;margin-bottom:12px;outline:none}
@@ -21,17 +24,24 @@
     .login-box__btn:hover{background:var(--blue-dark)}
     .login-box__error{color:var(--red);font-size:12px;margin-top:8px;display:none}
     .login-box__hint{font-size:11px;color:var(--text-light);margin-top:16px}
+
+    /* HEADER */
     .header{height:var(--header-h);background:var(--blue);display:flex;align-items:center;justify-content:space-between;padding:0 20px;color:#fff;z-index:1000;position:relative}
     .header__left{display:flex;align-items:center;gap:16px}.header__logo{font-size:18px;font-weight:800;letter-spacing:1px}.header__logo span{color:#7BC67E}
     .header__sub{font-size:12px;opacity:.7}.header__badge{background:rgba(255,255,255,.15);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}
     .header__right{display:flex;align-items:center;gap:12px;font-size:13px}
     .hbtn{background:rgba(255,255,255,.15);border:none;color:#fff;padding:6px 14px;border-radius:6px;cursor:pointer;font-family:inherit;font-size:13px}.hbtn:hover{background:rgba(255,255,255,.25)}
-    .layout{display:flex;height:calc(100vh - var(--header-h))}
+
+    /* LAYOUT */
+    .layout{display:flex;height:calc(100vh - var(--header-h) - var(--tab-h))}
     .sidebar{width:var(--sidebar-w);background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+    .map-container{flex:1;position:relative}#map{width:100%;height:100%}
+
+    /* SIDEBAR SECTIONS */
     .pbar{padding:12px 16px;border-bottom:1px solid var(--border);background:#F8FAFC}
     .pbar__lbl{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-light);margin-bottom:6px;font-weight:600}
     .pbar__sel{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px;font-weight:600;color:var(--text);background:#fff;cursor:pointer}
-    .pbar__meta{font-size:11px;color:var(--text-light);margin-top:6px;display:flex;gap:12px}
+    .pbar__meta{font-size:11px;color:var(--text-light);margin-top:6px;display:flex;gap:12px;flex-wrap:wrap}
     .stats{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--border)}
     .stat{padding:14px 8px;text-align:center;cursor:pointer;transition:background .2s;border-right:1px solid var(--border)}.stat:last-child{border-right:none}.stat:hover,.stat.active{background:var(--bg)}
     .stat__num{font-size:22px;font-weight:800}.stat__num--all{color:var(--blue)}.stat__num--problems{color:var(--red)}.stat__num--wishes{color:var(--yellow)}.stat__num--positive{color:var(--green-pos)}
@@ -45,19 +55,24 @@
     .kf__btn{padding:8px 14px;background:var(--blue);color:#fff;border:none;border-radius:6px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap}.kf__btn:hover{background:var(--blue-dark)}
     .kf__clr{background:none;color:var(--text-light);padding:8px 6px;font-size:16px}.kf__clr:hover{color:var(--red);background:none}
     .kf__st{font-size:11px;margin-top:6px}.kf__st--ok{color:var(--green);font-weight:600}.kf__st--err{color:var(--red)}
-    .ebar{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;gap:8px}
+    .ebar{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap}
     .ebtn{padding:5px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;color:var(--text)}.ebtn:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
     .chtog{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:13px;font-weight:600}.chtog:hover{background:var(--bg)}
     .chpan{display:none;padding:16px;border-bottom:1px solid var(--border)}.chpan.open{display:block}
     .chbar{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px}.chbar__l{width:100px;text-align:right;color:var(--text-light);flex-shrink:0;font-size:11px}.chbar__f{height:18px;border-radius:4px;transition:width .5s;min-width:2px}.chbar__n{font-weight:700;font-size:12px;min-width:24px}
-    .reports{flex:1;overflow-y:auto}
+    .reports{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
     .rpt{padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;display:flex;gap:12px;align-items:flex-start}.rpt:hover{background:var(--bg)}.rpt.active{background:#EBF5FF;border-left:3px solid var(--blue)}
     .rpt__dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:4px}.rpt__dot--problems{background:var(--red)}.rpt__dot--wishes{background:var(--yellow)}.rpt__dot--positive{background:var(--green-pos)}
     .rpt__body{flex:1;min-width:0}.rpt__cat{font-size:13px;font-weight:700}.rpt__com{font-size:12px;color:var(--text-light);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .rpt__meta{font-size:11px;color:var(--text-light);margin-top:4px;display:flex;gap:10px}
-    .map-container{flex:1;position:relative}#map{width:100%;height:100%}
+    .rpt__meta{font-size:11px;color:var(--text-light);margin-top:4px;display:flex;gap:10px;flex-wrap:wrap}
+    .rpt__status{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700}
+    .rpt__status--new{background:#FFF3CD;color:#856404}.rpt__status--approved{background:#D4EDDA;color:#155724}.rpt__status--rejected{background:#F8D7DA;color:#721C24}
+
+    /* GEOINFO */
     .geoinfo{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:1000;background:#fff;padding:8px 16px;border-radius:20px;box-shadow:0 2px 12px rgba(0,0,0,.12);font-size:12px;font-weight:600;display:none;align-items:center;gap:8px}.geoinfo.active{display:flex}
     .geoinfo__dot{width:8px;height:8px;border-radius:50%;background:var(--blue)}
+
+    /* DETAIL PANEL */
     .detail{width:360px;background:var(--card);border-left:1px solid var(--border);overflow-y:auto;display:none;flex-shrink:0}.detail.open{display:block}
     .detail__hdr{padding:16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
     .detail__title{font-size:16px;font-weight:700}.detail__close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-light);padding:4px 8px;border-radius:4px}.detail__close:hover{background:var(--bg)}
@@ -68,21 +83,90 @@
     .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;color:#fff}.badge--problems{background:var(--red)}.badge--wishes{background:var(--yellow)}.badge--positive{background:var(--green-pos)}
     .empty{padding:40px 20px;text-align:center;color:var(--text-light);font-size:14px}.empty__icon{font-size:40px;margin-bottom:12px}
     .loading{display:flex;align-items:center;justify-content:center;padding:40px;color:var(--text-light);font-size:14px}
-    .mod-bar{margin-top:14px;display:flex;gap:8px;align-items:center}
-    .mod-btn{padding:6px 14px;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s}
-    .mod-btn--ok{background:#E8F5E2;color:#2E7D32}.mod-btn--ok:hover{background:#C8E6C0}
-    .mod-btn--no{background:#FDE8E8;color:#C0392B}.mod-btn--no:hover{background:#F5C6C6}
-    .mod-status{font-size:11px;font-weight:600;padding:3px 8px;border-radius:4px}
-    .mod-status--new{background:#FFF3CD;color:#856404}
-    .mod-status--approved{background:#E8F5E2;color:#2E7D32}
-    .mod-status--rejected{background:#FDE8E8;color:#C0392B}
-    .rpt__st{display:inline-block;width:7px;height:7px;border-radius:50%;margin-left:5px;vertical-align:middle}
-    .rpt__st--new{background:#F0AD4E}.rpt__st--approved{background:#5CB85C}.rpt__st--rejected{background:#D9534F}
-    @media(max-width:1024px){.sidebar{width:340px}.detail{width:320px}}
-    @media(max-width:768px){.layout{flex-direction:column}.sidebar{width:100%;height:50vh}.map-container{height:50vh}.detail{display:none!important}}
+
+    /* MODERATION */
+    .mod{padding:16px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:10px}
+    .mod__label{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-light);font-weight:600}
+    .mod__status{font-size:13px;font-weight:700;padding:6px 12px;border-radius:8px;text-align:center}
+    .mod__status--new{background:#FFF3CD;color:#856404}
+    .mod__status--approved{background:#D4EDDA;color:#155724}
+    .mod__status--rejected{background:#F8D7DA;color:#721C24}
+    .mod__btns{display:flex;gap:8px}
+    .mod__btn{flex:1;padding:12px;border:none;border-radius:8px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s}
+    .mod__btn--approve{background:#D4EDDA;color:#155724}.mod__btn--approve:hover{background:#28A745;color:#fff}
+    .mod__btn--reject{background:#F8D7DA;color:#721C24}.mod__btn--reject:hover{background:#DC3545;color:#fff}
+    .mod__btn--pending{background:#FFF3CD;color:#856404}.mod__btn--pending:hover{background:#FFC107;color:#333}
+    .mod__btn.active{outline:3px solid var(--blue);outline-offset:2px}
+    .mod__toast{font-size:12px;text-align:center;padding:8px;border-radius:6px;background:#D4EDDA;color:#155724;display:none}
+
+    /* MOBILE TAB BAR */
+    .tab-bar{display:none;height:52px;background:var(--card);border-top:1px solid var(--border);position:fixed;bottom:0;left:0;right:0;z-index:2000}
+    .tab-bar__inner{display:flex;height:100%}
+    .tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;font-family:inherit;font-size:10px;font-weight:600;color:var(--text-light);cursor:pointer;transition:color .2s;position:relative}
+    .tab-btn.active{color:var(--blue)}
+    .tab-btn__icon{font-size:20px}
+    .tab-btn__badge{position:absolute;top:4px;right:calc(50% - 20px);width:8px;height:8px;border-radius:50%;background:var(--red);display:none}
+
+    /* ===== DESKTOP (default) ===== */
+    @media(min-width:1025px){
+      .sidebar{width:var(--sidebar-w)}.detail{width:360px}
+    }
+    @media(min-width:769px) and (max-width:1024px){
+      .sidebar{width:340px}.detail{width:320px}
+    }
+
+    /* ===== MOBILE ===== */
+    @media(max-width:768px){
+      :root{--header-h:48px;--tab-h:52px}
+      .header{padding:0 12px}
+      .header__logo{font-size:15px}
+      .header__sub,.header__badge,#lastUpdate,#headerUser{display:none}
+      .header__right{gap:6px}
+      .hbtn{padding:6px 10px;font-size:12px}
+      .hbtn--desktop{display:none}
+
+      .tab-bar{display:block}
+
+      .layout{height:calc(100vh - var(--header-h) - var(--tab-h));position:relative}
+
+      .sidebar{position:absolute;inset:0;width:100%;z-index:10;display:flex;flex-direction:column}
+      .map-container{position:absolute;inset:0;z-index:5}
+
+      .detail{position:fixed;top:0;left:0;right:0;bottom:0;width:100%;z-index:3000;overflow-y:auto;-webkit-overflow-scrolling:touch}
+      .detail__close{font-size:28px;padding:8px 12px}
+
+      /* Tab switching */
+      .sidebar{display:none}
+      .map-container{display:none}
+      .sidebar.mob-active{display:flex}
+      .map-container.mob-active{display:block}
+
+      /* Compact stats on mobile */
+      .stat{padding:10px 4px}
+      .stat__num{font-size:18px}
+      .stat__label{font-size:9px}
+
+      /* Export bar wrap */
+      .ebar{flex-wrap:wrap}
+      .ebtn{font-size:10px;padding:4px 8px}
+
+      /* Filters compact */
+      .filters{padding:8px 12px}
+      .kf{padding:8px 12px}
+
+      /* Report items */
+      .rpt{padding:12px}
+
+      /* Moderation buttons bigger on mobile */
+      .mod__btn{padding:14px;font-size:15px}
+
+      /* Project modal */
+      #pmModal>div{width:95vw!important;padding:20px!important}
+    }
   </style>
 </head>
 <body>
+  <!-- LOGIN -->
   <div class="login-overlay" id="loginOverlay">
     <div class="login-box">
       <div class="login-box__logo">RADWEGE<span>MELDER</span></div>
@@ -95,6 +179,7 @@
     </div>
   </div>
 
+  <!-- HEADER -->
   <header class="header">
     <div class="header__left">
       <div><div class="header__logo">RADWEGE<span>MELDER</span></div><span class="header__sub">Dashboard</span></div>
@@ -103,17 +188,17 @@
     <div class="header__right">
       <span id="lastUpdate"></span>
       <button class="hbtn" onclick="loadRpts()">🔄</button>
-      <span id="modBadge" style="display:none;background:#E00000;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;cursor:pointer" onclick="filterNew()"></span>
-      <button class="hbtn" onclick="openPM()">⚙️ Projekte</button>
-      <a href="konzept-check.html" style="color:#fff;text-decoration:none;font-size:13px;background:rgba(255,255,255,.15);padding:4px 12px;border-radius:20px;font-weight:600">&#x1F4CB; Konzept-Check</a>
-      <a href="https://2rat.github.io/velomeld/" style="color:#fff;text-decoration:none;font-size:13px" target="_blank">← App</a>
+      <button class="hbtn hbtn--desktop" onclick="openPM()">⚙️ Projekte</button>
+      <a href="https://2rat.github.io/velomeld/" style="color:#fff;text-decoration:none;font-size:13px" target="_blank" class="hbtn--desktop">← App</a>
       <span id="headerUser" style="font-size:12px;opacity:.7"></span>
       <button class="hbtn" onclick="doLogout()" title="Abmelden">🚪</button>
     </div>
   </header>
 
-  <div class="layout">
-    <aside class="sidebar">
+  <!-- MAIN LAYOUT -->
+  <div class="layout" id="layout">
+    <!-- SIDEBAR (Liste) -->
+    <aside class="sidebar mob-active" id="sidebar">
       <div class="pbar">
         <div class="pbar__lbl">📋 Projekt</div>
         <select class="pbar__sel" id="projSel" onchange="selProj()"><option value="all">Alle Meldungen</option></select>
@@ -122,7 +207,7 @@
       <div class="kf">
         <div class="flbl" style="margin-bottom:6px">📍 Kommune / Geofence</div>
         <div class="kf__row">
-          <input type="text" class="kf__inp" id="komInp" placeholder="z.B. Lebach, Schmelz, Saarlouis…">
+          <input type="text" class="kf__inp" id="komInp" placeholder="z.B. Lebach, Schmelz…">
           <button class="kf__btn" onclick="applyGeo()">Filtern</button>
           <button class="kf__btn kf__clr" onclick="clearGeo()" title="Löschen">✕</button>
         </div>
@@ -148,22 +233,61 @@
         <button class="ebtn" onclick="exGJ()">📥 GeoJSON</button>
         <button class="ebtn" onclick="exCSV()">📥 CSV</button>
         <button class="ebtn" onclick="exPDF()">📄 PDF-Bericht</button>
+        <button class="ebtn hbtn--desktop" onclick="openPM()">⚙️ Projekte</button>
       </div>
       <div class="chtog" onclick="togCh()"><span>📊 Statistiken</span><span id="chArr">▼</span></div>
       <div class="chpan" id="chPan"><div id="chBars"></div></div>
       <div class="reports" id="rptList"><div class="loading">Meldungen werden geladen…</div></div>
     </aside>
-    <div class="map-container">
+
+    <!-- MAP -->
+    <div class="map-container" id="mapWrap">
       <div id="map"></div>
       <div class="geoinfo" id="geoInfo"><div class="geoinfo__dot"></div><span id="geoLbl"></span></div>
     </div>
+
+    <!-- DETAIL PANEL -->
     <aside class="detail" id="detPan">
-      <div class="detail__hdr"><div class="detail__title" id="detTitle">Meldung</div><button class="detail__close" onclick="closeDet()">✕</button></div>
+      <div class="detail__hdr">
+        <div class="detail__title" id="detTitle">Meldung</div>
+        <button class="detail__close" onclick="closeDet()">✕</button>
+      </div>
       <img class="detail__photo" id="detPhoto" style="display:none">
       <div class="detail__body" id="detBody"></div>
+      <div class="mod" id="detMod">
+        <div class="mod__label">Moderation</div>
+        <div class="mod__status mod__status--new" id="modStatus">Neu – Prüfung ausstehend</div>
+        <div class="mod__btns">
+          <button class="mod__btn mod__btn--approve" onclick="modReport('approved')">✅ Freigeben</button>
+          <button class="mod__btn mod__btn--reject" onclick="modReport('rejected')">❌ Ablehnen</button>
+        </div>
+        <div class="mod__btns">
+          <button class="mod__btn mod__btn--pending" onclick="modReport('new')">🔄 Zurücksetzen</button>
+        </div>
+        <div class="mod__toast" id="modToast"></div>
+      </div>
     </aside>
   </div>
 
+  <!-- MOBILE TAB BAR -->
+  <div class="tab-bar" id="tabBar">
+    <div class="tab-bar__inner">
+      <button class="tab-btn active" onclick="mobTab('list')" id="tabList">
+        <span class="tab-btn__icon">📋</span>
+        <span>Liste</span>
+      </button>
+      <button class="tab-btn" onclick="mobTab('map')" id="tabMap">
+        <span class="tab-btn__icon">🗺️</span>
+        <span>Karte</span>
+      </button>
+      <button class="tab-btn" onclick="mobTab('settings')" id="tabSettings">
+        <span class="tab-btn__icon">⚙️</span>
+        <span>Mehr</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- PROJECT MODAL -->
   <div id="pmModal" style="display:none;position:fixed;inset:0;z-index:5000;background:rgba(0,0,0,.5);align-items:center;justify-content:center">
     <div style="background:#fff;border-radius:16px;padding:32px;width:520px;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
@@ -192,7 +316,7 @@
 const SB_URL='https://vimsikjyoupihogmquul.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpbXNpa2p5b3VwaWhvZ21xdXVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0NTIyMjYsImV4cCI6MjA4NjAyODIyNn0._Foa5ZVr4nwoOlZ4T-ORX0U4sNUjgRJJRyBDHvHV2vo';
 const USERS={admin:{pass:'2rat2026',name:'2Rat Admin'},planer:{pass:'radverkehr',name:'Fachplaner'}};
-var curUser=null;
+var curUser=null,curRptId=null;
 function doLogin(){const u=$('loginUser').value.trim(),p=$('loginPass').value;if(USERS[u]&&USERS[u].pass===p){curUser={...USERS[u],id:u};localStorage.setItem('du',JSON.stringify(curUser));showDB();}else $('loginError').style.display='block';}
 function doLogout(){localStorage.removeItem('du');curUser=null;$('loginOverlay').classList.remove('hidden');}
 function showDB(){$('loginOverlay').classList.add('hidden');$('headerUser').textContent=curUser.name;loadProj();loadRpts();}
@@ -200,12 +324,39 @@ $('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 const sv=localStorage.getItem('du');if(sv){const parsed=JSON.parse(sv);if(parsed.id&&USERS[parsed.id]){curUser=parsed;showDB();}else{localStorage.removeItem('du');}}
 
 const CL={problems:'Problem',wishes:'Wunsch',positive:'Positiv'};
-const SL={surface:'Oberfläche',narrow:'Engstelle',crossing:'Kreuzung/Knoten',traverse:'Querung',conflict:'Konflikte',parking:'Parken',signage:'Wegweisung',wrong_signage:'Falsche Beschilderung',lighting:'Beleuchtung',winter:'Winterdienst / Reinigung',construction:'Baustelle',drainage:'Entwässerung',other:'Sonstiges',other_problem:'Sonstiges Problem',barrier_free:'Barrierefreiheit',new_path:'Radweg gewünscht',bike_parking:'Abstellanlage',tempo30:'Tempo 30',traffic_light:'Ampelschaltung',bike_street:'Fahrradstraße',oneway:'Einbahnstraße öffnen',good_infra:'Gute Infrastruktur',safe_crossing:'Sichere Querung',service:'Service',detour:'Umleitung fehlt',bike_friendly_stop:'Fahrradfreundl. Einkehr'};
+const SL={surface:'Oberfläche',narrow:'Engstelle',crossing:'Kreuzung/Knoten',traverse:'Querung',conflict:'Konflikte',parking:'Parken',signage:'Wegweisung',lighting:'Beleuchtung',construction:'Baustelle',drainage:'Entwässerung',other_problem:'Sonstiges',new_path:'Radweg gewünscht',bike_parking:'Abstellanlage',tempo30:'Tempo 30',traffic_light:'Ampelschaltung',bike_street:'Fahrradstraße',oneway:'Einbahnstraße öffnen',good_infra:'Gute Infrastruktur',safe_crossing:'Sichere Querung',service:'Service',detour:'Umleitung fehlt',bike_friendly_stop:'Fahrradfreundl. Einkehr',wrong_signage:'Falsche Beschilderung',barrier_free:'Barrierefreiheit',winter:'Winterdienst'};
 const CC={problems:'#E00000',wishes:'#E5A700',positive:'#00A836'};
+const STS={new:'Neu',approved:'Freigegeben',rejected:'Abgelehnt'};
 var all=[],filt=[],aCat='all',mkrs={},mc,gfPoly=null,gfOn=false,projs=[],aProj=null;
 function $(id){return document.getElementById(id);}
 
-// Projects
+// ============ MOBILE TAB SWITCHING ============
+var mobView='list';
+function isMobile(){return window.innerWidth<=768;}
+function mobTab(view){
+  mobView=view;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  $('sidebar').classList.remove('mob-active');
+  $('mapWrap').classList.remove('mob-active');
+
+  if(view==='list'){
+    $('tabList').classList.add('active');
+    $('sidebar').classList.add('mob-active');
+  } else if(view==='map'){
+    $('tabMap').classList.add('active');
+    $('mapWrap').classList.add('mob-active');
+    setTimeout(()=>map.invalidateSize(),100);
+  } else if(view==='settings'){
+    $('tabSettings').classList.add('active');
+    openPM();
+    // Switch back to list after modal closes
+    $('sidebar').classList.add('mob-active');
+    $('tabList').classList.add('active');
+    $('tabSettings').classList.remove('active');
+  }
+}
+
+// ============ PROJECTS ============
 function loadProj(){projs=JSON.parse(localStorage.getItem('rp')||'[]');rProjSel();rProjList();}
 function saveProj(){localStorage.setItem('rp',JSON.stringify(projs));rProjSel();rProjList();}
 function addProj(){
@@ -222,7 +373,7 @@ function addProj(){
   msg.style.display='block';
   setTimeout(function(){msg.style.display='none';},4000);
 }
-function delProj(id){if(!confirm('Projekt wirklich loeschen?'))return;projs=projs.filter(function(p){return p.id!==id;});if(aProj&&aProj.id===id){aProj=null;$('projSel').value='all';}saveProj();af();}
+function delProj(id){if(!confirm('Projekt wirklich löschen?'))return;projs=projs.filter(function(p){return p.id!==id;});if(aProj&&aProj.id===id){aProj=null;$('projSel').value='all';}saveProj();af();}
 function rProjSel(){var s=$('projSel');s.innerHTML='<option value="all">Alle Meldungen</option>';projs.forEach(function(p){var o=document.createElement('option');o.value=p.id;o.textContent=p.name+(p.kommune?' ('+p.kommune+')':'');s.appendChild(o);});}
 function rProjList(){
   var c=$('pmList');
@@ -240,16 +391,13 @@ function rProjList(){
     var meta=document.createElement('div');
     meta.style.cssText='font-size:11px;color:#7B8A9A;margin-top:2px';
     meta.textContent=(p.kommune?'📍 '+p.kommune:'')+(p.dateFrom?' · 📅 '+p.dateFrom+' – '+(p.dateTo||'offen'):'');
-    info.appendChild(title);
-    info.appendChild(meta);
+    info.appendChild(title);info.appendChild(meta);
     var delBtn=document.createElement('button');
-    delBtn.textContent='🗑️';
-    delBtn.title='Loeschen';
+    delBtn.textContent='🗑️';delBtn.title='Löschen';
     delBtn.style.cssText='background:none;border:none;color:#E00000;cursor:pointer;font-size:16px;padding:2px 6px';
     delBtn.setAttribute('data-id',p.id);
     delBtn.onclick=function(){delProj(this.getAttribute('data-id'));};
-    header.appendChild(info);
-    header.appendChild(delBtn);
+    header.appendChild(info);header.appendChild(delBtn);
     card.appendChild(header);
     if(p.kommune){
       var linkUrl=getProjLink(p);
@@ -257,13 +405,11 @@ function rProjList(){
       linkSection.style.cssText='margin-top:10px;padding-top:10px;border-top:1px solid #E2E8F0';
       var linkLabel=document.createElement('div');
       linkLabel.style.cssText='font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#7B8A9A;font-weight:600;margin-bottom:6px';
-      linkLabel.textContent='🔗 Oeffentlicher Aktions-Link';
+      linkLabel.textContent='🔗 Öffentlicher Aktions-Link';
       var linkRow=document.createElement('div');
       linkRow.style.cssText='display:flex;gap:6px';
       var linkInp=document.createElement('input');
-      linkInp.type='text';
-      linkInp.readOnly=true;
-      linkInp.value=linkUrl;
+      linkInp.type='text';linkInp.readOnly=true;linkInp.value=linkUrl;
       linkInp.style.cssText='flex:1;padding:6px 8px;border:1px solid #E2E8F0;border-radius:6px;font-family:inherit;font-size:11px;color:#2C3E50;background:#F8FAFC';
       linkInp.onclick=function(){this.select();};
       var copyBtn=document.createElement('button');
@@ -271,17 +417,11 @@ function rProjList(){
       copyBtn.style.cssText='padding:6px 12px;background:#1A5FA8;color:#fff;border:none;border-radius:6px;font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap';
       copyBtn.setAttribute('data-url',linkUrl);
       copyBtn.onclick=function(){
-        var url=this.getAttribute('data-url');
-        var btn=this;
-        navigator.clipboard.writeText(url).then(function(){
-          btn.textContent='Kopiert!';
-          setTimeout(function(){btn.textContent='📋 Kopieren';},2000);
-        }).catch(function(){prompt('Link kopieren:',url);});
+        var url=this.getAttribute('data-url');var btn=this;
+        navigator.clipboard.writeText(url).then(function(){btn.textContent='Kopiert!';setTimeout(function(){btn.textContent='📋 Kopieren';},2000);}).catch(function(){prompt('Link kopieren:',url);});
       };
-      linkRow.appendChild(linkInp);
-      linkRow.appendChild(copyBtn);
-      linkSection.appendChild(linkLabel);
-      linkSection.appendChild(linkRow);
+      linkRow.appendChild(linkInp);linkRow.appendChild(copyBtn);
+      linkSection.appendChild(linkLabel);linkSection.appendChild(linkRow);
       card.appendChild(linkSection);
     }
     c.appendChild(card);
@@ -295,7 +435,7 @@ if(aProj.dateFrom)$('fFrom').value=aProj.dateFrom;if(aProj.dateTo)$('fTo').value
 $('projMeta').innerHTML=(aProj.kommune?'<span>📍 '+esc(aProj.kommune)+'</span>':'')+(aProj.dateFrom?'<span>📅 '+aProj.dateFrom+' – '+(aProj.dateTo||'…')+'</span>':'')+(aProj.kommune?'<br><a href="'+getProjLink(aProj)+'" target="_blank" style="color:var(--blue);font-size:11px;text-decoration:none">🔗 Öffentliche Karte öffnen</a>':'');}
 function openPM(){$('pmModal').style.display='flex';}function closePM(){$('pmModal').style.display='none';}
 
-// Map
+// ============ MAP ============
 const map=L.map('map').setView([49.35,6.85],10);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap · 2Rat',maxZoom:19}).addTo(map);
 mc=L.markerClusterGroup({maxClusterRadius:50,spiderfyOnMaxZoom:true,showCoverageOnHover:false,
@@ -303,7 +443,7 @@ iconCreateFunction(cl){const n=cl.getChildCount(),sz=n<10?36:n<50?44:52,cats={};
 map.addLayer(mc);
 function mkIco(cat){const c=CC[cat]||'#999';return L.divIcon({html:'<svg xmlns="http://www.w3.org/2000/svg" width="28" height="36" viewBox="0 0 28 36"><path d="M14 0C6.27 0 0 6.27 0 14c0 10.5 14 22 14 22s14-11.5 14-22C28 6.27 21.73 0 14 0z" fill="'+c+'" stroke="white" stroke-width="1.5"/><circle cx="14" cy="13" r="6" fill="white" opacity="0.9"/></svg>',iconSize:[28,36],iconAnchor:[14,36],popupAnchor:[0,-36],className:''});}
 
-// Geofence
+// ============ GEOFENCE ============
 async function applyGeo(){const q=$('komInp').value.trim();if(!q)return;const st=$('komSt');st.textContent='Suche…';st.className='kf__st';
 try{const res=await fetch('https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(q+', Deutschland')+'&format=json&polygon_geojson=1&limit=1',{headers:{'User-Agent':'2Rat-Dashboard/1.0'}});const data=await res.json();
 if(!data.length){st.textContent='❌ Nicht gefunden.';st.className='kf__st kf__st--err';return;}const r=data[0];
@@ -318,12 +458,18 @@ function inGeo(lat,lng){if(!gfOn||!gfPoly)return true;if(gfPoly.getLayers){for(c
 function rc(pt,poly){let ins=false;for(let i=0,j=poly.length-1;i<poly.length;j=i++){const yi=poly[i].lng,xi=poly[i].lat,yj=poly[j].lng,xj=poly[j].lat;if((yi>pt.lng)!==(yj>pt.lng)&&pt.lat<(xj-xi)*(pt.lng-yi)/(yj-yi)+xi)ins=!ins;}return ins;}
 $('komInp').addEventListener('keydown',e=>{if(e.key==='Enter')applyGeo();});
 
-// Load
-async function loadRpts(){try{const res=await fetch(SB_URL+'/rest/v1/reports?order=timestamp.desc&limit=5000',{headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}});if(!res.ok)throw 0;all=await res.json();$('lastUpdate').textContent='Stand: '+new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});af();updBadge();}catch(e){$('rptList').innerHTML='<div class="empty"><div class="empty__icon">⚠️</div>Fehler beim Laden.</div>';}}
-function updBadge(){var n=all.filter(x=>!x.status||x.status==='new').length;var b=$('modBadge');if(n>0){b.textContent='⚡ '+n+' neue';b.style.display='inline';}else{b.style.display='none';}}
-function filterNew(){var el=$('fSearch');el.value='';aCat='all';filt=all.filter(x=>!x.status||x.status==='new');rList();rMap();}
+// ============ LOAD DATA ============
+async function loadRpts(){
+  try{
+    const res=await fetch(SB_URL+'/rest/v1/reports?order=timestamp.desc&limit=5000',{headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}});
+    if(!res.ok)throw 0;
+    all=await res.json();
+    $('lastUpdate').textContent='Stand: '+new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+    af();
+  }catch(e){$('rptList').innerHTML='<div class="empty"><div class="empty__icon">⚠️</div>Fehler beim Laden.</div>';}
+}
 
-// Filters
+// ============ FILTERS ============
 function fCat(c,el){aCat=c;document.querySelectorAll('.stat').forEach(s=>s.classList.remove('active'));if(el)el.classList.add('active');af();}
 function af(){let r=[...all];if(aCat!=='all')r=r.filter(x=>x.category===aCat);
 const sc=$('fSub').value;if(sc)r=r.filter(x=>x.subcategory===sc);
@@ -335,37 +481,109 @@ filt=r;uStats();uSub();rList();rMap();rCh();}
 function uStats(){const b=(gfOn||$('fFrom').value||$('fTo').value)?filt:all;$('cAll').textContent=b.length;$('cProb').textContent=b.filter(r=>r.category==='problems').length;$('cWish').textContent=b.filter(r=>r.category==='wishes').length;$('cPos').textContent=b.filter(r=>r.category==='positive').length;}
 function uSub(){const sel=$('fSub'),cur=sel.value,rel=aCat==='all'?filt:filt.filter(r=>r.category===aCat);const subs=[...new Set(rel.map(r=>r.subcategory).filter(Boolean))].sort((a,b)=>(SL[a]||a).localeCompare(SL[b]||b));sel.innerHTML='<option value="">Alle Unterkategorien</option>';subs.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=SL[s]||s;if(s===cur)o.selected=true;sel.appendChild(o);});}
 
-function rList(){const c=$('rptList');if(!filt.length){c.innerHTML='<div class="empty"><div class="empty__icon">📭</div>Keine Meldungen.</div>';return;}
-c.innerHTML=filt.map(r=>'<div class="rpt" onclick="selRpt(\''+r.id+'\')" id="r-'+r.id+'"><div class="rpt__dot rpt__dot--'+r.category+'"></div><div class="rpt__body"><div class="rpt__cat">'+(SL[r.subcategory]||r.subcategory||CL[r.category])+'<span class="rpt__st rpt__st--'+(r.status||'new')+'"></span></div>'+(r.comment?'<div class="rpt__com">'+esc(r.comment)+'</div>':'')+'<div class="rpt__meta"><span>📅 '+fD(r.timestamp)+'</span>'+(r.has_photo?'<span style="color:var(--blue)">📷</span>':'')+'</div></div></div>').join('');}
+// ============ REPORT LIST ============
+function rList(){const c=$('rptList');if(!filt.length){c.innerHTML='<div class="empty"><div class="empty__icon">🔭</div>Keine Meldungen.</div>';return;}
+c.innerHTML=filt.map(r=>{
+  const st=r.status||'new';
+  const stLabel=st==='approved'?' <span class="rpt__status rpt__status--approved">✅</span>':st==='rejected'?' <span class="rpt__status rpt__status--rejected">❌</span>':r.subcategory==='other_problem'?' <span class="rpt__status rpt__status--new">⏳</span>':'';
+  return '<div class="rpt" onclick="selRpt(\''+r.id+'\')" id="r-'+r.id+'"><div class="rpt__dot rpt__dot--'+r.category+'"></div><div class="rpt__body"><div class="rpt__cat">'+(SL[r.subcategory]||r.subcategory||CL[r.category])+stLabel+'</div>'+(r.comment?'<div class="rpt__com">'+esc(r.comment)+'</div>':'')+'<div class="rpt__meta"><span>📅 '+fD(r.timestamp)+'</span>'+(r.has_photo?'<span style="color:var(--blue)">📷</span>':'')+'</div></div></div>';
+}).join('');}
 
 function rMap(){mc.clearLayers();mkrs={};filt.forEach(r=>{if(!r.latitude||!r.longitude)return;const m=L.marker([r.latitude,r.longitude],{icon:mkIco(r.category)});m._c=r.category;m.on('click',()=>selRpt(r.id));mc.addLayer(m);mkrs[r.id]=m;});
 if(filt.length&&mc.getLayers().length&&!gfOn)try{map.fitBounds(mc.getBounds(),{padding:[40,40],maxZoom:14});}catch(e){}}
 
 function rCh(){const c=$('chBars'),counts={};filt.forEach(r=>{const l=SL[r.subcategory]||r.subcategory||'?';counts[l]=(counts[l]||0)+1;});const sorted=Object.entries(counts).sort((a,b)=>b[1]-a[1]);const mx=sorted.length?sorted[0][1]:1;
 c.innerHTML=sorted.map(([l,n])=>{const rp=filt.find(r=>(SL[r.subcategory]||r.subcategory)===l);const col=rp?CC[rp.category]:'#999';return '<div class="chbar"><div class="chbar__l">'+l+'</div><div class="chbar__f" style="width:'+Math.max(n/mx*100,5)+'%;background:'+col+'"></div><div class="chbar__n">'+n+'</div></div>';}).join('')||'<div style="color:var(--text-light);font-size:12px;text-align:center">Keine Daten</div>';}
-function togCh(){const p=$('chPan'),a=$('chArr');p.classList.toggle('open');a.textContent=p.classList.contains('open')?'â–²':'â–¼';}
+function togCh(){const p=$('chPan'),a=$('chArr');p.classList.toggle('open');a.textContent=p.classList.contains('open')?'▲':'▼';}
 
-// Detail
-function selRpt(id){const r=all.find(x=>x.id===id);if(!r)return;document.querySelectorAll('.rpt').forEach(e=>e.classList.remove('active'));
-const el=$('r-'+id);if(el){el.classList.add('active');el.scrollIntoView({behavior:'smooth',block:'nearest'});}
-if(r.latitude&&r.longitude&&mkrs[id])map.setView([r.latitude,r.longitude],16);
-const ph=$('detPhoto'),bd=$('detBody');$('detTitle').textContent=SL[r.subcategory]||CL[r.category]||'Meldung';
-ph.style.display='none';if(r.has_photo||r.photo_url){ph.src=r.photo_url||SB_URL+'/storage/v1/object/public/photos/'+r.id+'.jpg';ph.style.display='block';ph.onerror=()=>{ph.style.display='none';};}
-bd.innerHTML='<div class="detail__row"><span class="detail__label">Kategorie</span><span class="badge badge--'+r.category+'">'+(CL[r.category]||r.category)+'</span></div><div class="detail__row"><span class="detail__label">Unterkategorie</span><span class="detail__value">'+(SL[r.subcategory]||r.subcategory||'–')+'</span></div><div class="detail__row"><span class="detail__label">Datum</span><span class="detail__value">'+fDT(r.timestamp)+'</span></div><div class="detail__row"><span class="detail__label">Koordinaten</span><span class="detail__value">'+(r.latitude?r.latitude.toFixed(5):'–')+', '+(r.longitude?r.longitude.toFixed(5):'–')+'</span></div>'+(r.accuracy?'<div class="detail__row"><span class="detail__label">GPS-Genauigkeit</span><span class="detail__value">'+Math.round(r.accuracy)+' m</span></div>':'')+(r.comment?'<div class="detail__comment">'+esc(r.comment)+'</div>':'');
-$('detPan').classList.add('open');
-var mb=document.createElement('div');mb.className='mod-bar';
-mb.innerHTML='<span class="mod-status mod-status--'+(r.status||'new')+'">'+(r.status==='approved'?'Freigegeben':r.status==='rejected'?'Abgelehnt':'Neu')+'</span>'+'<button class="mod-btn mod-btn--ok" onclick="setStatus(\''+r.id+'\',\'approved\')">Freigeben</button>'+'<button class="mod-btn mod-btn--no" onclick="setStatus(\''+r.id+'\',\'rejected\')">Ablehnen</button>';
-$('detBody').appendChild(mb);}
-async function setStatus(id,st){try{const resp=await fetch(SB_URL+'/rest/v1/reports?id=eq.'+id,{method:'PATCH',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({status:st})});if(!resp.ok)throw new Error('HTTP '+resp.status);var r=all.find(x=>x.id===id);if(r)r.status=st;selRpt(id);af();}catch(e){alert('Fehler: '+e.message);}}
-function closeDet(){$('detPan').classList.remove('open');document.querySelectorAll('.rpt').forEach(e=>e.classList.remove('active'));}
+// ============ DETAIL + MODERATION ============
+function selRpt(id){
+  const r=all.find(x=>x.id===id);if(!r)return;
+  curRptId=id;
+  document.querySelectorAll('.rpt').forEach(e=>e.classList.remove('active'));
+  const el=$('r-'+id);if(el){el.classList.add('active');el.scrollIntoView({behavior:'smooth',block:'nearest'});}
+  if(r.latitude&&r.longitude&&mkrs[id])map.setView([r.latitude,r.longitude],16);
 
-// Export
-function exGJ(){const gj={type:'FeatureCollection',features:filt.filter(r=>r.latitude&&r.longitude).map(r=>({type:'Feature',geometry:{type:'Point',coordinates:[r.longitude,r.latitude]},properties:{id:r.id,category:r.category,subcategory:r.subcategory,comment:r.comment||'',timestamp:r.timestamp}}))};dlF(JSON.stringify(gj,null,2),'radwegemelder.geojson','application/json');}
-function exCSV(){const h='ID;Kategorie;Unterkategorie;Kommentar;Latitude;Longitude;Datum\n';const rows=filt.map(r=>'"'+r.id+'";"'+(CL[r.category]||'')+'";"'+(SL[r.subcategory]||'')+'";"'+((r.comment||'').replace(/"/g,'""'))+'";'+(r.latitude||'')+';'+(r.longitude||'')+';"'+fDT(r.timestamp)+'"').join('\n');dlF('\ufeff'+h+rows,'radwegemelder.csv','text/csv;charset=utf-8');}
+  const ph=$('detPhoto'),bd=$('detBody');
+  $('detTitle').textContent=SL[r.subcategory]||CL[r.category]||'Meldung';
+  ph.style.display='none';
+  if(r.has_photo||r.photo_url){ph.src=r.photo_url||SB_URL+'/storage/v1/object/public/photos/'+r.id+'.jpg';ph.style.display='block';ph.onerror=()=>{ph.style.display='none';};}
+
+  bd.innerHTML='<div class="detail__row"><span class="detail__label">Kategorie</span><span class="badge badge--'+r.category+'">'+(CL[r.category]||r.category)+'</span></div><div class="detail__row"><span class="detail__label">Unterkategorie</span><span class="detail__value">'+(SL[r.subcategory]||r.subcategory||'–')+'</span></div><div class="detail__row"><span class="detail__label">Datum</span><span class="detail__value">'+fDT(r.timestamp)+'</span></div><div class="detail__row"><span class="detail__label">Koordinaten</span><span class="detail__value">'+(r.latitude?r.latitude.toFixed(5):'–')+', '+(r.longitude?r.longitude.toFixed(5):'–')+'</span></div>'+(r.accuracy?'<div class="detail__row"><span class="detail__label">GPS-Genauigkeit</span><span class="detail__value">'+Math.round(r.accuracy)+' m</span></div>':'')+(r.comment?'<div class="detail__comment">💬 '+esc(r.comment)+'</div>':'');
+
+  // Moderation status
+  const st=r.status||'new';
+  const modSt=$('modStatus');
+  modSt.className='mod__status mod__status--'+st;
+  modSt.textContent=st==='approved'?'✅ Freigegeben':st==='rejected'?'❌ Abgelehnt':'⏳ Neu – Prüfung ausstehend';
+
+  $('detPan').classList.add('open');
+
+  // On mobile: switch to map briefly, then show detail
+  if(isMobile()){
+    $('mapWrap').classList.add('mob-active');
+    $('sidebar').classList.remove('mob-active');
+    setTimeout(()=>map.invalidateSize(),50);
+  }
+}
+
+function closeDet(){
+  $('detPan').classList.remove('open');
+  curRptId=null;
+  document.querySelectorAll('.rpt').forEach(e=>e.classList.remove('active'));
+  // On mobile: go back to list
+  if(isMobile()){mobTab('list');}
+}
+
+// Moderation: update status via Supabase
+async function modReport(newStatus){
+  if(!curRptId)return;
+  const toast=$('modToast');
+  toast.style.display='none';
+  try{
+    const res=await fetch(SB_URL+'/rest/v1/reports?id=eq.'+curRptId,{
+      method:'PATCH',
+      headers:{
+        apikey:SB_KEY,
+        Authorization:'Bearer '+SB_KEY,
+        'Content-Type':'application/json',
+        Prefer:'return=minimal'
+      },
+      body:JSON.stringify({status:newStatus})
+    });
+    if(!res.ok)throw new Error('Status '+res.status);
+
+    // Update local data
+    const rpt=all.find(x=>x.id===curRptId);
+    if(rpt)rpt.status=newStatus;
+
+    // Update UI
+    const modSt=$('modStatus');
+    modSt.className='mod__status mod__status--'+newStatus;
+    modSt.textContent=newStatus==='approved'?'✅ Freigegeben':newStatus==='rejected'?'❌ Abgelehnt':'⏳ Neu – Prüfung ausstehend';
+
+    toast.textContent=newStatus==='approved'?'Meldung freigegeben!':newStatus==='rejected'?'Meldung abgelehnt.':'Status zurückgesetzt.';
+    toast.style.background=newStatus==='approved'?'#D4EDDA':newStatus==='rejected'?'#F8D7DA':'#FFF3CD';
+    toast.style.color=newStatus==='approved'?'#155724':newStatus==='rejected'?'#721C24':'#856404';
+    toast.style.display='block';
+    setTimeout(()=>{toast.style.display='none';},3000);
+
+    // Refresh list
+    rList();
+  }catch(e){
+    toast.textContent='❌ Fehler beim Speichern: '+e.message;
+    toast.style.background='#F8D7DA';toast.style.color='#721C24';
+    toast.style.display='block';
+  }
+}
+
+// ============ EXPORT ============
+function exGJ(){const gj={type:'FeatureCollection',features:filt.filter(r=>r.latitude&&r.longitude).map(r=>({type:'Feature',geometry:{type:'Point',coordinates:[r.longitude,r.latitude]},properties:{id:r.id,category:r.category,subcategory:r.subcategory,comment:r.comment||'',timestamp:r.timestamp,status:r.status||'new'}}))};dlF(JSON.stringify(gj,null,2),'radwegemelder.geojson','application/json');}
+function exCSV(){const h='ID;Kategorie;Unterkategorie;Kommentar;Latitude;Longitude;Datum;Status\n';const rows=filt.map(r=>'"'+r.id+'";"'+(CL[r.category]||'')+'";"'+(SL[r.subcategory]||'')+'";"'+((r.comment||'').replace(/"/g,'""'))+'";'+(r.latitude||'')+';'+(r.longitude||'')+';"'+fDT(r.timestamp)+'";"'+(STS[r.status]||'Neu')+'"').join('\n');dlF('\ufeff'+h+rows,'radwegemelder.csv','text/csv;charset=utf-8');}
 function exPDF(){const t=filt.length,p=filt.filter(r=>r.category==='problems').length,w=filt.filter(r=>r.category==='wishes').length,g=filt.filter(r=>r.category==='positive').length;
 const kom=$('komInp').value||'Gesamtgebiet',df=$('fFrom').value||'–',dt=$('fTo').value||'–';
 const counts={};filt.forEach(r=>{const l=SL[r.subcategory]||r.subcategory||'Sonstiges';counts[l]=(counts[l]||0)+1;});const sorted=Object.entries(counts).sort((a,b)=>b[1]-a[1]);
-const h='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Radwegemelder Bericht</title><style>body{font-family:Segoe UI,sans-serif;max-width:700px;margin:40px auto;color:#2C3E50;line-height:1.6}h1{font-size:22px;border-bottom:3px solid #1A5FA8;padding-bottom:8px}h2{font-size:16px;color:#1A5FA8;margin-top:24px}.st{display:flex;gap:16px;margin:16px 0}.sb{flex:1;background:#F4F6F9;border-radius:8px;padding:12px;text-align:center}.sn{font-size:28px;font-weight:800}.sl{font-size:11px;color:#7B8A9A;text-transform:uppercase}table{width:100%;border-collapse:collapse;margin-top:12px}td,th{padding:8px 12px;text-align:left;border-bottom:1px solid #E2E8F0;font-size:13px}th{font-weight:700;background:#F4F6F9}.ft{margin-top:32px;font-size:11px;color:#7B8A9A;border-top:1px solid #E2E8F0;padding-top:12px}@media print{body{margin:20px}}</style></head><body><h1>🚲 Radwegemelder – Auswertungsbericht</h1><p><b>Gebiet:</b> '+esc(kom)+' · <b>Zeitraum:</b> '+df+' bis '+dt+'<br><b>Erstellt:</b> '+new Date().toLocaleDateString('de-DE')+' · <b>Quelle:</b> 2Rat Radwegemelder</p><div class="st"><div class="sb"><div class="sn" style="color:#1A5FA8">'+t+'</div><div class="sl">Gesamt</div></div><div class="sb"><div class="sn" style="color:#E00000">'+p+'</div><div class="sl">Probleme</div></div><div class="sb"><div class="sn" style="color:#E5A700">'+w+'</div><div class="sl">Wünsche</div></div><div class="sb"><div class="sn" style="color:#00A836">'+g+'</div><div class="sl">Positiv</div></div></div><h2>Verteilung</h2><table><tr><th>Kategorie</th><th>Anzahl</th></tr>'+sorted.map(([l,c])=>'<tr><td>'+l+'</td><td>'+c+'</td></tr>').join('')+'</table><h2>Einzelmeldungen</h2><table><tr><th>Datum</th><th>Typ</th><th>Kategorie</th><th>Kommentar</th></tr>'+filt.slice(0,100).map(r=>'<tr><td>'+fD(r.timestamp)+'</td><td>'+(CL[r.category]||'')+'</td><td>'+(SL[r.subcategory]||'')+'</td><td>'+esc(r.comment||'–')+'</td></tr>').join('')+(filt.length>100?'<tr><td colspan="4" style="color:#7B8A9A">… +'+(filt.length-100)+' weitere</td></tr>':'')+'</table><div class="ft">2Rat – Büro für Radverkehrsplanung · Armin Jung · www.2rat.org</div></body></html>';
+const h='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Radwegemelder Bericht</title><style>body{font-family:Segoe UI,sans-serif;max-width:700px;margin:40px auto;color:#2C3E50;line-height:1.6}h1{font-size:22px;border-bottom:3px solid #1A5FA8;padding-bottom:8px}h2{font-size:16px;color:#1A5FA8;margin-top:24px}.st{display:flex;gap:16px;margin:16px 0}.sb{flex:1;background:#F4F6F9;border-radius:8px;padding:12px;text-align:center}.sn{font-size:28px;font-weight:800}.sl{font-size:11px;color:#7B8A9A;text-transform:uppercase}table{width:100%;border-collapse:collapse;margin-top:12px}td,th{padding:8px 12px;text-align:left;border-bottom:1px solid #E2E8F0;font-size:13px}th{font-weight:700;background:#F4F6F9}.ft{margin-top:32px;font-size:11px;color:#7B8A9A;border-top:1px solid #E2E8F0;padding-top:12px}@media print{body{margin:20px}}</style></head><body><h1>🚲 Radwegemelder – Auswertungsbericht</h1><p><b>Gebiet:</b> '+esc(kom)+' · <b>Zeitraum:</b> '+df+' bis '+dt+'<br><b>Erstellt:</b> '+new Date().toLocaleDateString('de-DE')+' · <b>Quelle:</b> 2Rat Radwegemelder</p><div class="st"><div class="sb"><div class="sn" style="color:#1A5FA8">'+t+'</div><div class="sl">Gesamt</div></div><div class="sb"><div class="sn" style="color:#E00000">'+p+'</div><div class="sl">Probleme</div></div><div class="sb"><div class="sn" style="color:#E5A700">'+w+'</div><div class="sl">Wünsche</div></div><div class="sb"><div class="sn" style="color:#00A836">'+g+'</div><div class="sl">Positiv</div></div></div><h2>Verteilung</h2><table><tr><th>Kategorie</th><th>Anzahl</th></tr>'+sorted.map(([l,c])=>'<tr><td>'+l+'</td><td>'+c+'</td></tr>').join('')+'</table><h2>Einzelmeldungen</h2><table><tr><th>Datum</th><th>Typ</th><th>Kategorie</th><th>Kommentar</th><th>Status</th></tr>'+filt.slice(0,100).map(r=>'<tr><td>'+fD(r.timestamp)+'</td><td>'+(CL[r.category]||'')+'</td><td>'+(SL[r.subcategory]||'')+'</td><td>'+esc(r.comment||'–')+'</td><td>'+(STS[r.status]||'Neu')+'</td></tr>').join('')+(filt.length>100?'<tr><td colspan="5" style="color:#7B8A9A">… +'+(filt.length-100)+' weitere</td></tr>':'')+'</table><div class="ft">2Rat – Büro für Radverkehrsplanung · Armin Jung · www.2rat.org</div></body></html>';
 const win=window.open('','_blank');win.document.write(h);win.document.close();setTimeout(()=>win.print(),500);}
 function dlF(c,n,t){const b=new Blob([c],{type:t});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=n;a.click();URL.revokeObjectURL(u);}
 
