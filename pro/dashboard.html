@@ -485,7 +485,7 @@ function uSub(){const sel=$('fSub'),cur=sel.value,rel=aCat==='all'?filt:filt.fil
 function rList(){const c=$('rptList');if(!filt.length){c.innerHTML='<div class="empty"><div class="empty__icon">🔭</div>Keine Meldungen.</div>';return;}
 c.innerHTML=filt.map(r=>{
   const st=r.status||'new';
-  const stLabel=st==='approved'?' <span class="rpt__status rpt__status--approved">✅</span>':st==='rejected'?' <span class="rpt__status rpt__status--rejected">❌</span>':r.subcategory==='other_problem'?' <span class="rpt__status rpt__status--new">⏳</span>':'';
+  const stLabel=r.subcategory==='other_problem'?(st==='approved'?' <span class="rpt__status rpt__status--approved">✅</span>':st==='rejected'?' <span class="rpt__status rpt__status--rejected">❌</span>':' <span class="rpt__status rpt__status--new">⏳</span>'):'';
   return '<div class="rpt" onclick="selRpt(\''+r.id+'\')" id="r-'+r.id+'"><div class="rpt__dot rpt__dot--'+r.category+'"></div><div class="rpt__body"><div class="rpt__cat">'+(SL[r.subcategory]||r.subcategory||CL[r.category])+stLabel+'</div>'+(r.comment?'<div class="rpt__com">'+esc(r.comment)+'</div>':'')+'<div class="rpt__meta"><span>📅 '+fD(r.timestamp)+'</span>'+(r.has_photo?'<span style="color:var(--blue)">📷</span>':'')+'</div></div></div>';
 }).join('');}
 
@@ -511,11 +511,17 @@ function selRpt(id){
 
   bd.innerHTML='<div class="detail__row"><span class="detail__label">Kategorie</span><span class="badge badge--'+r.category+'">'+(CL[r.category]||r.category)+'</span></div><div class="detail__row"><span class="detail__label">Unterkategorie</span><span class="detail__value">'+(SL[r.subcategory]||r.subcategory||'–')+'</span></div><div class="detail__row"><span class="detail__label">Datum</span><span class="detail__value">'+fDT(r.timestamp)+'</span></div><div class="detail__row"><span class="detail__label">Koordinaten</span><span class="detail__value">'+(r.latitude?r.latitude.toFixed(5):'–')+', '+(r.longitude?r.longitude.toFixed(5):'–')+'</span></div>'+(r.accuracy?'<div class="detail__row"><span class="detail__label">GPS-Genauigkeit</span><span class="detail__value">'+Math.round(r.accuracy)+' m</span></div>':'')+(r.comment?'<div class="detail__comment">💬 '+esc(r.comment)+'</div>':'');
 
-  // Moderation status
-  const st=r.status||'new';
-  const modSt=$('modStatus');
-  modSt.className='mod__status mod__status--'+st;
-  modSt.textContent=st==='approved'?'✅ Freigegeben':st==='rejected'?'❌ Abgelehnt':'⏳ Neu – Prüfung ausstehend';
+  // Moderation: nur bei "Sonstiges" anzeigen
+  const modSection=$('detMod');
+  if(r.subcategory==='other_problem'){
+    modSection.style.display='';
+    const st=r.status||'new';
+    const modSt=$('modStatus');
+    modSt.className='mod__status mod__status--'+st;
+    modSt.textContent=st==='approved'?'✅ Freigegeben':st==='rejected'?'❌ Abgelehnt':'⏳ Neu – Prüfung ausstehend';
+  } else {
+    modSection.style.display='none';
+  }
 
   $('detPan').classList.add('open');
 
