@@ -70,15 +70,6 @@
     .popup__comment { margin-top: 10px; padding: 10px; background: #F7F8F9; border-radius: 10px; font-size: 13px; line-height: 1.5; color: #4A5568; }
     .popup__meta { margin-top: 10px; font-size: 11px; color: var(--gray-mid); }
 
-    .marker-cluster-problems { background: rgba(224,0,0,0.25); }
-    .marker-cluster-problems div { background: var(--red); color: white; font-weight: 700; font-family: var(--font); }
-    .marker-cluster-wishes { background: rgba(229,167,0,0.25); }
-    .marker-cluster-wishes div { background: var(--yellow); color: white; font-weight: 700; font-family: var(--font); }
-    .marker-cluster-positive { background: rgba(0,168,54,0.25); }
-    .marker-cluster-positive div { background: var(--green); color: white; font-weight: 700; font-family: var(--font); }
-    .marker-cluster-all { background: rgba(61,79,88,0.2); }
-    .marker-cluster-all div { background: var(--gray); color: white; font-weight: 700; font-family: var(--font); }
-
     .loading {
       position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
       z-index: 1000; background: white; padding: 20px 30px; border-radius: 16px;
@@ -96,7 +87,6 @@
     }
     .info-box a { color: #1A5FA8; text-decoration: none; font-weight: 600; }
 
-    /* Kommune-Banner */
     .kommune-banner {
       display: none; background: #1A5FA8; color: white; padding: 8px 20px;
       font-size: 13px; font-weight: 600; text-align: center;
@@ -119,16 +109,15 @@
 </head>
 <body>
 
-  <!-- Kommune-Banner (nur bei ?kommune=...) -->
   <div class="kommune-banner" id="kommuneBanner">
-    📍 Radwegecheck <span class="kommune-banner__name" id="kommuneName"></span>
+    &#x1F4CD; Radwegecheck <span class="kommune-banner__name" id="kommuneName"></span>
     <span class="kommune-banner__info" id="kommuneInfo"></span>
   </div>
 
   <div class="header">
     <div class="header__brand">
       <div class="header__title"><span>Radwege</span><span>melder</span></div>
-      <div class="header__subtitle" id="subtitle">Öffentliche Meldungskarte · Saarland</div>
+      <div class="header__subtitle" id="subtitle">&#214;ffentliche Meldungskarte &#183; Saarland</div>
     </div>
     <div class="header__stats" id="stats"></div>
   </div>
@@ -137,26 +126,26 @@
 
   <div class="filters">
     <button class="filter-btn filter-btn--all active" data-filter="all" onclick="setFilter('all')">
-      📍 Alle <span class="filter-count" id="count-all">0</span>
+      &#x1F5FA;&#xFE0F; Alle <span class="filter-count" id="count-all">0</span>
     </button>
     <button class="filter-btn filter-btn--problems" data-filter="problems" onclick="setFilter('problems')">
-      ⚠️ Probleme <span class="filter-count" id="count-problems">0</span>
+      &#x26A0;&#xFE0F; Probleme <span class="filter-count" id="count-problems">0</span>
     </button>
     <button class="filter-btn filter-btn--wishes" data-filter="wishes" onclick="setFilter('wishes')">
-      💬 Wünsche <span class="filter-count" id="count-wishes">0</span>
+      &#x1F4AC; W&#252;nsche <span class="filter-count" id="count-wishes">0</span>
     </button>
     <button class="filter-btn filter-btn--positive" data-filter="positive" onclick="setFilter('positive')">
-      👍 Positiv <span class="filter-count" id="count-positive">0</span>
+      &#x1F44D; Positiv <span class="filter-count" id="count-positive">0</span>
     </button>
   </div>
 
   <div class="loading" id="loading">
     <div class="loading__spinner"></div>
-    Meldungen werden geladen…
+    Meldungen werden geladen&#8230;
   </div>
 
   <div class="info-box">
-    🚲 Mitmachen? <a href="https://2rat.github.io/velomeld/">Radwegemelder-App öffnen</a>
+    &#x1F6B2; Mitmachen? <a href="https://2rat.github.io/velomeld/">Radwegemelder-App &#246;ffnen</a>
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -166,54 +155,86 @@
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpbXNpa2p5b3VwaWhvZ21xdXVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0NTIyMjYsImV4cCI6MjA4NjAyODIyNn0._Foa5ZVr4nwoOlZ4T-ORX0U4sNUjgRJJRyBDHvHV2vo';
 
     const CATEGORIES = {
-      problems: { label: 'Problem', color: '#E00000', emoji: '⚠️',
-        subs: { surface:{icon:'🕳️',label:'Oberfläche'}, narrow:{icon:'↔️',label:'Engstelle'}, crossing:{icon:'🔀',label:'Kreuzung / Knoten'}, traverse:{icon:'🚶',label:'Querung'}, conflict:{icon:'💥',label:'Konflikte'}, parking:{icon:'🅿️',label:'Parken'}, signage:{icon:'🪧',label:'Wegweisung'}, lighting:{icon:'💡',label:'Beleuchtung'}, construction:{icon:'🚧',label:'Baustelle'}, drainage:{icon:'💧',label:'Entwässerung'}, other:{icon:'📝',label:'Sonstiges'}, detour:{icon:'🔄',label:'Umleitung fehlt'}, barrier_free:{icon:'♿',label:'Barrierefreiheit'}, other_problem:{icon:'❗',label:'Sonstiges Problem'} }
+      problems: { label: 'Problem', color: '#E00000', emoji: '\u26A0\uFE0F',
+        subs: {
+          surface:       { icon: '\uD83D\uDD73\uFE0F', label: 'Oberfl\u00E4che' },
+          narrow:        { icon: '\u2194\uFE0F',       label: 'Engstelle' },
+          crossing:      { icon: '\uD83D\uDD00',       label: 'Kreuzung / Knoten' },
+          traverse:      { icon: '\uD83D\uDEB6',       label: 'Querung' },
+          conflict:      { icon: '\uD83D\uDCA5',       label: 'Konflikte' },
+          parking:       { icon: '\uD83C\uDD7F\uFE0F', label: 'Parken' },
+          signage:       { icon: '\uD83E\uDEA7',       label: 'Wegweisung' },
+          wrong_signage: { icon: '\uD83D\uDEAB',       label: 'Falsche Beschilderung' },
+          lighting:      { icon: '\uD83D\uDCA1',       label: 'Beleuchtung' },
+          winter:        { icon: '\u2744\uFE0F',       label: 'Winterdienst / Reinigung' },
+          construction:  { icon: '\uD83D\uDEA7',       label: 'Baustelle' },
+          drainage:      { icon: '\uD83D\uDCA7',       label: 'Entw\u00E4sserung' },
+          other:         { icon: '\uD83D\uDCCD',       label: 'Sonstiges' },
+          detour:        { icon: '\uD83D\uDD04',       label: 'Umleitung fehlt' },
+          barrier_free:  { icon: '\u267F',              label: 'Barrierefreiheit' },
+          other_problem: { icon: '\u2757',              label: 'Sonstiges Problem' }
+        }
       },
-      wishes: { label: 'Wunsch', color: '#E5A700', emoji: '💬',
-        subs: { new_path:{icon:'🛤️',label:'Radweg gewünscht'}, bike_parking:{icon:'🔒',label:'Abstellanlage'}, tempo30:{icon:'🐌',label:'Tempo 30'}, traffic_light:{icon:'🚦',label:'Ampelschaltung'}, bike_street:{icon:'🚲',label:'Fahrradstraße'}, oneway:{icon:'↩️',label:'Einbahnstraße öffnen'} }
+      wishes: { label: 'Wunsch', color: '#E5A700', emoji: '\uD83D\uDCAC',
+        subs: {
+          new_path:      { icon: '\uD83D\uDEE4\uFE0F', label: 'Radweg gew\u00FCnscht' },
+          bike_parking:  { icon: '\uD83D\uDD12',       label: 'Abstellanlage' },
+          tempo30:       { icon: '\uD83D\uDC0C',       label: 'Tempo 30' },
+          traffic_light: { icon: '\uD83D\uDEA6',       label: 'Ampelschaltung' },
+          bike_street:   { icon: '\uD83D\uDEB2',       label: 'Fahrradstra\u00DFe' },
+          oneway:        { icon: '\u21A9\uFE0F',       label: 'Einbahnstra\u00DFe \u00F6ffnen' }
+        }
       },
-      positive: { label: 'Positiv', color: '#00A836', emoji: '👍',
-        subs: { good_infra:{icon:'⭐',label:'Gute Infrastruktur'}, safe_crossing:{icon:'✅',label:'Sichere Querung'}, service:{icon:'🛠️',label:'Service'}, bike_friendly_stop:{icon:'☕',label:'Fahrradfreundliche Einkehr'} }
+      positive: { label: 'Positiv', color: '#00A836', emoji: '\uD83D\uDC4D',
+        subs: {
+          good_infra:         { icon: '\u2B50',              label: 'Gute Infrastruktur' },
+          safe_crossing:      { icon: '\u2705',              label: 'Sichere Querung' },
+          service:            { icon: '\uD83D\uDEE0\uFE0F', label: 'Service' },
+          bike_friendly_stop: { icon: '\u2615',              label: 'Fahrradfreundliche Einkehr' }
+        }
       }
     };
 
     function getSubInfo(cat, sub) {
       const c = CATEGORIES[cat];
-      if (!c) return { icon: '📍', label: sub, color: '#888', catLabel: cat };
+      if (!c) return { icon: '\uD83D\uDCCD', label: sub || 'Meldung', color: '#999', catLabel: cat };
       const s = c.subs[sub];
-      return { icon: s ? s.icon : c.emoji, label: s ? s.label : sub, color: c.color, catLabel: c.label };
+      if (s) return { icon: s.icon, label: s.label, color: c.color, catLabel: c.label };
+      return { icon: c.emoji, label: sub || c.label, color: c.color, catLabel: c.label };
     }
 
-    function createMarkerIcon(color) {
-      return L.divIcon({
-        html: `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="38" viewBox="0 0 28 38"><path d="M14 0C6.27 0 0 6.27 0 14c0 10.5 14 24 14 24s14-13.5 14-24C28 6.27 21.73 0 14 0z" fill="${color}" stroke="white" stroke-width="2"/><circle cx="14" cy="14" r="6" fill="white" opacity="0.9"/></svg>`,
-        className: '', iconSize: [28, 38], iconAnchor: [14, 38], popupAnchor: [0, -34],
+    function makeSVG(color) {
+      return `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="42" viewBox="0 0 32 42">
+        <path d="M16 0C7.2 0 0 7.2 0 16c0 12 16 26 16 26s16-14 16-26C32 7.2 24.8 0 16 0z" fill="${color}" stroke="#fff" stroke-width="2"/>
+        <circle cx="16" cy="15" r="6" fill="#fff" opacity="0.9"/>
+      </svg>`;
+    }
+    const ICONS = {};
+    ['problems', 'wishes', 'positive'].forEach(cat => {
+      ICONS[cat] = L.divIcon({
+        html: makeSVG(CATEGORIES[cat].color),
+        className: '', iconSize: [32, 42], iconAnchor: [16, 42], popupAnchor: [0, -36]
       });
-    }
+    });
 
-    const ICONS = { problems: createMarkerIcon('#E00000'), wishes: createMarkerIcon('#E5A700'), positive: createMarkerIcon('#00A836') };
+    const map = L.map('map').setView([49.38, 6.95], 10);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      maxZoom: 19
+    }).addTo(map);
 
-    // ─── State ───
-    let allReports = [], filteredByGeo = [], currentFilter = 'all', clusterGroup;
+    let allReports = [], filteredByGeo = [], currentFilter = 'all', clusterGroup = null;
     let kommuneMode = false, kommuneName = '', gfPoly = null;
 
-    // ─── URL-Parameter lesen ───
     const params = new URLSearchParams(window.location.search);
     const paramKommune = params.get('kommune');
     const paramVon = params.get('von');
     const paramBis = params.get('bis');
     const paramTitel = params.get('titel');
 
-    // ─── Map Init ───
-    const map = L.map('map', { center: [49.35, 6.85], zoom: 10, zoomControl: true });
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a> · <a href="https://2rat.github.io/velomeld/">2Rat Radwegemelder</a>', maxZoom: 19
-    }).addTo(map);
-
-    // ─── Kommune-Geofence laden ───
     async function loadKommuneGeofence(name) {
       try {
-        const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(name + ', Deutschland')}&format=json&polygon_geojson=1&limit=1`, {
+        const res = await fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(name + ', Saarland, Deutschland') + '&format=json&polygon_geojson=1&limit=1', {
           headers: { 'User-Agent': '2Rat-Radwegemelder/1.0' }
         });
         const data = await res.json();
@@ -221,34 +242,30 @@
         const r = data[0];
         kommuneName = r.display_name.split(',')[0];
 
-        // Banner anzeigen
         document.getElementById('kommuneBanner').classList.add('active');
         document.getElementById('kommuneName').textContent = kommuneName;
-        document.getElementById('subtitle').textContent = 'Meldungskarte · ' + kommuneName;
+        document.getElementById('subtitle').textContent = 'Meldungskarte \u00B7 ' + kommuneName;
 
-        // Zeitraum im Banner
         if (paramVon || paramBis) {
-          const vonStr = paramVon || '…';
-          const bisStr = paramBis || '…';
-          document.getElementById('kommuneInfo').textContent = '· Aktionszeitraum: ' + vonStr + ' bis ' + bisStr;
+          var vonStr = paramVon || '\u2026';
+          var bisStr = paramBis || '\u2026';
+          document.getElementById('kommuneInfo').textContent = '\u00B7 Aktionszeitraum: ' + vonStr + ' bis ' + bisStr;
         }
 
-        // Titel überschreiben
         if (paramTitel) {
           document.getElementById('kommuneName').textContent = paramTitel;
-          document.title = paramTitel + ' – Radwegemelder';
+          document.title = paramTitel + ' \u2013 Radwegemelder';
         } else {
-          document.title = 'Radwegecheck ' + kommuneName + ' – Radwegemelder';
+          document.title = 'Radwegecheck ' + kommuneName + ' \u2013 Radwegemelder';
         }
 
-        // Polygon zeichnen
         if (r.geojson && (r.geojson.type === 'Polygon' || r.geojson.type === 'MultiPolygon')) {
           gfPoly = L.geoJSON(r.geojson, {
             style: { color: '#1A5FA8', weight: 2, fillColor: '#1A5FA8', fillOpacity: 0.05, dashArray: '6,4' }
           }).addTo(map);
           map.fitBounds(gfPoly.getBounds(), { padding: [40, 40] });
         } else if (r.boundingbox) {
-          const b = L.latLngBounds([+r.boundingbox[0], +r.boundingbox[2]], [+r.boundingbox[1], +r.boundingbox[3]]);
+          var b = L.latLngBounds([+r.boundingbox[0], +r.boundingbox[2]], [+r.boundingbox[1], +r.boundingbox[3]]);
           gfPoly = L.rectangle(b, { color: '#1A5FA8', weight: 2, fillColor: '#1A5FA8', fillOpacity: 0.05, dashArray: '6,4' }).addTo(map);
           map.fitBounds(b, { padding: [40, 40] });
         }
@@ -256,15 +273,14 @@
       } catch (e) { console.error('Geofence-Fehler:', e); }
     }
 
-    // ─── Point-in-Polygon ───
     function inGeo(lat, lng) {
       if (!kommuneMode || !gfPoly) return true;
       if (gfPoly.getLayers) {
-        for (const ly of gfPoly.getLayers()) {
+        for (var ly of gfPoly.getLayers()) {
           if (ly.getLatLngs) {
-            const rings = ly.getLatLngs();
-            const flat = Array.isArray(rings[0][0]) ? rings.flat() : rings;
-            for (const ring of flat) if (raycast(L.latLng(lat, lng), ring)) return true;
+            var rings = ly.getLatLngs();
+            var flat = Array.isArray(rings[0][0]) ? rings.flat() : rings;
+            for (var ring of flat) if (raycast(L.latLng(lat, lng), ring)) return true;
           } else if (ly.getBounds && ly.getBounds().contains([lat, lng])) return true;
         }
         return false;
@@ -272,57 +288,55 @@
       return gfPoly.getBounds ? gfPoly.getBounds().contains([lat, lng]) : true;
     }
     function raycast(pt, poly) {
-      let ins = false;
-      for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
-        const yi = poly[i].lng, xi = poly[i].lat, yj = poly[j].lng, xj = poly[j].lat;
+      var ins = false;
+      for (var i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+        var yi = poly[i].lng, xi = poly[i].lat, yj = poly[j].lng, xj = poly[j].lat;
         if ((yi > pt.lng) !== (yj > pt.lng) && pt.lat < (xj - xi) * (pt.lng - yi) / (yj - yi) + xi) ins = !ins;
       }
       return ins;
     }
 
-    // ─── Daten laden ───
     async function loadReports() {
       try {
-        const resp = await fetch(SUPABASE_URL + '/rest/v1/reports?select=*&order=timestamp.desc&limit=5000', { headers: { 'apikey': SUPABASE_KEY } });
+        var resp = await fetch(SUPABASE_URL + '/rest/v1/reports?select=*&order=timestamp.desc&limit=5000', { headers: { 'apikey': SUPABASE_KEY } });
         if (!resp.ok) throw new Error('HTTP ' + resp.status);
         allReports = await resp.json();
 
-        // Geofence-Filter
         filteredByGeo = allReports;
         if (kommuneMode) {
-          filteredByGeo = allReports.filter(r => r.latitude && r.longitude && inGeo(r.latitude, r.longitude));
+          filteredByGeo = allReports.filter(function(r) { return r.latitude && r.longitude && inGeo(r.latitude, r.longitude); });
         }
 
-        // Zeitraum-Filter
-        if (paramVon) filteredByGeo = filteredByGeo.filter(r => r.timestamp && r.timestamp >= paramVon);
-        if (paramBis) filteredByGeo = filteredByGeo.filter(r => r.timestamp && r.timestamp <= paramBis + 'T23:59:59');
+        if (paramVon) filteredByGeo = filteredByGeo.filter(function(r) { return r.timestamp && r.timestamp >= paramVon; });
+        if (paramBis) filteredByGeo = filteredByGeo.filter(function(r) { return r.timestamp && r.timestamp <= paramBis + 'T23:59:59'; });
 
         updateCounts();
         renderMarkers();
 
         if (!kommuneMode && filteredByGeo.length > 0) {
-          const bounds = filteredByGeo.map(r => [r.latitude, r.longitude]);
+          var bounds = filteredByGeo.map(function(r) { return [r.latitude, r.longitude]; });
           map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
         }
       } catch (err) {
         console.error('Fehler:', err);
-        document.getElementById('loading').innerHTML = '❌ Meldungen konnten nicht geladen werden';
+        document.getElementById('loading').innerHTML = '\u274C Meldungen konnten nicht geladen werden';
       }
       document.getElementById('loading').style.display = 'none';
     }
 
-    // ─── Marker ───
     function renderMarkers() {
       if (clusterGroup) map.removeLayer(clusterGroup);
       clusterGroup = L.markerClusterGroup({
         maxClusterRadius: 50, spiderfyOnMaxZoom: true, showCoverageOnHover: false,
-        iconCreateFunction(cluster) {
-          const count = cluster.getChildCount();
-          const size = count < 10 ? 36 : count < 50 ? 44 : 52;
-          const cats = {};
-          cluster.getAllChildMarkers().forEach(m => { if (m._cat) cats[m._cat] = (cats[m._cat]||0) + 1; });
-          const top = Object.entries(cats).sort((a,b) => b[1]-a[1])[0];
-          const col = top ? ({problems:'#E00000',wishes:'#E5A700',positive:'#00A836'}[top[0]] || '#3D4F58') : '#3D4F58';
+        iconCreateFunction: function(cluster) {
+          var count = cluster.getChildCount();
+          var size = count < 10 ? 36 : count < 50 ? 44 : 52;
+          var cats = {};
+          cluster.getAllChildMarkers().forEach(function(m) { if (m._cat) cats[m._cat] = (cats[m._cat]||0) + 1; });
+          var entries = Object.entries(cats).sort(function(a,b) { return b[1]-a[1]; });
+          var top = entries[0];
+          var colMap = {problems:'#E00000',wishes:'#E5A700',positive:'#00A836'};
+          var col = top ? (colMap[top[0]] || '#3D4F58') : '#3D4F58';
           return L.divIcon({
             html: '<div style="width:' + (size-10) + 'px;height:' + (size-10) + 'px;line-height:' + (size-10) + 'px;text-align:center;border-radius:50%;background:' + col + ';color:white;font-weight:700;font-family:DM Sans,sans-serif;font-size:13px;">' + count + '</div>',
             className: '', iconSize: [size, size],
@@ -330,15 +344,23 @@
         }
       });
 
-      const filtered = currentFilter === 'all' ? filteredByGeo : filteredByGeo.filter(r => r.category === currentFilter);
+      var filtered = currentFilter === 'all' ? filteredByGeo : filteredByGeo.filter(function(r) { return r.category === currentFilter; });
 
-      filtered.forEach(r => {
-        const info = getSubInfo(r.category, r.subcategory);
-        const icon = ICONS[r.category] || ICONS.problems;
-        const marker = L.marker([r.latitude, r.longitude], { icon });
+      filtered.forEach(function(r) {
+        var info = getSubInfo(r.category, r.subcategory);
+        var icon = ICONS[r.category] || ICONS.problems;
+        var marker = L.marker([r.latitude, r.longitude], { icon: icon });
         marker._cat = r.category;
-        const dateStr = new Date(r.timestamp).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-        marker.bindPopup(`<div class="popup"><div class="popup__header"><span class="popup__icon">${info.icon}</span><div><div class="popup__category">${info.label}</div><span class="popup__badge" style="background:${info.color}">${info.catLabel}</span></div></div>${r.comment ? '<div class="popup__comment">' + escapeHtml(r.comment) + '</div>' : ''}<div class="popup__meta">📅 ${dateStr}</div></div>`);
+        var dateStr = new Date(r.timestamp).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        var commentHtml = '';
+        if (r.comment) {
+          if (r.status === 'approved') {
+            commentHtml = '<div class="popup__comment">' + escapeHtml(r.comment) + '</div>';
+          } else {
+            commentHtml = '<div class="popup__comment" style="color:#8A9BA4;font-style:italic;">Kommentar wird gepr\u00FCft\u2026</div>';
+          }
+        }
+        marker.bindPopup('<div class="popup"><div class="popup__header"><span class="popup__icon">' + info.icon + '</span><div><div class="popup__category">' + info.label + '</div><span class="popup__badge" style="background:' + info.color + '">' + info.catLabel + '</span></div></div>' + commentHtml + '<div class="popup__meta">\uD83D\uDCC5 ' + dateStr + '</div></div>');
         clusterGroup.addLayer(marker);
       });
       map.addLayer(clusterGroup);
@@ -346,34 +368,33 @@
 
     function setFilter(filter) {
       currentFilter = filter;
-      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.filter === filter));
+      document.querySelectorAll('.filter-btn').forEach(function(btn) { btn.classList.toggle('active', btn.dataset.filter === filter); });
       renderMarkers();
     }
 
     function updateCounts() {
-      const counts = { all: filteredByGeo.length, problems: 0, wishes: 0, positive: 0 };
-      filteredByGeo.forEach(r => { if (counts[r.category] !== undefined) counts[r.category]++; });
-      Object.entries(counts).forEach(([key, count]) => { const el = document.getElementById('count-' + key); if (el) el.textContent = count; });
-      document.getElementById('stats').innerHTML = `
-        <div class="stat"><div class="stat__dot" style="background:var(--red)"></div>${counts.problems}</div>
-        <div class="stat"><div class="stat__dot" style="background:var(--yellow)"></div>${counts.wishes}</div>
-        <div class="stat"><div class="stat__dot" style="background:var(--green)"></div>${counts.positive}</div>`;
+      var counts = { all: filteredByGeo.length, problems: 0, wishes: 0, positive: 0 };
+      filteredByGeo.forEach(function(r) { if (counts[r.category] !== undefined) counts[r.category]++; });
+      Object.entries(counts).forEach(function(e) { var el = document.getElementById('count-' + e[0]); if (el) el.textContent = e[1]; });
+      document.getElementById('stats').innerHTML =
+        '<div class="stat"><div class="stat__dot" style="background:var(--red)"></div>' + counts.problems + '</div>' +
+        '<div class="stat"><div class="stat__dot" style="background:var(--yellow)"></div>' + counts.wishes + '</div>' +
+        '<div class="stat"><div class="stat__dot" style="background:var(--green)"></div>' + counts.positive + '</div>';
     }
 
-    function escapeHtml(text) { const d = document.createElement('div'); d.textContent = text; return d.innerHTML; }
+    function escapeHtml(text) { var d = document.createElement('div'); d.textContent = text; return d.innerHTML; }
 
-    // ─── Start ───
     async function init() {
-      // Wenn Kommune-Parameter da → erst Geofence laden, dann Meldungen
-      if (paramKommune) {
-        await loadKommuneGeofence(paramKommune);
+      if (!paramKommune) {
+        document.getElementById('map').innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;padding:40px;font-family:sans-serif;color:#3D3D3D;background:#FAEFD8;"><div style="font-size:48px;margin-bottom:16px;">&#x1F6B2;</div><div style="font-size:20px;font-weight:700;margin-bottom:8px;">Radwegemelder</div><div style="font-size:14px;color:#6B6B6B;max-width:400px;line-height:1.6;">Diese Karte ist nur mit einem kommunenspezifischen Link verf&#252;gbar.<br><br>Sie m&#246;chten den Radwegemelder in Ihrer Kommune einsetzen?</div><a href="https://www.2rat.org" target="_blank" style="margin-top:20px;background:#689246;color:white;padding:10px 24px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">Kontakt aufnehmen &#8594;</a></div>';
+        return;
       }
+      await loadKommuneGeofence(paramKommune);
       await loadReports();
     }
     init();
 
-    // Auto-Refresh alle 60 Sekunden
-    setInterval(loadReports, 60000);
+    if (paramKommune) setInterval(loadReports, 60000);
   </script>
 </body>
 </html>
