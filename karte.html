@@ -386,6 +386,8 @@
 
     async function init() {
       if (!paramKommune) {
+        document.getElementById('loading').style.display = 'none';
+        document.querySelector('.filters').style.display = 'none';
         document.getElementById('map').innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;padding:40px;font-family:sans-serif;color:#3D3D3D;background:#FAEFD8;"><div style="font-size:48px;margin-bottom:16px;">&#x1F6B2;</div><div style="font-size:20px;font-weight:700;margin-bottom:8px;">Radwegemelder</div><div style="font-size:14px;color:#6B6B6B;max-width:400px;line-height:1.6;">Diese Karte ist nur mit einem kommunenspezifischen Link verf&#252;gbar.<br><br>Sie m&#246;chten den Radwegemelder in Ihrer Kommune einsetzen?</div><a href="https://www.2rat.org" target="_blank" style="margin-top:20px;background:#689246;color:white;padding:10px 24px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">Kontakt aufnehmen &#8594;</a></div>';
         return;
       }
