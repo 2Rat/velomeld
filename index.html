@@ -1082,13 +1082,6 @@ const CATEGORIES = {
         tags: ['schild', 'wegweisung', 'beschilderung', 'markierung'],
       },
       {
-        id: 'wrong_signage',
-        icon: '🚫',
-        label: 'Falsche Beschilderung',
-        description: 'Falsche Richtungsangabe, veraltete Schilder, widersprüchliche Beschilderung',
-        tags: ['falsch', 'beschilderung', 'schild', 'veraltet', 'widerspruch', 'irreführend'],
-      },
-      {
         id: 'lighting',
         icon: '💡',
         label: 'Beleuchtung',
@@ -2651,15 +2644,19 @@ async function handleAddPhoto() {
 }
 
 async function handleSaveReport() {
-  // Cooldown: 2 Minuten zwischen Meldungen
-  const COOLDOWN_MS = 2 * 60 * 1000;
-  const lastSubmit = parseInt(localStorage.getItem('lastSubmitTime') || '0');
-  const elapsed = Date.now() - lastSubmit;
-  if (elapsed < COOLDOWN_MS) {
-    const remaining = Math.ceil((COOLDOWN_MS - elapsed) / 1000);
-    showToast('\u23F3 Bitte warten \u2013 n\u00E4chste Meldung in ' + remaining + ' Sek. m\u00F6glich');
+  // Spam-Schutz: 3 Meldungen frei, dann 60s Cooldown
+  const CD_WINDOW = 60000;
+  const CD_MAX = 3;
+  let stamps = JSON.parse(localStorage.getItem('rm_stamps') || '[]');
+  const now = Date.now();
+  stamps = stamps.filter(t => now - t < CD_WINDOW);
+  if (stamps.length >= CD_MAX) {
+    const wait = Math.ceil((CD_WINDOW - (now - stamps[0])) / 1000);
+    showToast('\u23F3 Bitte ' + wait + 's warten \u2013 Spam-Schutz');
     return;
   }
+  stamps.push(now);
+  localStorage.setItem('rm_stamps', JSON.stringify(stamps));
 
   const pos = getCurrentPosition();
 
@@ -2684,9 +2681,6 @@ async function handleSaveReport() {
   for (const photo of state.photos) {
     await savePhoto(localId, photo.dataUrl);
   }
-
-  // Cooldown-Zeitstempel setzen
-  localStorage.setItem('lastSubmitTime', Date.now().toString());
 
   // Sync versuchen (im Hintergrund, respektiert Sync-Modus)
   if (syncEnabled && navigator.onLine && shouldSync()) {
