@@ -96,8 +96,16 @@
     .mod__btn--approve{background:#D4EDDA;color:#155724}.mod__btn--approve:hover{background:#28A745;color:#fff}
     .mod__btn--reject{background:#F8D7DA;color:#721C24}.mod__btn--reject:hover{background:#DC3545;color:#fff}
     .mod__btn--pending{background:#FFF3CD;color:#856404}.mod__btn--pending:hover{background:#FFC107;color:#333}
+    .mod__btn--delete{background:#F8D7DA;color:#721C24;border:2px dashed #DC3545}.mod__btn--delete:hover{background:#DC3545;color:#fff;border-style:solid}
     .mod__btn.active{outline:3px solid var(--blue);outline-offset:2px}
     .mod__toast{font-size:12px;text-align:center;padding:8px;border-radius:6px;background:#D4EDDA;color:#155724;display:none}
+
+    /* MODERATION BAR */
+    .modbar{padding:10px 16px;border-bottom:1px solid var(--border);background:#FFFCF0}
+    .modbar__btn{width:100%;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#FFF3CD;border:2px solid #FFDA6A;border-radius:8px;font-family:inherit;font-size:13px;font-weight:700;color:#856404;cursor:pointer;transition:all .2s}
+    .modbar__btn:hover{background:#FFE69C;border-color:#FFD43B}
+    .modbar__btn.active{background:#856404;color:#fff;border-color:#856404}
+    .modbar__count{background:#DC3545;color:#fff;font-size:12px;font-weight:800;padding:2px 8px;border-radius:12px;min-width:24px;text-align:center}
 
     /* MOBILE TAB BAR */
     .tab-bar{display:none;height:52px;background:var(--card);border-top:1px solid var(--border);position:fixed;bottom:0;left:0;right:0;z-index:2000}
@@ -233,10 +241,15 @@
         <button class="ebtn" onclick="exGJ()">📥 GeoJSON</button>
         <button class="ebtn" onclick="exCSV()">📥 CSV</button>
         <button class="ebtn" onclick="exPDF()">📄 PDF-Bericht</button>
-        <button class="ebtn hbtn--desktop" onclick="openPM()">⚙️ Projekte</button>
       </div>
       <div class="chtog" onclick="togCh()"><span>📊 Statistiken</span><span id="chArr">▼</span></div>
       <div class="chpan" id="chPan"><div id="chBars"></div></div>
+      <div class="modbar" id="modBar" style="display:none">
+        <button class="modbar__btn" id="modFilterBtn" onclick="togModFilter()">
+          <span>⏳ Freigabe nötig</span>
+          <span class="modbar__count" id="modCount">0</span>
+        </button>
+      </div>
       <div class="reports" id="rptList"><div class="loading">Meldungen werden geladen…</div></div>
     </aside>
 
@@ -261,10 +274,13 @@
           <button class="mod__btn mod__btn--approve" onclick="modReport('approved')">✅ Freigeben</button>
           <button class="mod__btn mod__btn--reject" onclick="modReport('rejected')">❌ Ablehnen</button>
         </div>
-        <div class="mod__btns">
-          <button class="mod__btn mod__btn--pending" onclick="modReport('new')">🔄 Zurücksetzen</button>
-        </div>
         <div class="mod__toast" id="modToast"></div>
+      </div>
+      <div class="mod" id="detDel">
+        <div class="mod__label">Verwaltung</div>
+        <div class="mod__btns">
+          <button class="mod__btn mod__btn--delete" onclick="delReport()">🗑️ Meldung löschen</button>
+        </div>
       </div>
     </aside>
   </div>
@@ -327,7 +343,7 @@ const CL={problems:'Problem',wishes:'Wunsch',positive:'Positiv'};
 const SL={surface:'Oberfläche',narrow:'Engstelle',crossing:'Kreuzung/Knoten',traverse:'Querung',conflict:'Konflikte',parking:'Parken',signage:'Wegweisung',lighting:'Beleuchtung',construction:'Baustelle',drainage:'Entwässerung',other_problem:'Sonstiges',new_path:'Radweg gewünscht',bike_parking:'Abstellanlage',tempo30:'Tempo 30',traffic_light:'Ampelschaltung',bike_street:'Fahrradstraße',oneway:'Einbahnstraße öffnen',good_infra:'Gute Infrastruktur',safe_crossing:'Sichere Querung',service:'Service',detour:'Umleitung fehlt',bike_friendly_stop:'Fahrradfreundl. Einkehr',wrong_signage:'Falsche Beschilderung',barrier_free:'Barrierefreiheit',winter:'Winterdienst'};
 const CC={problems:'#E00000',wishes:'#E5A700',positive:'#00A836'};
 const STS={new:'Neu',approved:'Freigegeben',rejected:'Abgelehnt'};
-var all=[],filt=[],aCat='all',mkrs={},mc,gfPoly=null,gfOn=false,projs=[],aProj=null;
+var all=[],filt=[],aCat='all',mkrs={},mc,gfPoly=null,gfOn=false,projs=[],aProj=null,modFilterOn=false;
 function $(id){return document.getElementById(id);}
 
 // ============ MOBILE TAB SWITCHING ============
@@ -470,13 +486,28 @@ async function loadRpts(){
 }
 
 // ============ FILTERS ============
-function fCat(c,el){aCat=c;document.querySelectorAll('.stat').forEach(s=>s.classList.remove('active'));if(el)el.classList.add('active');af();}
+function fCat(c,el){aCat=c;modFilterOn=false;$('modFilterBtn').classList.remove('active');document.querySelectorAll('.stat').forEach(s=>s.classList.remove('active'));if(el)el.classList.add('active');af();}
+function togModFilter(){modFilterOn=!modFilterOn;$('modFilterBtn').classList.toggle('active',modFilterOn);af();}
 function af(){let r=[...all];if(aCat!=='all')r=r.filter(x=>x.category===aCat);
+if(modFilterOn)r=r.filter(x=>x.subcategory==='other_problem'&&(!x.status||x.status==='new'));
 const sc=$('fSub').value;if(sc)r=r.filter(x=>x.subcategory===sc);
 const df=$('fFrom').value,dt=$('fTo').value;if(df)r=r.filter(x=>x.timestamp&&x.timestamp>=df);if(dt)r=r.filter(x=>x.timestamp&&x.timestamp<=dt+'T23:59:59');
 if(gfOn)r=r.filter(x=>x.latitude&&x.longitude&&inGeo(x.latitude,x.longitude));
 const s=$('fSearch').value.toLowerCase();if(s)r=r.filter(x=>(x.comment&&x.comment.toLowerCase().includes(s))||(SL[x.subcategory]||'').toLowerCase().includes(s));
-filt=r;uStats();uSub();rList();rMap();rCh();}
+filt=r;uStats();uSub();rList();rMap();rCh();uMod();}
+
+function uMod(){
+  const pending=all.filter(x=>x.subcategory==='other_problem'&&(!x.status||x.status==='new'));
+  const bar=$('modBar');
+  const cnt=$('modCount');
+  if(pending.length>0){
+    bar.style.display='';
+    cnt.textContent=pending.length;
+  } else {
+    bar.style.display='none';
+    if(modFilterOn){modFilterOn=false;$('modFilterBtn').classList.remove('active');}
+  }
+}
 
 function uStats(){const b=(gfOn||$('fFrom').value||$('fTo').value)?filt:all;$('cAll').textContent=b.length;$('cProb').textContent=b.filter(r=>r.category==='problems').length;$('cWish').textContent=b.filter(r=>r.category==='wishes').length;$('cPos').textContent=b.filter(r=>r.category==='positive').length;}
 function uSub(){const sel=$('fSub'),cur=sel.value,rel=aCat==='all'?filt:filt.filter(r=>r.category===aCat);const subs=[...new Set(rel.map(r=>r.subcategory).filter(Boolean))].sort((a,b)=>(SL[a]||a).localeCompare(SL[b]||b));sel.innerHTML='<option value="">Alle Unterkategorien</option>';subs.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=SL[s]||s;if(s===cur)o.selected=true;sel.appendChild(o);});}
@@ -522,6 +553,9 @@ function selRpt(id){
   } else {
     modSection.style.display='none';
   }
+
+  // Löschen-Button immer anzeigen
+  $('detDel').style.display='';
 
   $('detPan').classList.add('open');
 
@@ -574,12 +608,35 @@ async function modReport(newStatus){
     toast.style.display='block';
     setTimeout(()=>{toast.style.display='none';},3000);
 
-    // Refresh list
-    rList();
+    // Refresh list + moderation counter
+    rList();uMod();
   }catch(e){
     toast.textContent='❌ Fehler beim Speichern: '+e.message;
     toast.style.background='#F8D7DA';toast.style.color='#721C24';
     toast.style.display='block';
+  }
+}
+
+// Delete report
+async function delReport(){
+  if(!curRptId)return;
+  if(!confirm('Meldung wirklich endgültig löschen?'))return;
+  try{
+    const res=await fetch(SB_URL+'/rest/v1/reports?id=eq.'+curRptId,{
+      method:'DELETE',
+      headers:{
+        apikey:SB_KEY,
+        Authorization:'Bearer '+SB_KEY,
+        Prefer:'return=minimal'
+      }
+    });
+    if(!res.ok)throw new Error('Status '+res.status);
+    // Remove from local data
+    all=all.filter(x=>x.id!==curRptId);
+    closeDet();
+    af();
+  }catch(e){
+    alert('Fehler beim Löschen: '+e.message);
   }
 }
 
