@@ -145,7 +145,7 @@
   </div>
 
   <div class="info-box">
-    &#x1F6B2; Mitmachen? <a href="https://2rat.github.io/velomeld/">Radwegemelder-App &#246;ffnen</a>
+    &#x1F6B2; Mitmachen? <a id="appLink" href="https://2rat.github.io/velomeld/">Radwegemelder-App &#246;ffnen</a>
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -228,6 +228,7 @@
 
     const params = new URLSearchParams(window.location.search);
     const paramKommune = params.get('kommune');
+    if(paramKommune){var al=document.getElementById('appLink');if(al)al.href='https://2rat.github.io/velomeld/?kommune='+encodeURIComponent(paramKommune);}
     const paramVon = params.get('von');
     const paramBis = params.get('bis');
     const paramTitel = params.get('titel');
