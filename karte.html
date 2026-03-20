@@ -299,7 +299,7 @@
 
     async function loadReports() {
       try {
-        var resp = await fetch(SUPABASE_URL + '/rest/v1/reports?select=*&order=timestamp.desc&limit=5000', { headers: { 'apikey': SUPABASE_KEY } });
+        var resp = await fetch(SUPABASE_URL + '/rest/v1/reports?select=*&order=timestamp.desc&limit=5000&or=(subcategory.neq.other_problem,status.eq.approved)', { headers: { 'apikey': SUPABASE_KEY } });
         if (!resp.ok) throw new Error('HTTP ' + resp.status);
         allReports = await resp.json();
 
