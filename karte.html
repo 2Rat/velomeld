@@ -355,12 +355,11 @@
         var dateStr = new Date(r.timestamp).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
         var commentHtml = '';
         if (r.comment) {
-          if (r.status === 'approved') {
-            commentHtml = '<div class="popup__comment">' + escapeHtml(r.comment) + '</div>';
-          } else {
+          if (r.subcategory === 'other_problem' && r.status !== 'approved') {
             commentHtml = '<div class="popup__comment" style="color:#8A9BA4;font-style:italic;">Kommentar wird gepr\u00FCft\u2026</div>';
+          } else {
+            commentHtml = '<div class="popup__comment">' + escapeHtml(r.comment) + '</div>';
           }
-        }
         marker.bindPopup('<div class="popup"><div class="popup__header"><span class="popup__icon">' + info.icon + '</span><div><div class="popup__category">' + info.label + '</div><span class="popup__badge" style="background:' + info.color + '">' + info.catLabel + '</span></div></div>' + commentHtml + '<div class="popup__meta">\uD83D\uDCC5 ' + dateStr + '</div></div>');
         clusterGroup.addLayer(marker);
       });
