@@ -451,6 +451,8 @@
         mc.style.flexDirection = 'column';
         mc.style.height = '100%';
         init();
+        setTimeout(function(){ map.invalidateSize(); }, 300);
+        setTimeout(function(){ map.invalidateSize(); }, 1000);
       } else {
         document.getElementById('loginError').style.display = 'block';
       }
