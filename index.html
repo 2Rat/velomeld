@@ -2292,11 +2292,15 @@ async function loadReportCounter() {
       '⚠️ ' + counts.problems + '× Probleme · 💬 ' + counts.wishes + '× Wünsche · 👍 ' + counts.positive + '× Lob';
     document.getElementById('report-counter').style.display = 'block';
 
-    // Link zur Ergebnisseite mit aktuellen URL-Parametern
+    // Link zur Ergebnisseite nur mit Kommune-Parameter
     var counterLink = document.getElementById('counter-link');
     if (counterLink) {
       var qs = window.location.search;
-      counterLink.href = './karte.html' + (qs || '');
+      if (qs && qs.indexOf('kommune=') !== -1) {
+        counterLink.href = './karte.html' + qs;
+      } else {
+        counterLink.style.display = 'none';
+      }
     }
   } catch (e) {
     console.warn('[Counter] Fehler:', e);
