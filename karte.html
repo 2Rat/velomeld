@@ -3,10 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Radwegemelder – Öffentliche Karte</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+  <title>Radwegemelder – Ergebnisse</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -16,7 +13,7 @@
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; font-family: var(--font); color: var(--gray); }
-    body { display: flex; flex-direction: column; }
+    body { display: flex; flex-direction: column; background: #F4F6F8; }
 
     .header {
       background: var(--white); padding: 12px 20px;
@@ -28,64 +25,6 @@
     .header__title span:first-child { color: #1A5FA8; }
     .header__title span:last-child { color: #2D8C28; }
     .header__subtitle { font-size: 10px; color: var(--gray-mid); font-weight: 500; }
-    .header__stats { display: flex; gap: 12px; font-size: 13px; font-weight: 600; }
-    .stat { display: flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; background: #f5f5f5; }
-    .stat__dot { width: 10px; height: 10px; border-radius: 50%; }
-
-    #map { flex: 1; min-height: 0; }
-
-    .filters {
-      position: absolute; top: 80px; left: 10px; z-index: 1000;
-      display: flex; flex-direction: column; gap: 6px;
-    }
-    .filter-btn {
-      display: flex; align-items: center; gap: 6px;
-      padding: 8px 14px; border: 2px solid transparent; border-radius: 24px;
-      background: var(--white); box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-      font-family: var(--font); font-size: 13px; font-weight: 600;
-      cursor: pointer; transition: all 0.2s; white-space: nowrap;
-    }
-    .filter-btn:hover { transform: scale(1.03); }
-    .filter-btn.active { border-color: currentColor; }
-    .filter-btn--problems { color: var(--red); }
-    .filter-btn--problems.active { background: #FFF0F0; }
-    .filter-btn--wishes { color: var(--yellow); }
-    .filter-btn--wishes.active { background: #FFF8E0; }
-    .filter-btn--positive { color: var(--green); }
-    .filter-btn--positive.active { background: #EEFBF0; }
-    .filter-btn--all { color: var(--gray); }
-    .filter-btn--all.active { background: #F0F2F4; border-color: var(--gray); }
-    .filter-count {
-      background: currentColor; color: white; font-size: 11px;
-      padding: 1px 7px; border-radius: 10px; min-width: 22px; text-align: center;
-    }
-
-    .leaflet-popup-content-wrapper { border-radius: 14px !important; box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important; padding: 0 !important; }
-    .leaflet-popup-content { margin: 0 !important; min-width: 220px; }
-    .popup { padding: 16px; }
-    .popup__header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-    .popup__icon { font-size: 24px; }
-    .popup__category { font-weight: 700; font-size: 14px; }
-    .popup__badge { display: inline-block; padding: 2px 8px; border-radius: 8px; font-size: 11px; font-weight: 600; color: white; }
-    .popup__comment { margin-top: 10px; padding: 10px; background: #F7F8F9; border-radius: 10px; font-size: 13px; line-height: 1.5; color: #4A5568; }
-    .popup__meta { margin-top: 10px; font-size: 11px; color: var(--gray-mid); }
-
-    .loading {
-      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-      z-index: 1000; background: white; padding: 20px 30px; border-radius: 16px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.15); font-weight: 600;
-      display: flex; align-items: center; gap: 10px;
-    }
-    .loading__spinner { width: 20px; height: 20px; border: 3px solid #E5E7EB; border-top-color: #1A5FA8; border-radius: 50%; animation: spin 0.8s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .info-box {
-      position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
-      z-index: 1000; background: white; padding: 10px 20px; border-radius: 24px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.12); font-size: 12px; color: var(--gray-mid);
-      display: flex; align-items: center; gap: 8px; white-space: nowrap;
-    }
-    .info-box a { color: #1A5FA8; text-decoration: none; font-weight: 600; }
 
     .kommune-banner {
       display: none; background: #1A5FA8; color: white; padding: 8px 20px;
@@ -96,14 +35,94 @@
     .kommune-banner__name { font-size: 15px; }
     .kommune-banner__info { font-size: 11px; opacity: 0.8; }
 
+    .content {
+      flex: 1; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; padding: 30px 20px; gap: 20px;
+    }
+
+    .stats-card {
+      background: white; border-radius: 20px; padding: 32px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08); max-width: 440px; width: 100%;
+      text-align: center;
+    }
+    .stats-card__icon { font-size: 48px; margin-bottom: 12px; }
+    .stats-card__total { font-size: 36px; font-weight: 800; color: #1A5FA8; }
+    .stats-card__label { font-size: 14px; color: var(--gray-mid); margin-top: 4px; }
+
+    .cat-row {
+      display: flex; justify-content: center; gap: 16px;
+      margin-top: 24px; flex-wrap: wrap;
+    }
+    .cat-item {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 14px 20px; border-radius: 14px; min-width: 100px;
+    }
+    .cat-item--problems { background: #FFF0F0; }
+    .cat-item--wishes { background: #FFF8E0; }
+    .cat-item--positive { background: #EEFBF0; }
+    .cat-item__count { font-size: 28px; font-weight: 800; }
+    .cat-item--problems .cat-item__count { color: var(--red); }
+    .cat-item--wishes .cat-item__count { color: var(--yellow); }
+    .cat-item--positive .cat-item__count { color: var(--green); }
+    .cat-item__label { font-size: 12px; color: var(--gray-mid); margin-top: 4px; font-weight: 600; }
+
+    .top-list {
+      margin-top: 24px; text-align: left; width: 100%;
+    }
+    .top-list__title {
+      font-size: 13px; font-weight: 700; color: var(--gray-mid);
+      margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .top-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 0; border-bottom: 1px solid #F0F2F4;
+    }
+    .top-item:last-child { border-bottom: none; }
+    .top-item__icon { font-size: 18px; }
+    .top-item__label { flex: 1; font-size: 13px; font-weight: 500; }
+    .top-item__count {
+      font-size: 13px; font-weight: 700; background: #F0F2F4;
+      padding: 2px 10px; border-radius: 10px;
+    }
+
+    .cta-box {
+      background: white; border-radius: 16px; padding: 20px 28px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06); max-width: 440px; width: 100%;
+      text-align: center;
+    }
+    .cta-box__text { font-size: 14px; color: var(--gray); margin-bottom: 12px; }
+    .cta-box__link {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 24px; background: #1A5FA8; color: white;
+      border-radius: 24px; text-decoration: none; font-size: 14px; font-weight: 600;
+      box-shadow: 0 2px 8px rgba(26,95,168,0.3); transition: transform 0.2s;
+    }
+    .cta-box__link:hover { transform: scale(1.03); }
+
+    .loading {
+      font-size: 15px; color: var(--gray-mid); font-weight: 600;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .loading__spinner {
+      width: 20px; height: 20px; border: 3px solid #E5E7EB;
+      border-top-color: #1A5FA8; border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .footer-info {
+      font-size: 11px; color: var(--gray-mid); text-align: center;
+      padding-bottom: 16px;
+    }
+    .footer-info a { color: #1A5FA8; text-decoration: none; font-weight: 600; }
+
     @media (max-width: 480px) {
       .header { padding: 10px 14px; }
       .header__title { font-size: 15px; letter-spacing: 2px; }
-      .header__stats { gap: 6px; font-size: 11px; }
-      .stat { padding: 3px 8px; }
-      .filters { top: 70px; left: 6px; }
-      .filter-btn { padding: 6px 10px; font-size: 12px; }
-      .info-box { font-size: 11px; padding: 8px 14px; bottom: 10px; }
+      .stats-card { padding: 24px 20px; }
+      .stats-card__total { font-size: 30px; }
+      .cat-item { padding: 10px 14px; min-width: 80px; }
+      .cat-item__count { font-size: 22px; }
     }
   </style>
 </head>
@@ -117,287 +136,184 @@
   <div class="header">
     <div class="header__brand">
       <div class="header__title"><span>Radwege</span><span>melder</span></div>
-      <div class="header__subtitle" id="subtitle">&#214;ffentliche Meldungskarte &#183; Saarland</div>
+      <div class="header__subtitle" id="subtitle">Ergebnisse &#183; Saarland</div>
     </div>
-    <div class="header__stats" id="stats"></div>
   </div>
 
-  <div id="map"></div>
+  <div class="content">
+    <div class="loading" id="loading">
+      <div class="loading__spinner"></div>
+      Meldungen werden geladen&#8230;
+    </div>
 
-  <div class="filters">
-    <button class="filter-btn filter-btn--all active" data-filter="all" onclick="setFilter('all')">
-      &#x1F5FA;&#xFE0F; Alle <span class="filter-count" id="count-all">0</span>
-    </button>
-    <button class="filter-btn filter-btn--problems" data-filter="problems" onclick="setFilter('problems')">
-      &#x26A0;&#xFE0F; Probleme <span class="filter-count" id="count-problems">0</span>
-    </button>
-    <button class="filter-btn filter-btn--wishes" data-filter="wishes" onclick="setFilter('wishes')">
-      &#x1F4AC; W&#252;nsche <span class="filter-count" id="count-wishes">0</span>
-    </button>
-    <button class="filter-btn filter-btn--positive" data-filter="positive" onclick="setFilter('positive')">
-      &#x1F44D; Positiv <span class="filter-count" id="count-positive">0</span>
-    </button>
+    <div class="stats-card" id="statsCard" style="display:none;">
+      <div class="stats-card__icon">&#x1F4CA;</div>
+      <div class="stats-card__total" id="totalCount">0</div>
+      <div class="stats-card__label">Meldungen eingegangen</div>
+
+      <div class="cat-row">
+        <div class="cat-item cat-item--problems">
+          <div class="cat-item__count" id="countProblems">0</div>
+          <div class="cat-item__label">&#x26A0;&#xFE0F; Probleme</div>
+        </div>
+        <div class="cat-item cat-item--wishes">
+          <div class="cat-item__count" id="countWishes">0</div>
+          <div class="cat-item__label">&#x1F4AC; W&#252;nsche</div>
+        </div>
+        <div class="cat-item cat-item--positive">
+          <div class="cat-item__count" id="countPositive">0</div>
+          <div class="cat-item__label">&#x1F44D; Lob</div>
+        </div>
+      </div>
+
+      <div class="top-list" id="topList">
+        <div class="top-list__title">H&#228;ufigste Meldungen</div>
+      </div>
+    </div>
+
+    <div class="cta-box" id="ctaBox" style="display:none;">
+      <div class="cta-box__text">&#x1F6B2; Du f&#228;hrst regelm&#228;&#223;ig Rad? Hilf mit, die Radwege zu verbessern!</div>
+      <a class="cta-box__link" id="appLink" href="https://2rat.github.io/velomeld/">
+        &#x1F4F1; Jetzt mitmachen
+      </a>
+    </div>
   </div>
 
-  <div class="loading" id="loading">
-    <div class="loading__spinner"></div>
-    Meldungen werden geladen&#8230;
+  <div class="footer-info">
+    Ein Projekt von <a href="https://www.2rat.org" target="_blank">2Rat &#8211; B&#252;ro f&#252;r Radverkehrsplanung</a>
   </div>
 
-  <div class="info-box">
-    &#x1F6B2; Mitmachen? <a id="appLink" href="https://2rat.github.io/velomeld/">Radwegemelder-App &#246;ffnen</a>
-  </div>
-
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
   <script>
-    const SUPABASE_URL = 'https://vimsikjyoupihogmquul.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpbXNpa2p5b3VwaWhvZ21xdXVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0NTIyMjYsImV4cCI6MjA4NjAyODIyNn0._Foa5ZVr4nwoOlZ4T-ORX0U4sNUjgRJJRyBDHvHV2vo';
+    var SUPABASE_URL = 'https://vimsikjyoupihogmquul.supabase.co';
+    var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpbXNpa2p5b3VwaWhvZ21xdXVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0NTIyMjYsImV4cCI6MjA4NjAyODIyNn0._Foa5ZVr4nwoOlZ4T-ORX0U4sNUjgRJJRyBDHvHV2vo';
 
-    const CATEGORIES = {
-      problems: { label: 'Problem', color: '#E00000', emoji: '\u26A0\uFE0F',
-        subs: {
-          surface:       { icon: '\uD83D\uDD73\uFE0F', label: 'Oberfl\u00E4che' },
-          narrow:        { icon: '\u2194\uFE0F',       label: 'Engstelle' },
-          crossing:      { icon: '\uD83D\uDD00',       label: 'Kreuzung / Knoten' },
-          traverse:      { icon: '\uD83D\uDEB6',       label: 'Querung' },
-          conflict:      { icon: '\uD83D\uDCA5',       label: 'Konflikte' },
-          parking:       { icon: '\uD83C\uDD7F\uFE0F', label: 'Parken' },
-          signage:       { icon: '\uD83E\uDEA7',       label: 'Wegweisung' },
-          wrong_signage: { icon: '\uD83D\uDEAB',       label: 'Falsche Beschilderung' },
-          lighting:      { icon: '\uD83D\uDCA1',       label: 'Beleuchtung' },
-          winter:        { icon: '\u2744\uFE0F',       label: 'Winterdienst / Reinigung' },
-          construction:  { icon: '\uD83D\uDEA7',       label: 'Baustelle' },
-          drainage:      { icon: '\uD83D\uDCA7',       label: 'Entw\u00E4sserung' },
-          other:         { icon: '\uD83D\uDCCD',       label: 'Sonstiges' },
-          detour:        { icon: '\uD83D\uDD04',       label: 'Umleitung fehlt' },
-          barrier_free:  { icon: '\u267F',              label: 'Barrierefreiheit' },
-          other_problem: { icon: '\u2757',              label: 'Sonstiges Problem' }
-        }
-      },
-      wishes: { label: 'Wunsch', color: '#E5A700', emoji: '\uD83D\uDCAC',
-        subs: {
-          new_path:      { icon: '\uD83D\uDEE4\uFE0F', label: 'Radweg gew\u00FCnscht' },
-          bike_parking:  { icon: '\uD83D\uDD12',       label: 'Abstellanlage' },
-          tempo30:       { icon: '\uD83D\uDC0C',       label: 'Tempo 30' },
-          traffic_light: { icon: '\uD83D\uDEA6',       label: 'Ampelschaltung' },
-          bike_street:   { icon: '\uD83D\uDEB2',       label: 'Fahrradstra\u00DFe' },
-          oneway:        { icon: '\u21A9\uFE0F',       label: 'Einbahnstra\u00DFe \u00F6ffnen' }
-        }
-      },
-      positive: { label: 'Positiv', color: '#00A836', emoji: '\uD83D\uDC4D',
-        subs: {
-          good_infra:         { icon: '\u2B50',              label: 'Gute Infrastruktur' },
-          safe_crossing:      { icon: '\u2705',              label: 'Sichere Querung' },
-          service:            { icon: '\uD83D\uDEE0\uFE0F', label: 'Service' },
-          bike_friendly_stop: { icon: '\u2615',              label: 'Fahrradfreundliche Einkehr' }
-        }
-      }
+    var SUB_LABELS = {
+      surface: '\uD83D\uDD73\uFE0F Oberfl\u00E4che',
+      narrow: '\u2194\uFE0F Engstelle',
+      crossing: '\uD83D\uDD00 Kreuzung',
+      traverse: '\uD83D\uDEB6 Querung',
+      conflict: '\uD83D\uDCA5 Konflikte',
+      parking: '\uD83C\uDD7F\uFE0F Parken',
+      signage: '\uD83E\uDEA7 Wegweisung',
+      lighting: '\uD83D\uDCA1 Beleuchtung',
+      winter: '\u2744\uFE0F Winterdienst',
+      barrier_free: '\u267F Barrierefreiheit',
+      detour: '\uD83D\uDD04 Umleitung fehlt',
+      other_problem: '\u2757 Sonstiges',
+      new_path: '\uD83D\uDEE4\uFE0F Radweg gew\u00FCnscht',
+      bike_parking: '\uD83D\uDD12 Abstellanlage',
+      tempo30: '\uD83D\uDC0C Tempo 30',
+      traffic_light: '\uD83D\uDEA6 Ampelschaltung',
+      bike_street: '\uD83D\uDEB2 Fahrradstra\u00DFe',
+      oneway: '\u21A9\uFE0F Einbahnstra\u00DFe \u00F6ffnen',
+      good_infra: '\u2B50 Gute Infrastruktur',
+      safe_crossing: '\u2705 Sichere Querung',
+      service: '\uD83D\uDEE0\uFE0F Service',
+      bike_friendly_stop: '\u2615 Fahrradfreundliche Einkehr',
+      bike_friendly: '\uD83C\uDF7A Fahrradfreundliche Einkehr'
     };
 
-    function getSubInfo(cat, sub) {
-      const c = CATEGORIES[cat];
-      if (!c) return { icon: '\uD83D\uDCCD', label: sub || 'Meldung', color: '#999', catLabel: cat };
-      const s = c.subs[sub];
-      if (s) return { icon: s.icon, label: s.label, color: c.color, catLabel: c.label };
-      return { icon: c.emoji, label: sub || c.label, color: c.color, catLabel: c.label };
+    var params = new URLSearchParams(window.location.search);
+    var paramKommune = params.get('kommune');
+    var paramVon = params.get('von');
+    var paramBis = params.get('bis');
+    var paramTitel = params.get('titel');
+
+    if (paramKommune) {
+      var al = document.getElementById('appLink');
+      if (al) al.href = 'https://2rat.github.io/velomeld/?kommune=' + encodeURIComponent(paramKommune);
     }
-
-    function makeSVG(color) {
-      return `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="42" viewBox="0 0 32 42">
-        <path d="M16 0C7.2 0 0 7.2 0 16c0 12 16 26 16 26s16-14 16-26C32 7.2 24.8 0 16 0z" fill="${color}" stroke="#fff" stroke-width="2"/>
-        <circle cx="16" cy="15" r="6" fill="#fff" opacity="0.9"/>
-      </svg>`;
-    }
-    const ICONS = {};
-    ['problems', 'wishes', 'positive'].forEach(cat => {
-      ICONS[cat] = L.divIcon({
-        html: makeSVG(CATEGORIES[cat].color),
-        className: '', iconSize: [32, 42], iconAnchor: [16, 42], popupAnchor: [0, -36]
-      });
-    });
-
-    const map = L.map('map').setView([49.38, 6.95], 10);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-      maxZoom: 19
-    }).addTo(map);
-
-    let allReports = [], filteredByGeo = [], currentFilter = 'all', clusterGroup = null;
-    let kommuneMode = false, kommuneName = '', gfPoly = null;
-
-    const params = new URLSearchParams(window.location.search);
-    const paramKommune = params.get('kommune');
-    if(paramKommune){var al=document.getElementById('appLink');if(al)al.href='https://2rat.github.io/velomeld/?kommune='+encodeURIComponent(paramKommune);}
-    const paramVon = params.get('von');
-    const paramBis = params.get('bis');
-    const paramTitel = params.get('titel');
-
-    async function loadKommuneGeofence(name) {
-      try {
-        const res = await fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(name + ', Saarland, Deutschland') + '&format=json&polygon_geojson=1&limit=1', {
-          headers: { 'User-Agent': '2Rat-Radwegemelder/1.0' }
-        });
-        const data = await res.json();
-        if (!data.length) { console.warn('Kommune nicht gefunden:', name); return; }
-        const r = data[0];
-        kommuneName = r.display_name.split(',')[0];
-
-        document.getElementById('kommuneBanner').classList.add('active');
-        document.getElementById('kommuneName').textContent = kommuneName;
-        document.getElementById('subtitle').textContent = 'Meldungskarte \u00B7 ' + kommuneName;
-
-        if (paramVon || paramBis) {
-          var vonStr = paramVon || '\u2026';
-          var bisStr = paramBis || '\u2026';
-          document.getElementById('kommuneInfo').textContent = '\u00B7 Aktionszeitraum: ' + vonStr + ' bis ' + bisStr;
-        }
-
-        if (paramTitel) {
-          document.getElementById('kommuneName').textContent = paramTitel;
-          document.title = paramTitel + ' \u2013 Radwegemelder';
-        } else {
-          document.title = 'Radwegecheck ' + kommuneName + ' \u2013 Radwegemelder';
-        }
-
-        if (r.geojson && (r.geojson.type === 'Polygon' || r.geojson.type === 'MultiPolygon')) {
-          gfPoly = L.geoJSON(r.geojson, {
-            style: { color: '#1A5FA8', weight: 2, fillColor: '#1A5FA8', fillOpacity: 0.05, dashArray: '6,4' }
-          }).addTo(map);
-          map.fitBounds(gfPoly.getBounds(), { padding: [40, 40] });
-        } else if (r.boundingbox) {
-          var b = L.latLngBounds([+r.boundingbox[0], +r.boundingbox[2]], [+r.boundingbox[1], +r.boundingbox[3]]);
-          gfPoly = L.rectangle(b, { color: '#1A5FA8', weight: 2, fillColor: '#1A5FA8', fillOpacity: 0.05, dashArray: '6,4' }).addTo(map);
-          map.fitBounds(b, { padding: [40, 40] });
-        }
-        kommuneMode = true;
-      } catch (e) { console.error('Geofence-Fehler:', e); }
-    }
-
-    function inGeo(lat, lng) {
-      if (!kommuneMode || !gfPoly) return true;
-      if (gfPoly.getLayers) {
-        for (var ly of gfPoly.getLayers()) {
-          if (ly.getLatLngs) {
-            var rings = ly.getLatLngs();
-            var flat = Array.isArray(rings[0][0]) ? rings.flat() : rings;
-            for (var ring of flat) if (raycast(L.latLng(lat, lng), ring)) return true;
-          } else if (ly.getBounds && ly.getBounds().contains([lat, lng])) return true;
-        }
-        return false;
-      }
-      return gfPoly.getBounds ? gfPoly.getBounds().contains([lat, lng]) : true;
-    }
-    function raycast(pt, poly) {
-      var ins = false;
-      for (var i = 0, j = poly.length - 1; i < poly.length; j = i++) {
-        var yi = poly[i].lng, xi = poly[i].lat, yj = poly[j].lng, xj = poly[j].lat;
-        if ((yi > pt.lng) !== (yj > pt.lng) && pt.lat < (xj - xi) * (pt.lng - yi) / (yj - yi) + xi) ins = !ins;
-      }
-      return ins;
-    }
-
-    async function loadReports() {
-      try {
-        var resp = await fetch(SUPABASE_URL + '/rest/v1/reports?select=*&order=timestamp.desc&limit=5000&or=(subcategory.neq.other_problem,status.eq.approved)', { headers: { 'apikey': SUPABASE_KEY } });
-        if (!resp.ok) throw new Error('HTTP ' + resp.status);
-        allReports = await resp.json();
-
-        filteredByGeo = allReports;
-        if (kommuneMode) {
-          filteredByGeo = allReports.filter(function(r) { return r.latitude && r.longitude && inGeo(r.latitude, r.longitude); });
-        }
-
-        if (paramVon) filteredByGeo = filteredByGeo.filter(function(r) { return r.timestamp && r.timestamp >= paramVon; });
-        if (paramBis) filteredByGeo = filteredByGeo.filter(function(r) { return r.timestamp && r.timestamp <= paramBis + 'T23:59:59'; });
-
-        updateCounts();
-        renderMarkers();
-
-        if (!kommuneMode && filteredByGeo.length > 0) {
-          var bounds = filteredByGeo.map(function(r) { return [r.latitude, r.longitude]; });
-          map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
-        }
-      } catch (err) {
-        console.error('Fehler:', err);
-        document.getElementById('loading').innerHTML = '\u274C Meldungen konnten nicht geladen werden';
-      }
-      document.getElementById('loading').style.display = 'none';
-    }
-
-    function renderMarkers() {
-      if (clusterGroup) map.removeLayer(clusterGroup);
-      clusterGroup = L.markerClusterGroup({
-        maxClusterRadius: 50, spiderfyOnMaxZoom: true, showCoverageOnHover: false,
-        iconCreateFunction: function(cluster) {
-          var count = cluster.getChildCount();
-          var size = count < 10 ? 36 : count < 50 ? 44 : 52;
-          var cats = {};
-          cluster.getAllChildMarkers().forEach(function(m) { if (m._cat) cats[m._cat] = (cats[m._cat]||0) + 1; });
-          var entries = Object.entries(cats).sort(function(a,b) { return b[1]-a[1]; });
-          var top = entries[0];
-          var colMap = {problems:'#E00000',wishes:'#E5A700',positive:'#00A836'};
-          var col = top ? (colMap[top[0]] || '#3D4F58') : '#3D4F58';
-          return L.divIcon({
-            html: '<div style="width:' + (size-10) + 'px;height:' + (size-10) + 'px;line-height:' + (size-10) + 'px;text-align:center;border-radius:50%;background:' + col + ';color:white;font-weight:700;font-family:DM Sans,sans-serif;font-size:13px;">' + count + '</div>',
-            className: '', iconSize: [size, size],
-          });
-        }
-      });
-
-      var filtered = currentFilter === 'all' ? filteredByGeo : filteredByGeo.filter(function(r) { return r.category === currentFilter; });
-
-      filtered.forEach(function(r) {
-        var info = getSubInfo(r.category, r.subcategory);
-        var icon = ICONS[r.category] || ICONS.problems;
-        var marker = L.marker([r.latitude, r.longitude], { icon: icon });
-        marker._cat = r.category;
-        var dateStr = new Date(r.timestamp).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-        var commentHtml = '';
-        if (r.comment) {
-          if (r.subcategory === 'other_problem' && r.status !== 'approved') {
-            commentHtml = '<div class="popup__comment" style="color:#8A9BA4;font-style:italic;">Kommentar wird gepr\u00FCft\u2026</div>';
-          } else {
-            commentHtml = '<div class="popup__comment">' + escapeHtml(r.comment) + '</div>';
-          }
-          }
-        marker.bindPopup('<div class="popup"><div class="popup__header"><span class="popup__icon">' + info.icon + '</span><div><div class="popup__category">' + info.label + '</div><span class="popup__badge" style="background:' + info.color + '">' + info.catLabel + '</span></div></div>' + commentHtml + '<div class="popup__meta">\uD83D\uDCC5 ' + dateStr + '</div></div>');
-        clusterGroup.addLayer(marker);
-      });
-      map.addLayer(clusterGroup);
-    }
-
-    function setFilter(filter) {
-      currentFilter = filter;
-      document.querySelectorAll('.filter-btn').forEach(function(btn) { btn.classList.toggle('active', btn.dataset.filter === filter); });
-      renderMarkers();
-    }
-
-    function updateCounts() {
-      var counts = { all: filteredByGeo.length, problems: 0, wishes: 0, positive: 0 };
-      filteredByGeo.forEach(function(r) { if (counts[r.category] !== undefined) counts[r.category]++; });
-      Object.entries(counts).forEach(function(e) { var el = document.getElementById('count-' + e[0]); if (el) el.textContent = e[1]; });
-      document.getElementById('stats').innerHTML =
-        '<div class="stat"><div class="stat__dot" style="background:var(--red)"></div>' + counts.problems + '</div>' +
-        '<div class="stat"><div class="stat__dot" style="background:var(--yellow)"></div>' + counts.wishes + '</div>' +
-        '<div class="stat"><div class="stat__dot" style="background:var(--green)"></div>' + counts.positive + '</div>';
-    }
-
-    function escapeHtml(text) { var d = document.createElement('div'); d.textContent = text; return d.innerHTML; }
 
     async function init() {
       if (!paramKommune) {
         document.getElementById('loading').style.display = 'none';
-        document.querySelector('.filters').style.display = 'none';
-        document.getElementById('map').innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;padding:40px;font-family:sans-serif;color:#3D3D3D;background:#FAEFD8;"><div style="font-size:48px;margin-bottom:16px;">&#x1F6B2;</div><div style="font-size:20px;font-weight:700;margin-bottom:8px;">Radwegemelder</div><div style="font-size:14px;color:#6B6B6B;max-width:400px;line-height:1.6;">Diese Karte ist nur mit einem kommunenspezifischen Link verf&#252;gbar.<br><br>Sie m&#246;chten den Radwegemelder in Ihrer Kommune einsetzen?</div><a href="https://www.2rat.org" target="_blank" style="margin-top:20px;background:#689246;color:white;padding:10px 24px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">Kontakt aufnehmen &#8594;</a></div>';
+        document.querySelector('.content').innerHTML =
+          '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;padding:40px;color:#3D3D3D;">' +
+          '<div style="font-size:48px;margin-bottom:16px;">\uD83D\uDEB2</div>' +
+          '<div style="font-size:20px;font-weight:700;margin-bottom:8px;">Radwegemelder</div>' +
+          '<div style="font-size:14px;color:#6B6B6B;max-width:400px;line-height:1.6;">Diese Seite ist nur mit einem kommunenspezifischen Link verf\u00FCgbar.<br><br>Sie m\u00F6chten den Radwegemelder in Ihrer Kommune einsetzen?</div>' +
+          '<a href="https://www.2rat.org" target="_blank" style="margin-top:20px;background:#689246;color:white;padding:10px 24px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">Kontakt aufnehmen \u2192</a></div>';
         return;
       }
-      await loadKommuneGeofence(paramKommune);
-      await loadReports();
-    }
-    init();
 
-    if (paramKommune) setInterval(loadReports, 60000);
+      // Kommune-Banner
+      try {
+        var res = await fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(paramKommune + ', Saarland, Deutschland') + '&format=json&limit=1', {
+          headers: { 'User-Agent': '2Rat-Radwegemelder/1.0' }
+        });
+        var data = await res.json();
+        if (data.length) {
+          var kommuneName = data[0].display_name.split(',')[0];
+          document.getElementById('kommuneBanner').classList.add('active');
+          document.getElementById('kommuneName').textContent = paramTitel || kommuneName;
+          document.getElementById('subtitle').textContent = 'Ergebnisse \u00B7 ' + (paramTitel || kommuneName);
+          document.title = (paramTitel || ('Radwegecheck ' + kommuneName)) + ' \u2013 Radwegemelder';
+
+          if (paramVon || paramBis) {
+            document.getElementById('kommuneInfo').textContent = '\u00B7 Aktionszeitraum: ' + (paramVon || '\u2026') + ' bis ' + (paramBis || '\u2026');
+          }
+        }
+      } catch (e) { console.warn('Nominatim-Fehler:', e); }
+
+      // Meldungen laden
+      try {
+        var url = SUPABASE_URL + '/rest/v1/reports?select=category,subcategory,timestamp&order=timestamp.desc&limit=5000&or=(subcategory.neq.other_problem,status.eq.approved)';
+        var resp = await fetch(url, { headers: { 'apikey': SUPABASE_KEY } });
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        var reports = await resp.json();
+
+        // Nach Zeitraum filtern
+        if (paramVon) reports = reports.filter(function(r) { return r.timestamp && r.timestamp >= paramVon; });
+        if (paramBis) reports = reports.filter(function(r) { return r.timestamp && r.timestamp <= paramBis + 'T23:59:59'; });
+
+        var total = reports.length;
+        var counts = { problems: 0, wishes: 0, positive: 0 };
+        var subCounts = {};
+
+        reports.forEach(function(r) {
+          if (counts.hasOwnProperty(r.category)) counts[r.category]++;
+          var key = r.subcategory || 'unknown';
+          subCounts[key] = (subCounts[key] || 0) + 1;
+        });
+
+        // Anzeige aktualisieren
+        document.getElementById('totalCount').textContent = total;
+        document.getElementById('countProblems').textContent = counts.problems;
+        document.getElementById('countWishes').textContent = counts.wishes;
+        document.getElementById('countPositive').textContent = counts.positive;
+
+        // Top 5 Unterkategorien
+        var topEntries = Object.entries(subCounts)
+          .sort(function(a, b) { return b[1] - a[1]; })
+          .slice(0, 5);
+
+        var topListEl = document.getElementById('topList');
+        topEntries.forEach(function(entry) {
+          var label = SUB_LABELS[entry[0]] || entry[0];
+          var parts = label.match(/^(\S+)\s(.+)$/);
+          var icon = parts ? parts[1] : '\uD83D\uDCCD';
+          var text = parts ? parts[2] : label;
+
+          var div = document.createElement('div');
+          div.className = 'top-item';
+          div.innerHTML =
+            '<span class="top-item__icon">' + icon + '</span>' +
+            '<span class="top-item__label">' + text + '</span>' +
+            '<span class="top-item__count">' + entry[1] + '</span>';
+          topListEl.appendChild(div);
+        });
+
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('statsCard').style.display = 'block';
+        document.getElementById('ctaBox').style.display = 'block';
+
+      } catch (err) {
+        console.error('Fehler:', err);
+        document.getElementById('loading').innerHTML = '\u274C Meldungen konnten nicht geladen werden';
+      }
+    }
+
+    init();
   </script>
 </body>
 </html>
