@@ -794,6 +794,7 @@ input, textarea {
     <div class="home-bottom">
       <h2 class="home-bottom__title">Was möchtest du melden?</h2>
       <p class="home-bottom__subtitle">Wähle eine Kategorie für deine Meldung.</p>
+      <p style="font-size:11px; color:#8A9BA4; margin-top:4px; margin-bottom:2px;">📍 Bitte melde nur vor Ort – nicht von zu Hause.</p>
 
       <!-- Problem -->
       <button class="cat-btn cat-btn--problems" data-category="problems">
@@ -825,11 +826,10 @@ input, textarea {
         <div class="cat-btn__arrow">›</div>
       </button>
 
-      <!-- Öffentliche Karte Button -->
-      <div style="text-align:center; margin-top:18px;">
-        <a href="./karte.html" style="display:inline-flex; align-items:center; gap:8px; padding:10px 20px; background:#1A5FA8; color:white; border-radius:24px; text-decoration:none; font-size:13px; font-weight:600; box-shadow:0 2px 8px rgba(26,95,168,0.3);">
-          🗺️ Radwegecheck Saarland ansehen
-        </a>
+      <!-- Live-Meldungszähler -->
+      <div id="report-counter" style="display:none; text-align:center; margin-top:18px; padding:14px 20px; background:linear-gradient(135deg,#EAF2FB,#F4F8FC); border-radius:16px; border:1px solid #D0DEE8;">
+        <div style="font-size:15px; font-weight:700; color:#1A5FA8;" id="counter-total"></div>
+        <div style="font-size:12px; color:#5A6A74; margin-top:6px;" id="counter-categories"></div>
       </div>
 
       <!-- Footer -->
@@ -905,7 +905,8 @@ input, textarea {
       </div>
 
       <!-- Speichern -->
-      <div style="padding:8px 0 16px;">
+      <div style="padding:8px 0 4px;">
+        <p style="font-size:11px; color:#8A9BA4; text-align:center; margin-bottom:10px;">📍 Stehst du gerade an der Stelle, die du melden möchtest?</p>
         <button id="btn-save-report" class="btn-primary">
           ✓ Meldung speichern
         </button>
@@ -2267,6 +2268,33 @@ const state = {
   gpsAccuracy: null,
 };
 
+// ─── LIVE-MELDUNGSZÄHLER ───
+
+async function loadReportCounter() {
+  try {
+    const resp = await fetch(SUPABASE_URL + '/rest/v1/reports?select=category', {
+      headers: { 'apikey': SUPABASE_ANON_KEY }
+    });
+    if (!resp.ok) return;
+    const reports = await resp.json();
+    const total = reports.length;
+    if (total === 0) return;
+
+    const counts = { problems: 0, wishes: 0, positive: 0 };
+    reports.forEach(r => {
+      if (counts.hasOwnProperty(r.category)) counts[r.category]++;
+    });
+
+    document.getElementById('counter-total').textContent =
+      '📊 Schon ' + total + ' Meldungen eingegangen!';
+    document.getElementById('counter-categories').textContent =
+      '⚠️ ' + counts.problems + '× Probleme · 💬 ' + counts.wishes + '× Wünsche · 👍 ' + counts.positive + '× Lob';
+    document.getElementById('report-counter').style.display = 'block';
+  } catch (e) {
+    console.warn('[Counter] Fehler:', e);
+  }
+}
+
 // ─── INITIALISIERUNG ───
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -2280,6 +2308,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // 3. Sync initialisieren
   initSync();
+
+  // 3b. Live-Meldungszähler laden
+  loadReportCounter();
 
   // 4. Karte
   initMap('map-container');
