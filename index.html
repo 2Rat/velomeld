@@ -2272,6 +2272,8 @@ const state = {
 // ─── LIVE-MELDUNGSZÄHLER ───
 
 async function loadReportCounter() {
+  // Nur anzeigen wenn Kommune-Parameter vorhanden
+  if (window.location.search.indexOf('kommune=') === -1) return;
   try {
     const resp = await fetch(SUPABASE_URL + '/rest/v1/reports?select=category', {
       headers: { 'apikey': SUPABASE_ANON_KEY }
