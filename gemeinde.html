@@ -29,7 +29,7 @@
     .header__title span:last-child { color: #2D8C28; }
     .header__subtitle { font-size: 10px; color: var(--gray-mid); font-weight: 500; }
     .header__stats { display: flex; gap: 12px; font-size: 13px; font-weight: 600; }
-    .stat { display: flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; background: #f5f5f5; }
+    .stat { display: flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; background: rgba(255,255,255,0.2); color: #fff; }
     .stat__dot { width: 10px; height: 10px; border-radius: 50%; }
 
     #map { flex: 1; min-height: 0; }
@@ -152,14 +152,7 @@
   <div class="kommune-banner" id="kommuneBanner">
     &#x1F4CD; Radwegecheck <span class="kommune-banner__name" id="kommuneName"></span>
     <span class="kommune-banner__info" id="kommuneInfo"></span>
-  </div>
-
-  <div class="header">
-    <div class="header__brand">
-      <div class="header__title"><span>Radwege</span><span>melder</span></div>
-      <div class="header__subtitle" id="subtitle">Gemeinde-Ansicht &#183; Saarland</div>
-    </div>
-    <div class="header__stats" id="stats"></div>
+    <span id="stats" style="margin-left:auto; display:flex; gap:8px;"></span>
   </div>
 
   <div id="map"></div>
@@ -285,7 +278,8 @@
 
         document.getElementById('kommuneBanner').classList.add('active');
         document.getElementById('kommuneName').textContent = kommuneName;
-        document.getElementById('subtitle').textContent = 'Gemeinde-Ansicht \u00B7 ' + kommuneName;
+        var subtitleEl = document.getElementById('subtitle');
+        if (subtitleEl) subtitleEl.textContent = 'Gemeinde-Ansicht \u00B7 ' + kommuneName;
 
         if (paramVon || paramBis) {
           var vonStr = paramVon || '\u2026';

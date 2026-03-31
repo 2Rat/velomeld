@@ -133,13 +133,6 @@
     <span class="kommune-banner__info" id="kommuneInfo"></span>
   </div>
 
-  <div class="header">
-    <div class="header__brand">
-      <div class="header__title"><span>Radwege</span><span>melder</span></div>
-      <div class="header__subtitle" id="subtitle">Ergebnisse &#183; Saarland</div>
-    </div>
-  </div>
-
   <div class="content">
     <div class="loading" id="loading">
       <div class="loading__spinner"></div>
@@ -246,7 +239,8 @@
           var kommuneName = data[0].display_name.split(',')[0];
           document.getElementById('kommuneBanner').classList.add('active');
           document.getElementById('kommuneName').textContent = paramTitel || kommuneName;
-          document.getElementById('subtitle').textContent = 'Ergebnisse \u00B7 ' + (paramTitel || kommuneName);
+          var subtitleEl = document.getElementById('subtitle');
+          if (subtitleEl) subtitleEl.textContent = 'Ergebnisse \u00B7 ' + (paramTitel || kommuneName);
           document.title = (paramTitel || ('Radwegecheck ' + kommuneName)) + ' \u2013 Radwegemelder';
 
           if (paramVon || paramBis) {
