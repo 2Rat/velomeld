@@ -1,8 +1,11 @@
-// 2Rat Radwegemelder – Service Worker v6
-const CACHE_NAME = 'radmelder-v6';
+// 2Rat Radwegemelder – Service Worker v7
+// FIX 2026-04-16: clone() vor return r aufrufen (war Race-Condition)
+//                 Version-Bump v6 -> v7 erzwingt Update auf allen Geraeten
+const CACHE_NAME = 'radmelder-v7';
 const BASE = self.location.pathname.replace(/\/sw\.js$/, '/');
+
 self.addEventListener('install', (event) => {
-  console.log('[SW] Install v6');
+  console.log('[SW] Install v7');
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       const urls = ['', 'index.html', 'manifest.json', 'datenschutz.html', 'whitelabel.js'].map(p => BASE + p);
@@ -14,31 +17,47 @@ self.addEventListener('install', (event) => {
   );
   self.skipWaiting();
 });
+
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))))
   );
   self.clients.claim();
 });
+
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
+
   // Supabase API: immer direkt zum Netz, kein Cache
   if (url.hostname.includes('supabase')) return;
-  // Nominatim (Geocoding für White-Label): immer Netz, kein Cache
+
+  // Nominatim (Geocoding fuer White-Label): immer Netz, kein Cache
   if (url.hostname.includes('nominatim')) return;
+
   // OSM Tiles: Network-first
   if (url.hostname.includes('tile.openstreetmap.org')) {
     event.respondWith(
       fetch(event.request)
-        .then(r => { caches.open(CACHE_NAME).then(c => c.put(event.request, r.clone())); return r; })
+        .then(r => {
+          // FIX 2026-04-16: clone() VOR return r, damit Body nicht schon konsumiert ist
+          const clone = r.clone();
+          caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
+          return r;
+        })
         .catch(() => caches.match(event.request))
     );
     return;
   }
+
   // App + Libraries: Network-first, Cache-Fallback
   event.respondWith(
     fetch(event.request)
-      .then(r => { caches.open(CACHE_NAME).then(c => c.put(event.request, r.clone())); return r; })
+      .then(r => {
+        // FIX 2026-04-16: clone() VOR return r
+        const clone = r.clone();
+        caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
+        return r;
+      })
       .catch(() => caches.match(event.request))
   );
 });
