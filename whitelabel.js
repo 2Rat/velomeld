@@ -96,7 +96,7 @@
           '<div style="font-weight:800; font-size:22px; letter-spacing:2px; text-transform:uppercase; color:' + escHtml(mainColor) + '; line-height:1.1;">' + escHtml(titel) + '</div>';
       }
 
-      header.style.cssText = 'display:flex; align-items:center; gap:14px; padding:16px 20px; background:#fff; border-bottom:none; box-shadow:0 2px 8px rgba(0,0,0,0.06); flex-shrink:0;';
+      header.style.cssText = 'display:flex; align-items:center; justify-content:center; gap:14px; padding:16px 20px; background:#fff; border-bottom:none; box-shadow:0 2px 8px rgba(0,0,0,0.06); flex-shrink:0;';
       header.innerHTML =
         bikeSvg +
         '<div>' +
