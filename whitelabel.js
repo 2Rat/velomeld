@@ -82,7 +82,7 @@
       // RADWEGECHECK in Blau, Kommune-Name in Gruen
       var bikeColor = '#1A5FA8';
       var stadtColor = '#2D8C28';
-      var bikeSvg = '<svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="' + bikeColor + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5V14l-3-3 4-3 2 3h2"/></svg>';
+      var bikeSvg = '<svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="' + bikeColor + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5V14l-3-3 4-3 2 3h2"/></svg>';
 
       var textBlock;
       if (paramKommune && !paramTitel) {
@@ -96,7 +96,7 @@
           '<div style="font-weight:800; font-size:22px; letter-spacing:2px; text-transform:uppercase; color:' + escHtml(mainColor) + '; line-height:1.1;">' + escHtml(titel) + '</div>';
       }
 
-      header.style.cssText = 'display:grid; grid-template-columns:1fr 1fr; align-items:center; padding:16px 20px; background:#fff; border-bottom:none; box-shadow:0 2px 8px rgba(0,0,0,0.06); flex-shrink:0;';
+      header.style.cssText = 'display:grid; grid-template-columns:38fr 62fr; align-items:center; padding:16px 20px; background:#fff; border-bottom:none; box-shadow:0 2px 8px rgba(0,0,0,0.06); flex-shrink:0;';
       header.innerHTML =
         '<div style="display:flex; justify-content:center;">' + bikeSvg + '</div>' +
         '<div>' +
