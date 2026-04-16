@@ -78,12 +78,32 @@
       }
     }
     if (header) {
-      header.innerHTML = 
-        '<div style="font-weight:800; font-size:24px; letter-spacing:3px; text-transform:uppercase; color:' + escHtml(mainColor) + ';">' +
-          '\uD83D\uDEB2 ' + escHtml(titel) +
-        '</div>' +
-        '<div style="font-size:11px; color:#8A9BA4; font-weight:500; margin-top:3px; letter-spacing:0.3px;">' +
-          escHtml(untertitel) +
+      // FIX 2026-04-16: Neues Layout - Bike-SVG links, Text gestapelt rechts
+      // RADWEGECHECK in Blau, Kommune-Name in Gruen
+      var bikeColor = '#1A5FA8';
+      var stadtColor = '#2D8C28';
+      var bikeSvg = '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="' + bikeColor + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5V14l-3-3 4-3 2 3h2"/></svg>';
+
+      var textBlock;
+      if (paramKommune && !paramTitel) {
+        // Standard-Fall: zweizeilig RADWEGECHECK / KOMMUNE
+        textBlock =
+          '<div style="font-weight:800; font-size:22px; letter-spacing:2px; text-transform:uppercase; color:' + escHtml(bikeColor) + '; line-height:1.1;">Radwegecheck</div>' +
+          '<div style="font-weight:800; font-size:22px; letter-spacing:2px; text-transform:uppercase; color:' + escHtml(stadtColor) + '; line-height:1.1;">' + escHtml(paramKommune) + '</div>';
+      } else {
+        // Custom-Titel: einzeilig wie bisher
+        textBlock =
+          '<div style="font-weight:800; font-size:22px; letter-spacing:2px; text-transform:uppercase; color:' + escHtml(mainColor) + '; line-height:1.1;">' + escHtml(titel) + '</div>';
+      }
+
+      header.style.cssText = 'display:flex; align-items:center; gap:14px; padding:16px 20px; background:#fff; border-bottom:none; box-shadow:0 2px 8px rgba(0,0,0,0.06); flex-shrink:0;';
+      header.innerHTML =
+        bikeSvg +
+        '<div>' +
+          textBlock +
+          '<div style="font-size:11px; color:#8A9BA4; font-weight:500; margin-top:4px; letter-spacing:0.3px;">' +
+            escHtml(untertitel) +
+          '</div>' +
         '</div>';
       console.log('[White-Label] Header → ' + titel);
     }
