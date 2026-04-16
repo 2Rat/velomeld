@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Radwegemelder – Ergebnisse</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     :root {
       --red: #E00000; --yellow: #E5A700; --green: #00A836;
@@ -124,6 +126,15 @@
       .cat-item { padding: 10px 14px; min-width: 80px; }
       .cat-item__count { font-size: 22px; }
     }
+
+    /* FIX 2026-04-16: Karten-Modus (?modus=karte) */
+    .map-container { display: none; width: 100%; max-width: 800px; height: 50vh; min-height: 320px;
+      border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      margin-bottom: 12px; }
+    .map-container.active { display: block; }
+    .map-hint { font-size: 11px; color: var(--gray-mid); text-align: center;
+      max-width: 800px; margin: 0 auto 16px; padding: 0 16px; line-height: 1.5; }
+    .map-hint strong { color: var(--gray); }
   </style>
 </head>
 <body>
@@ -137,6 +148,13 @@
     <div class="loading" id="loading">
       <div class="loading__spinner"></div>
       Meldungen werden geladen&#8230;
+    </div>
+
+    <!-- FIX 2026-04-16: Karten-Modus -->
+    <div class="map-container" id="mapContainer"></div>
+    <div class="map-hint" id="mapHint" style="display:none;">
+      &#x1F512; <strong>Datenschutz:</strong> Die angezeigten Standorte sind aus Datenschutzgründen um ca. 80&#8239;m verschoben.
+      So bleiben Wohnadressen anonym. Die genaue Auswertung erfolgt intern bei der Verwaltung.
     </div>
 
     <div class="stats-card" id="statsCard" style="display:none;">
@@ -211,6 +229,47 @@
     var paramVon = params.get('von');
     var paramBis = params.get('bis');
     var paramTitel = params.get('titel');
+    var paramModus = params.get('modus');  // FIX 2026-04-16: 'karte' oder leer
+
+    // FIX 2026-04-16: Geofence-Polygon der Kommune (wird beim Nominatim-Aufruf befuellt)
+    var kommuneGeoJson = null;
+
+    // FIX 2026-04-16: Pruefen ob Punkt im Polygon liegt (Ray-Casting, ohne Leaflet)
+    function inPolygonRing(lat, lng, ring) {
+      var ins = false;
+      for (var i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+        var xi = ring[i][0], yi = ring[i][1];
+        var xj = ring[j][0], yj = ring[j][1];
+        if ((yi > lat) !== (yj > lat) && lng < (xj - xi) * (lat - yi) / (yj - yi) + xi) {
+          ins = !ins;
+        }
+      }
+      return ins;
+    }
+    function inGeoJson(lat, lng, geojson) {
+      if (!geojson) return true;  // kein Polygon -> nicht filtern
+      if (geojson.type === 'Polygon') {
+        return inPolygonRing(lat, lng, geojson.coordinates[0]);
+      }
+      if (geojson.type === 'MultiPolygon') {
+        for (var p = 0; p < geojson.coordinates.length; p++) {
+          if (inPolygonRing(lat, lng, geojson.coordinates[p][0])) return true;
+        }
+        return false;
+      }
+      return true;
+    }
+
+    // FIX 2026-04-16: Punkt zufaellig 80m verschieben (Datenschutz)
+    function verschiebePunkt(lat, lng) {
+      var R = 6378137;
+      var winkel = Math.random() * 2 * Math.PI;
+      var dx = 80 * Math.cos(winkel);
+      var dy = 80 * Math.sin(winkel);
+      var dLat = dy / R * (180 / Math.PI);
+      var dLng = dx / (R * Math.cos(lat * Math.PI / 180)) * (180 / Math.PI);
+      return [lat + dLat, lng + dLng];
+    }
 
     if (paramKommune) {
       var al = document.getElementById('appLink');
@@ -231,12 +290,17 @@
 
       // Kommune-Banner
       try {
-        var res = await fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(paramKommune + ', Saarland, Deutschland') + '&format=json&limit=1', {
+        // FIX 2026-04-16: polygon_geojson=1 fuer Geofence-Filter
+        var res = await fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(paramKommune + ', Saarland, Deutschland') + '&format=json&polygon_geojson=1&limit=1', {
           headers: { 'User-Agent': '2Rat-Radwegemelder/1.0' }
         });
         var data = await res.json();
         if (data.length) {
           var kommuneName = data[0].display_name.split(',')[0];
+          // FIX 2026-04-16: Polygon merken fuer spaetere Filterung
+          if (data[0].geojson && (data[0].geojson.type === 'Polygon' || data[0].geojson.type === 'MultiPolygon')) {
+            kommuneGeoJson = data[0].geojson;
+          }
           document.getElementById('kommuneBanner').classList.add('active');
           document.getElementById('kommuneName').textContent = paramTitel || kommuneName;
           var subtitleEl = document.getElementById('subtitle');
@@ -251,7 +315,8 @@
 
       // Meldungen laden
       try {
-        var url = SUPABASE_URL + '/rest/v1/reports?select=category,subcategory,timestamp&order=timestamp.desc&limit=5000&or=(subcategory.neq.other_problem,status.eq.approved)';
+        // FIX 2026-04-16: latitude/longitude mitladen fuer Geofence + Karten-Modus
+        var url = SUPABASE_URL + '/rest/v1/reports?select=category,subcategory,timestamp,latitude,longitude&order=timestamp.desc&limit=5000&or=(subcategory.neq.other_problem,status.eq.approved)';
         var resp = await fetch(url, { headers: { 'apikey': SUPABASE_KEY } });
         if (!resp.ok) throw new Error('HTTP ' + resp.status);
         var reports = await resp.json();
@@ -259,6 +324,13 @@
         // Nach Zeitraum filtern
         if (paramVon) reports = reports.filter(function(r) { return r.timestamp && r.timestamp >= paramVon; });
         if (paramBis) reports = reports.filter(function(r) { return r.timestamp && r.timestamp <= paramBis + 'T23:59:59'; });
+
+        // FIX 2026-04-16: Geofence-Filter - nur Meldungen innerhalb der Kommunengrenze zeigen
+        if (kommuneGeoJson) {
+          reports = reports.filter(function(r) {
+            return r.latitude && r.longitude && inGeoJson(r.latitude, r.longitude, kommuneGeoJson);
+          });
+        }
 
         var total = reports.length;
         var counts = { problems: 0, wishes: 0, positive: 0 };
@@ -301,9 +373,59 @@
         document.getElementById('statsCard').style.display = 'block';
         document.getElementById('ctaBox').style.display = 'block';
 
+        // FIX 2026-04-16: Karten-Modus aktivieren wenn ?modus=karte
+        if (paramModus === 'karte' && total > 0) {
+          zeigeKarte(reports);
+        }
+
       } catch (err) {
         console.error('Fehler:', err);
         document.getElementById('loading').innerHTML = '\u274C Meldungen konnten nicht geladen werden';
+      }
+    }
+
+    // FIX 2026-04-16: Leaflet-Karte mit verschobenen Punkten zeigen (Karten-Modus)
+    function zeigeKarte(reports) {
+      var mapCont = document.getElementById('mapContainer');
+      var mapHint = document.getElementById('mapHint');
+      mapCont.classList.add('active');
+      mapHint.style.display = 'block';
+
+      var map = L.map('mapContainer');
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap', maxZoom: 19
+      }).addTo(map);
+
+      // Polygon der Kommune einzeichnen
+      if (kommuneGeoJson) {
+        var poly = L.geoJSON(kommuneGeoJson, {
+          style: { color: '#1A5FA8', weight: 2, fillColor: '#1A5FA8', fillOpacity: 0.05, dashArray: '6,4' }
+        }).addTo(map);
+        map.fitBounds(poly.getBounds(), { padding: [20, 20] });
+      }
+
+      // Farben pro Kategorie
+      var farben = { problems: '#E00000', wishes: '#E5A700', positive: '#00A836' };
+
+      // Verschobene Marker setzen
+      reports.forEach(function(r) {
+        if (!r.latitude || !r.longitude) return;
+        var v = verschiebePunkt(r.latitude, r.longitude);
+        var farbe = farben[r.category] || '#3D4F58';
+        var marker = L.circleMarker(v, {
+          radius: 7, fillColor: farbe, color: '#fff', weight: 2,
+          opacity: 1, fillOpacity: 0.85
+        }).addTo(map);
+        var label = SUB_LABELS[r.subcategory] || r.subcategory || '';
+        marker.bindPopup('<div style="font-family:DM Sans,sans-serif;font-size:13px;">' + label + '</div>');
+      });
+
+      // Falls kein Polygon vorhanden: auf Marker-Bounds zentrieren
+      if (!kommuneGeoJson && reports.length > 0) {
+        var bounds = reports
+          .filter(function(r) { return r.latitude && r.longitude; })
+          .map(function(r) { return verschiebePunkt(r.latitude, r.longitude); });
+        if (bounds.length) map.fitBounds(L.latLngBounds(bounds), { padding: [20, 20] });
       }
     }
 
