@@ -2379,10 +2379,27 @@ async function loadReportCounter() {
       '⚠️ ' + counts.problems + '× Probleme · 💬 ' + counts.wishes + '× Wünsche · 👍 ' + counts.positive + '× Lob';
     document.getElementById('report-counter').style.display = 'block';
 
-    // 4. Link zur Ergebnisseite (nur Kommune-Parameter, keine Datumsfilter!)
+    // 4. Link zur Ergebnisseite
+    //    - keine Datumsfilter (laut Regel fuer oeffentliche Links)
+    //    - &modus=karte nur wenn projects.map_mode fuer diese Kommune = true
+    var mapMode = false;
+    try {
+      var pResp = await fetch(SUPABASE_URL + '/rest/v1/projects?select=map_mode&kommune=eq.' + encodeURIComponent(paramKommune) + '&order=created_at.desc&limit=1', {
+        headers: { 'apikey': SUPABASE_ANON_KEY }
+      });
+      if (pResp.ok) {
+        var pRows = await pResp.json();
+        if (pRows.length && pRows[0].map_mode === true) mapMode = true;
+      }
+    } catch (pe) {
+      console.warn('[Counter] Projekt-Lookup fehlgeschlagen, verwende Statistik-Default:', pe);
+    }
+
     var counterLink = document.getElementById('counter-link');
     if (counterLink) {
-      counterLink.href = './karte.html?kommune=' + encodeURIComponent(paramKommune);
+      var linkHref = './karte.html?kommune=' + encodeURIComponent(paramKommune);
+      if (mapMode) linkHref += '&modus=karte';
+      counterLink.href = linkHref;
     }
   } catch (e) {
     console.warn('[Counter] Fehler:', e);
