@@ -2280,40 +2280,109 @@ const state = {
   gpsAccuracy: null,
 };
 
-// ─── LIVE-MELDUNGSZÄHLER ───
+// ─── LIVE-MELDUNGSZÄHLER (mit Geofence-Filter) ───
+// Holt Geofence per Nominatim (wie gemeinde.html/karte.html/dashboard.html)
+// und filtert clientseitig, damit nur Meldungen der angefragten Kommune gezählt werden.
+
+var counterGfPoly = null;
+var counterGfBounds = null;
+var counterKommuneName = '';
+
+async function loadKommuneGeofenceForCounter(name) {
+  try {
+    const res = await fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(name + ', Saarland, Deutschland') + '&format=json&polygon_geojson=1&limit=1', {
+      headers: { 'User-Agent': '2Rat-Radwegemelder/1.0' }
+    });
+    const data = await res.json();
+    if (!data.length) { console.warn('[Counter] Kommune nicht gefunden:', name); return false; }
+    const r = data[0];
+    counterKommuneName = r.display_name.split(',')[0];
+    if (r.geojson && (r.geojson.type === 'Polygon' || r.geojson.type === 'MultiPolygon')) {
+      counterGfPoly = r.geojson;
+    } else if (r.boundingbox) {
+      counterGfBounds = {
+        south: +r.boundingbox[0], north: +r.boundingbox[1],
+        west:  +r.boundingbox[2], east:  +r.boundingbox[3]
+      };
+    }
+    return true;
+  } catch (e) {
+    console.warn('[Counter] Geofence-Fehler:', e);
+    return false;
+  }
+}
+
+function counterRaycast(pt, ring) {
+  // ring: Array von [lng, lat] (GeoJSON)
+  var ins = false;
+  for (var i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    var yi = ring[i][0], xi = ring[i][1]; // yi=lng, xi=lat
+    var yj = ring[j][0], xj = ring[j][1];
+    if ((yi > pt.lng) !== (yj > pt.lng) && pt.lat < (xj - xi) * (pt.lng - yi) / (yj - yi) + xi) ins = !ins;
+  }
+  return ins;
+}
+
+function counterInGeo(lat, lng) {
+  // Polygon bevorzugt
+  if (counterGfPoly) {
+    var polys = counterGfPoly.type === 'Polygon' ? [counterGfPoly.coordinates] : counterGfPoly.coordinates;
+    for (var p = 0; p < polys.length; p++) {
+      // erster Ring ist Außengrenze
+      if (counterRaycast({ lat: lat, lng: lng }, polys[p][0])) return true;
+    }
+    return false;
+  }
+  // Fallback BoundingBox
+  if (counterGfBounds) {
+    var b = counterGfBounds;
+    return lat >= b.south && lat <= b.north && lng >= b.west && lng <= b.east;
+  }
+  // Kein Geofence definiert -> nicht zählen (sicherer Default)
+  return false;
+}
 
 async function loadReportCounter() {
   // Nur anzeigen wenn Kommune-Parameter vorhanden
   if (window.location.search.indexOf('kommune=') === -1) return;
   try {
-    const resp = await fetch(SUPABASE_URL + '/rest/v1/reports?select=category', {
+    var params = new URLSearchParams(window.location.search);
+    var paramKommune = params.get('kommune');
+    if (!paramKommune) return;
+
+    // 1. Geofence per Nominatim holen
+    var ok = await loadKommuneGeofenceForCounter(paramKommune);
+    if (!ok) return;
+
+    // 2. Reports laden (mit Moderationsfilter wie in karte.html / gemeinde.html)
+    //    other_problem-Meldungen nur anzeigen, wenn status='approved'
+    const resp = await fetch(SUPABASE_URL + '/rest/v1/reports?select=category,subcategory,status,latitude,longitude&or=(subcategory.neq.other_problem,status.eq.approved)', {
       headers: { 'apikey': SUPABASE_ANON_KEY }
     });
     if (!resp.ok) return;
-    const reports = await resp.json();
-    const total = reports.length;
+    var all = await resp.json();
+
+    // 3. Geofence anwenden
+    var reports = all.filter(function(r) { return r.latitude && r.longitude && counterInGeo(r.latitude, r.longitude); });
+    var total = reports.length;
     if (total === 0) return;
 
-    const counts = { problems: 0, wishes: 0, positive: 0 };
-    reports.forEach(r => {
+    var counts = { problems: 0, wishes: 0, positive: 0 };
+    reports.forEach(function(r) {
       if (counts.hasOwnProperty(r.category)) counts[r.category]++;
     });
 
+    var name = counterKommuneName || paramKommune;
     document.getElementById('counter-total').textContent =
-      '📊 Schon ' + total + ' Meldungen eingegangen!';
+      '📊 Schon ' + total + ' Meldung' + (total === 1 ? '' : 'en') + ' in ' + name + '!';
     document.getElementById('counter-categories').textContent =
       '⚠️ ' + counts.problems + '× Probleme · 💬 ' + counts.wishes + '× Wünsche · 👍 ' + counts.positive + '× Lob';
     document.getElementById('report-counter').style.display = 'block';
 
-    // Link zur Ergebnisseite nur mit Kommune-Parameter
+    // 4. Link zur Ergebnisseite (nur Kommune-Parameter, keine Datumsfilter!)
     var counterLink = document.getElementById('counter-link');
     if (counterLink) {
-      var qs = window.location.search;
-      if (qs && qs.indexOf('kommune=') !== -1) {
-        counterLink.href = './karte.html' + qs;
-      } else {
-        counterLink.style.display = 'none';
-      }
+      counterLink.href = './karte.html?kommune=' + encodeURIComponent(paramKommune);
     }
   } catch (e) {
     console.warn('[Counter] Fehler:', e);
