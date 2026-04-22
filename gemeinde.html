@@ -267,13 +267,43 @@
     const paramTitel = params.get('titel');
 
     async function loadKommuneGeofence(name) {
+      // FIX 2026-04-22: Zweistufige Nominatim-Abfrage mit Admin-Filter
+      //   1. Mit Saarland-Suffix (Standardfall: Gemeinden/Kreise)
+      //   2. Fallback ohne Saarland-Suffix (fuer Bundeslaender wie "Saarland")
+      // Bevorzugt Treffer mit class=boundary/type=administrative, damit keine Uni/POI matcht.
+      async function _gQueryNominatim(query) {
+        var u = 'https://nominatim.openstreetmap.org/search?q='
+          + encodeURIComponent(query)
+          + '&format=json&polygon_geojson=1&addressdetails=1&limit=5';
+        var r = await fetch(u, { headers: { 'User-Agent': '2Rat-Radwegemelder/1.0' } });
+        if (!r.ok) return [];
+        return await r.json();
+      }
+      function _gPickAdmin(arr) {
+        if (!arr || !arr.length) return null;
+        var a = arr.find(function(x) { return x.class === 'boundary' && x.type === 'administrative'; });
+        return a || arr[0];
+      }
+
       try {
-        const res = await fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(name + ', Saarland, Deutschland') + '&format=json&polygon_geojson=1&limit=1', {
-          headers: { 'User-Agent': '2Rat-Radwegemelder/1.0' }
-        });
-        const data = await res.json();
-        if (!data.length) { console.warn('Kommune nicht gefunden:', name); return; }
-        const r = data[0];
+        var data1 = await _gQueryNominatim(name + ', Saarland, Deutschland');
+        console.log('[Gemeinde] Nominatim Versuch 1 (' + name + ', Saarland, Deutschland): '
+          + data1.length + ' Treffer',
+          data1.map(function(x) { return x.class + '/' + x.type + ' ' + x.display_name; }));
+        var r = _gPickAdmin(data1);
+        if (!r || r.class !== 'boundary') {
+          var data2 = await _gQueryNominatim(name + ', Deutschland');
+          console.log('[Gemeinde] Nominatim Versuch 2 (' + name + ', Deutschland): '
+            + data2.length + ' Treffer',
+            data2.map(function(x) { return x.class + '/' + x.type + ' ' + x.display_name; }));
+          var r2 = _gPickAdmin(data2);
+          if (r2 && r2.class === 'boundary') r = r2;
+          else if (!r && r2) r = r2;
+        }
+
+        if (!r) { console.warn('Kommune nicht gefunden:', name); return; }
+        console.log('[Gemeinde] Gewaehlt:', r.class + '/' + r.type, r.display_name);
+
         kommuneName = r.display_name.split(',')[0];
 
         document.getElementById('kommuneBanner').classList.add('active');

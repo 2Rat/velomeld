@@ -174,24 +174,53 @@
   }
 
   // ─── Geocoding ───
+  // FIX 2026-04-22: Zweistufige Nominatim-Abfrage mit Admin-Filter
+  //   1. Mit Saarland-Suffix (Standardfall: Gemeinden/Kreise)
+  //   2. Fallback ohne Saarland-Suffix (fuer Bundeslaender wie "Saarland")
+  // Bevorzugt Treffer mit class=boundary/type=administrative, damit keine Uni/POI matcht.
+  function _wlQueryNominatim(query) {
+    var url = 'https://nominatim.openstreetmap.org/search?q=' +
+      encodeURIComponent(query) +
+      '&format=json&addressdetails=1&limit=5';
+    return fetch(url, { headers: { 'User-Agent': '2Rat-Radwegemelder/1.0' } })
+      .then(function(res) { return res.ok ? res.json() : []; })
+      .catch(function() { return []; });
+  }
+
+  function _wlPickAdmin(arr) {
+    if (!arr || !arr.length) return null;
+    var a = arr.filter(function(x) { return x.class === 'boundary' && x.type === 'administrative'; })[0];
+    return a || arr[0];
+  }
+
   function geocodeKommune(name) {
-    var url = 'https://nominatim.openstreetmap.org/search?q=' + 
-      encodeURIComponent(name + ', Saarland, Deutschland') + 
-      '&format=json&limit=1';
-    
-    fetch(url, { headers: { 'User-Agent': '2Rat-Radwegemelder/1.0' } })
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
-      if (data.length > 0) {
-        var lat = parseFloat(data[0].lat);
-        var lon = parseFloat(data[0].lon);
-        trySetMapView(lat, lon, name);
-      } else {
-        console.warn('[White-Label] Kommune nicht gefunden: ' + name);
+    _wlQueryNominatim(name + ', Saarland, Deutschland').then(function(data1) {
+      console.log('[White-Label] Nominatim Versuch 1 (' + name + ', Saarland, Deutschland): ' +
+        data1.length + ' Treffer',
+        data1.map(function(x) { return x.class + '/' + x.type + ' ' + x.display_name; }));
+      var r = _wlPickAdmin(data1);
+      if (r && r.class === 'boundary') {
+        console.log('[White-Label] Gewaehlt:', r.class + '/' + r.type, r.display_name);
+        trySetMapView(parseFloat(r.lat), parseFloat(r.lon), name);
+        return;
       }
-    })
-    .catch(function(err) {
-      console.warn('[White-Label] Geocoding fehlgeschlagen:', err);
+      // 2. Versuch fuer Bundeslaender
+      _wlQueryNominatim(name + ', Deutschland').then(function(data2) {
+        console.log('[White-Label] Nominatim Versuch 2 (' + name + ', Deutschland): ' +
+          data2.length + ' Treffer',
+          data2.map(function(x) { return x.class + '/' + x.type + ' ' + x.display_name; }));
+        var r2 = _wlPickAdmin(data2);
+        if (r2) {
+          console.log('[White-Label] Gewaehlt:', r2.class + '/' + r2.type, r2.display_name);
+          trySetMapView(parseFloat(r2.lat), parseFloat(r2.lon), name);
+        } else if (r) {
+          // Notnagel: erster Treffer aus Versuch 1, auch wenn kein Boundary
+          console.log('[White-Label] Gewaehlt (Fallback):', r.class + '/' + r.type, r.display_name);
+          trySetMapView(parseFloat(r.lat), parseFloat(r.lon), name);
+        } else {
+          console.warn('[White-Label] Kommune nicht gefunden: ' + name);
+        }
+      });
     });
   }
 
