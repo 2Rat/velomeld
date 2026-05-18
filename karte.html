@@ -402,8 +402,8 @@
         document.getElementById('statsCard').style.display = 'block';
         document.getElementById('ctaBox').style.display = 'block';
 
-        // FIX 2026-04-16: Karten-Modus aktivieren wenn ?modus=karte
-        if (paramModus === 'karte' && total > 0) {
+        // FIX 2026-05-18: Karten-Modus auch bei 0 Meldungen anzeigen (frische Aktionen)
+        if (paramModus === 'karte') {
           zeigeKarte(reports);
         }
 
