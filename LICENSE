@@ -1,39 +1,86 @@
-Copyright (c) 2026 2RAT - Buero fuer Radverkehrsplanung
+Copyright (c) 2026 2Rat – Büro für Radverkehrsplanung
 Armin Jung, Radverkehrsplaner EIPOS
 Lebach, Saarland, Deutschland
 
-LIZENZ - SOURCE AVAILABLE / PROPRIETAER
+LIZENZ – SOURCE AVAILABLE / PROPRIETÄR
+Stand: Juli 2026
+
+GELTUNGSBEREICH
+   Diese Lizenz gilt für den gesamten Inhalt dieses Repositorys, also
+   für den Radwegemelder / Velomeld einschließlich der Kommunen- und
+   Pro-Ansichten, veröffentlicht unter
+   https://2rat.github.io/velomeld/
+   Die übrige Webseite unter 2rat.org sowie die dort bereitgestellten
+   Planungswerkzeuge liegen in einem eigenen Repository und
+   unterliegen der dort hinterlegten Lizenz.
 
 1. EINSICHTNAHME
-   Der Quellcode dieses Projekts ist oeffentlich einsehbar.
-   Dies stellt KEINE Freigabe zur Nutzung, Vervielfaeltigung
+   Der Quellcode dieses Projekts ist öffentlich einsehbar.
+   Dies stellt KEINE Freigabe zur Nutzung, Vervielfältigung
    oder Weiterverbreitung dar.
 
 2. NICHT GESTATTET ohne schriftliche Genehmigung:
-   - Kommerzielle Nutzung jeder Art
-   - Kopieren, Forken oder Klonen zum Zweck eigener Projekte
+   Die folgenden Beschränkungen beziehen sich auf den Quellcode und die
+   Software als solche. Die bestimmungsgemäße Nutzung der Anwendung im
+   Browser nach Punkt 3 bleibt davon unberührt.
+
+   - Verwertung des Quellcodes für eigene Projekte oder für eine
+     gewerbliche Weiterverwendung, gleich auf welchem Weg er beschafft
+     wurde. Ein über die Funktionen der Hosting-Plattform angelegter
+     Fork darf insbesondere nicht genutzt werden, um daraus eigene
+     Anwendungen weiterzuentwickeln, zu veröffentlichen oder eigene
+     Instanzen zu betreiben.
    - Modifikation und Weiterverbreitung
    - Hosting eigener Instanzen dieser Software
-   - Nutzung des Quellcodes als Vorlage fuer aehnliche Produkte
+   - Nutzung des Quellcodes als Vorlage für ähnliche Produkte
 
 3. GESTATTET:
    - Einsichtnahme des Quellcodes zu Lern- und Informationszwecken
    - Melden von Fehlern via GitHub Issues
-   - Nutzung der App unter velomeld.2rat.org durch Buerger und Kommunen
+   - Bestimmungsgemäße Nutzung der Anwendung im Browser unter
+     https://2rat.github.io/velomeld/ durch Bürgerinnen, Bürger und
+     Kommunen, einschließlich der kommunenspezifischen Ansichten
+   - Nutzung der Pro-Funktionen im Umfang einer gültigen
+     Zugangslizenz
+
+   Die Erlaubnis zur Nutzung umfasst nicht das Recht, die Anwendung
+   herunterzuladen, zu verändern oder selbst bereitzustellen.
 
 4. KOMMUNALE NUTZUNG
-   Kommunen koennen eine Nutzungslizenz im Rahmen einer
-   Zusammenarbeit mit 2RAT erwerben. Kontakt: fahr2rat@gmail.com
+   Kommunen können eine Nutzungslizenz im Rahmen einer
+   Zusammenarbeit mit 2Rat erwerben. Kontakt: fahr2rat@gmail.com
 
-5. MARKENRECHT
-   Velomeld, Radwegemelder, 2RAT und zugehoerige Logos sind
-   geschuetzte Geschaeftsbezeichnungen.
+5. KENNZEICHEN
+   2Rat ist die Geschäftsbezeichnung des Betreibers; Velomeld und
+   Radwegemelder werden als Bezeichnungen dieser Anwendung geführt.
+   Logos, Wort-Bild-Marken und Gestaltung sind urheberrechtlich
+   geschützt und dürfen nicht übernommen werden.
 
-6. HAFTUNGSAUSSCHLUSS
+6. RECHTE DRITTER
+   Eingebundene Bestandteile Dritter unterliegen den Lizenzbedingungen
+   ihrer jeweiligen Rechteinhaber. Diese bleiben von dieser Lizenz
+   unberührt und gehen ihr vor. Das betrifft insbesondere:
+
+   - Kartendaten: Kartendarstellungen beruhen auf Daten von
+     OpenStreetMap, (c) OpenStreetMap-Mitwirkende, veröffentlicht unter
+     der Open Database License (ODbL). Die Namensnennung erfolgt in
+     der Anwendung.
+   - Schriften und Bildmaterial: unterliegen den Bedingungen der
+     jeweiligen Rechteinhaber; mitgelieferte Lizenztexte liegen den
+     betreffenden Dateien bei.
+
+7. NUTZERINHALTE UND HAFTUNG FÜR INHALTE
+   Die Meldungen in der Anwendung und auf der öffentlichen Karte
+   werden von Nutzerinnen und Nutzern erstellt. 2Rat übernimmt keine
+   Gewähr für Richtigkeit, Vollständigkeit oder Aktualität der
+   gemeldeten Inhalte. Offensichtlich rechtswidrige Inhalte werden
+   nach Bekanntwerden umgehend entfernt.
+
+8. HAFTUNGSAUSSCHLUSS
    DIE SOFTWARE WIRD WIE BESEHEN BEREITGESTELLT, OHNE JEGLICHE
-   GEWAEHRLEISTUNG.
+   GEWÄHRLEISTUNG.
 
-7. GELTENDES RECHT
-   Es gilt deutsches Recht. Gerichtsstand ist Saarbruecken.
+9. GELTENDES RECHT
+   Es gilt deutsches Recht. Gerichtsstand ist Saarbrücken.
 
-Fuer Lizenzanfragen: fahr2rat@gmail.com
+Für Lizenzanfragen: fahr2rat@gmail.com
